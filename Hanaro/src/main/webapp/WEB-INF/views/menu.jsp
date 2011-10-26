@@ -1,0 +1,45 @@
+<%@ page contentType="text/html; charset=UTF-8" %>
+
+<!-- 메뉴그룹 level 1 -->
+<table style="width:100%; white-space: nowrap;">
+	<tr>
+		<td style="text-align:left;">
+			<div style="white-space: nowrap;"><!-- 좌측상단 메인 메뉴 -->
+				<a href="#" class="easyui-menubutton" menu="#qualityDivision" iconCls="icon-candlestickchart"><fmt:message key="menu.qualityDivision"/></a>
+			    
+			</div>
+		</td>
+		<td style="text-align:right;">
+			<div style="white-space: nowrap;"><!-- 우측 상단. 제어판 기능. (홈버튼,언어선택, 개인설정, 로그아웃) -->
+				<a href='<c:url value="/home"/>' class="easyui-linkbutton" iconCls="icon-house" plain="true"></a>
+				<a href="?locale=ko_KR" class="easyui-linkbutton" iconCls="icon-flag-kr" plain="true"></a>
+				<a href="?locale=zh_CN" class="easyui-linkbutton" iconCls="icon-flag-cn" plain="true"></a>
+				<a href="?locale=en_IN" class="easyui-linkbutton" iconCls="icon-flag-in" plain="true"></a>
+				<a href="?locale=cs_CZ" class="easyui-linkbutton" iconCls="icon-flag-cz" plain="true"></a>
+				<a href="?locale=pt_BR" class="easyui-linkbutton" iconCls="icon-flag-br" plain="true"></a>
+			    <a href="#" class="easyui-splitbutton" menu="#userDetails" iconCls="icon-user-gray">${pageContext.request.userPrincipal.name}</a>  
+			    <a href='<c:url value="/j_spring_security_logout" />' class="easyui-linkbutton" iconCls="icon-door-out" plain="true"><fmt:message key="system.logout"/></a> 
+			</div>
+		</td> 
+	</tr>  
+</table>
+
+<!--서브메뉴 level2 -->
+
+<!-- 사용자 서브메뉴 -->
+<div id="userDetails" style="width:150px;">  
+    <div iconCls="icon-change-password"><fmt:message key="menu.changePassword"/></div>   
+</div>
+
+<!-- 품질부문 서브메뉴 -->
+<div id="qualityDivision" style="width:150px;">
+	<div style="white-space: nowrap;"><fmt:message key="menu.qualityManagement"/>      	
+	<div style="width:150px;">			
+			<div href='<c:url value="/qualityDivision/qualityIssue/qualityIssueReg"/>'><fmt:message key="menu.qualityIssueReg"/></div>
+			<div ><fmt:message key="menu.qualityIssueProduce"/></div>
+			<div ><fmt:message key="menu.qualityNcrManagement"/></div>
+			<div ><fmt:message key="menu.qualityNcrStatus"/></div>			
+			<div ><fmt:message key="menu.qualityClaimSearch"/></div>
+	</div>
+	</div>
+</div>

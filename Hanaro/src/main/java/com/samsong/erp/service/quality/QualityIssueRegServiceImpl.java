@@ -1,0 +1,38 @@
+package com.samsong.erp.service.quality;
+
+
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.samsong.erp.dao.quality.QualityIssueRegDAO;
+import com.samsong.erp.model.quality.QualityIssueRegSheet;
+
+@Service
+public class QualityIssueRegServiceImpl implements QualityIssueRegService {
+
+	@Autowired
+	private QualityIssueRegDAO dao;
+	
+	public Map<String,Object>  getCodeDefectSource(Locale locale, String parentCode) {		
+		return dao.getCodeDefectSource(locale, parentCode);
+	}
+
+	public List<Map<String, Object>> getOccurPartListForReg(Locale locale,
+			String uid, String partType, String q) {		 
+		return dao.getOccurPartListForReg(locale, uid, partType, q);
+	}
+
+	@Override
+	public Map<String, Object> getCodeDefect(Locale locale, int searchLevel,
+			String code) {
+		return dao.getCodeDefect(locale, searchLevel, code);
+	}
+
+	@Override
+	public void procQualityIssueReg(String procType, Locale locale, QualityIssueRegSheet sheet, String user) { 
+		dao.procQualityIssueReg(procType, locale, sheet, user);
+	}
+
+}

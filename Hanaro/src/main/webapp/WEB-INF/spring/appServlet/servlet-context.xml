@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
+	
+	<!-- 어노테이션을 통한 스테레오 타입 DI -->
+	<!-- Enables the Spring MVC @Controller programming model -->
+	<annotation-driven />
+	<context:component-scan base-package="com.samsong.erp"  />
+
+	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
+	<resources mapping="/resources/**" location="/resources/" />
+
+	<!-- 지역화 인터셉터 설정 -->
+	<interceptors>
+	<!-- locale 파라메터 감지 -->
+	<beans:bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor"></beans:bean>
+	</interceptors>
+	
+	<!-- locale 리졸버 설정 (쿠키사용)-->
+	<beans:bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver"></beans:bean>
+	
+	<!-- 메시지 번들 사용 -->
+	<beans:bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+	<beans:property name="basename" value="/WEB-INF/messages/messages"></beans:property>
+	<beans:property name="cacheSeconds" value="0"></beans:property>
+	<beans:property name="defaultEncoding" value="UTF-8"></beans:property>
+	</beans:bean>
+	
+	
+	
+	<!-- 뷰 리졸버 설정 .jsp -->
+	<beans:bean id="viewResolver1"  class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+		<beans:property name="prefix" value="/WEB-INF/views/" />
+		<beans:property name="suffix" value=".jsp" />
+		<beans:property name="order" value="0"></beans:property>
+	</beans:bean>
+	
+			
+	<!-- 뷰 리졸버 설정 for excel,pdf ...-->
+	<beans:bean id="viewResolver2" class="org.springframework.web.servlet.view.ResourceBundleViewResolver">
+		<beans:property name="basename" value="views"/>
+		<beans:property name="order" value="1"></beans:property>
+	</beans:bean>
+	
+	
+		
+	
+	<!--  Exception 리졸버 설정  -->
+	<beans:bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<beans:property name="exceptionMappings">
+			<beans:props>
+				<!--<beans:prop key="org.springframework.web.servlet.PageNotFound">pageNotFound</beans:prop> -->
+				<beans:prop key="org.springframework.dao.DataAccessException">dataAccessFailure</beans:prop>
+				<beans:prop key="org.springframework.transaction.TransactionException">dataAccessFailure</beans:prop>
+			</beans:props>
+		</beans:property>
+	</beans:bean>
+	
+	<!-- 멀티파트 리졸버 설정-->
+	<beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<beans:property name="maxUploadSize" value="104857600"/> <!-- 업로드 파일 사이즈 100MB까지 -->
+	</beans:bean>
+</beans:beans>

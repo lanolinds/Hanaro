@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+		<global-method-security/>
+		
+		<http use-expressions="true" entry-point-ref="hanaroAuthEntryPoint" access-denied-page="/accessDenied" >
+		<intercept-url pattern="/index.jsp" filters="none"/><!-- index 는 더미로 활용했다. security 필터 해지. -->
+		<intercept-url pattern="/resources/**"  filters="none"/> <!--  공용 자원은 security 필터 적용 안함. -->
+		<intercept-url pattern="/login" access="isAnonymous()"/> <!-- 로그인 페이지는 익명 사용자 접근 허용. -->
+ 		<intercept-url pattern="/home" access="hasAnyRole('ROLE_USER','ROLE_CUST')"/><!-- 기본 사용자 역할 --> 		
+ 		<intercept-url pattern="/qualityDivision/**" access="hasAnyRole('ROLE_USER','ROLE_CUST')"/><!-- 기본 사용자 역할 -->
+		<intercept-url pattern="/**"  access="denyAll"/>  <!-- 기본 원칙은 아무도 접근 못한다!!!  -->
+		<custom-filter ref="hanaroLoginFilter" position="FORM_LOGIN_FILTER"/> <!--  시스템 로그인 기록을 log로 남기기위해 custom UsernamePasswordAuthenticationFilter를 구현하여 사용함. -->
+		<logout/> 
+		 
+		<session-management invalid-session-url="/login?timeout=1"></session-management>
+		</http>
+		
+		<beans:bean id="hanaroAuthEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+		<beans:property name="loginFormUrl" value="/login"></beans:property>
+		</beans:bean>
+		
+		<beans:bean id="authenticationFailHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+		<beans:constructor-arg name="defaultFailureUrl" value="/login?login_error=1"/>
+		</beans:bean>
+		
+		<beans:bean id="hanaroLoginFilter" class="com.samsong.erp.util.HanaroAuthenticationFilter"> 
+		<beans:property name="authenticationManager" ref="authenticationManager"></beans:property>
+		<beans:property name="authenticationFailureHandler" ref="authenticationFailHandler"></beans:property>
+		</beans:bean>
+		
+		<authentication-manager alias="authenticationManager"> 
+		<authentication-provider>
+		<password-encoder hash="md5" ></password-encoder>
+		<jdbc-user-service data-source-ref="dataSource" />
+		</authentication-provider>
+		</authentication-manager> 
+		
+</beans:beans>
