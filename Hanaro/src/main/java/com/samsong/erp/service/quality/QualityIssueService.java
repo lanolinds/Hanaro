@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.samsong.erp.model.quality.QualityIssueRegSheet;
 
-public interface QualityIssueRegService {
+public interface QualityIssueService {
 	public Map<String,Object> getCodeDefectSource(Locale locale,String parentCode);
 	
 	public List<Map<String,Object>> getOccurPartListForReg(Locale locale,String uid,String partType,String q);
@@ -14,5 +14,7 @@ public interface QualityIssueRegService {
 	public Map<String,Object> getCodeDefect(Locale locale, int searchLevel,String code);
 	
 	public void procQualityIssueReg (String procType, Locale locale, QualityIssueRegSheet sheet, String user);
+	
+	public List<Map<String,Object>> getUndoneIssueList(Locale locale);
 	
 }

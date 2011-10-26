@@ -32,7 +32,7 @@
 </div>
 </td>
 </tr>
-</table>
+</table> 
 <br/>
 <div class="easyui-panel" title="Contents of Java statck trace" style="width:1000px;height:400px;padding:10px;background:#000000;color:#ffffff;"  
         iconCls="icon-bug-error" collapsible="true" minimizable="false" maximizable="false">  

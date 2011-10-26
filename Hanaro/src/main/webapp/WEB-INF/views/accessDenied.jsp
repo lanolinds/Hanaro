@@ -32,7 +32,7 @@
 </div>
 </td>
 </tr>
-</table>
+</table> 
 
 </body>
 

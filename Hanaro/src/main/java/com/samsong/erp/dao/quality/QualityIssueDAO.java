@@ -2,7 +2,9 @@ package com.samsong.erp.dao.quality;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -23,7 +25,7 @@ import org.springframework.stereotype.Repository;
 import com.samsong.erp.model.quality.QualityIssueRegSheet;
 
 @Repository
-public class QualityIssueRegDAO {
+public class QualityIssueDAO {
 		
 	private JdbcTemplate jdbc;
 	private SimpleJdbcCall sp;
@@ -115,6 +117,25 @@ public class QualityIssueRegDAO {
 		   sp = new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueRegDAO_procQualityIssueReg");		
 		   sp.execute(params);   	
      }
+	
+	//처리 안 된 품질문제 리스트를 가져온다.
+	public List<Map<String,Object>> getUndoneIssueList(Locale locale){
+		final SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		return jdbc.query("exec IssueListDAO_getUndoneIssueList ?",new Object[] { locale.getCountry()}, new RowMapper<Map<String,Object>>(){
+
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int index)
+					throws SQLException {
+				Map<String,Object> m = new HashMap<String,Object>();
+				m.put("regNo",rs.getString(1));
+				m.put("date",fmt.format(rs.getObject(2)));
+				m.put("item",rs.getString(3));
+				m.put("count",rs.getInt(4));
+				m.put("remark",rs.getString(5));
+				return m;
+			}
+		});
+	}
 	
 
 }

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.samsong.erp.model.quality.QualityIssueRegSheet;
 import com.samsong.erp.service.cust.CustManagementService;
-import com.samsong.erp.service.quality.QualityIssueRegService;
+import com.samsong.erp.service.quality.QualityIssueService;
 
 @Controller
 @RequestMapping(value="/qualityDivision/qualityIssue")
@@ -29,7 +29,7 @@ public class QualityIssueController {
 	private static final Logger logger = Logger.getLogger(QualityIssueController.class);
 	
 	@Autowired
-	private QualityIssueRegService service;
+	private QualityIssueService service;
 	
 	@Autowired
 	private CustManagementService serviceCust;

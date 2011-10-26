@@ -30,7 +30,7 @@ $(document).ready(function(){
 		$("#rememberId").attr("checked",true);
 	}
 	
-	$("#rememberId").change(function(){
+	$("#rememberId").change(function(){ 
 		if($(this).attr("checked")){
 			$.cookie('hanaro.remember',true, { expires: 14 });
 			$.cookie('hanaro.id',$.trim($("#j_username").val()), { expires: 14 });

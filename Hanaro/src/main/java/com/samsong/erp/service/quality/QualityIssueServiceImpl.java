@@ -6,14 +6,14 @@ import java.util.Locale;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.samsong.erp.dao.quality.QualityIssueRegDAO;
+import com.samsong.erp.dao.quality.QualityIssueDAO;
 import com.samsong.erp.model.quality.QualityIssueRegSheet;
 
 @Service
-public class QualityIssueRegServiceImpl implements QualityIssueRegService {
+public class QualityIssueServiceImpl implements QualityIssueService {
 
 	@Autowired
-	private QualityIssueRegDAO dao;
+	private QualityIssueDAO dao;
 	
 	public Map<String,Object>  getCodeDefectSource(Locale locale, String parentCode) {		
 		return dao.getCodeDefectSource(locale, parentCode);
@@ -33,6 +33,11 @@ public class QualityIssueRegServiceImpl implements QualityIssueRegService {
 	@Override
 	public void procQualityIssueReg(String procType, Locale locale, QualityIssueRegSheet sheet, String user) { 
 		dao.procQualityIssueReg(procType, locale, sheet, user);
+	}
+
+	@Override
+	public List<Map<String, Object>> getUndoneIssueList(Locale locale) {
+		return dao.getUndoneIssueList(locale);
 	}
 
 }
