@@ -120,7 +120,13 @@
 	
 	//품질문제 등록 리스트 조회하기
 	function searchList(){
-		$.messager.alert("24245","424","424");
+		var params = {};
+		params.division = $("#searchDivision").val();
+		params.occurSite = $("#searchOccurSite").val(); 
+		params.stdDt = $("#searchStdDt").datebox("getValue");
+		params.endDt=$("#searchEndDt").datebox("getValue");
+			$("#resultDataGrid").datagrid({url:"getQualityIssueRegList",queryParams:params}).datagrid("reload");
+		
 	}
 	
 	
@@ -381,15 +387,31 @@
 			</td>
 			<td>
 				<table class="easyui-datagrid" iconCls="icon-application-view-list" style="width:800px;height:720px;" 
-				title='<fmt:message key="ui.label.RegList"/>' toolbar="#divSearch">
+				title='<fmt:message key="ui.label.RegList"/>' toolbar="#divSearch" pagination="true"  id="resultDataGrid" pageSize="30" singleSelect="true" >
 					<thead>
 						        <tr>  
-						            <th field="name1" width="50">Col 1</th>  
-						            <th field="name2" width="50">Col 2</th>  
-						            <th field="name3" width="50">Col 3</th>  
-						            <th field="name4" width="50">Col 4</th>  
-						            <th field="name5" width="50">Col 5</th>  
-						            <th field="name6" width="50">Col 6</th>  
+						            <th field="DATA0" width="110" sortable="true" align="center"><fmt:message key="ui.label.RegNo" /></th>  
+						            <th field="DATA1" width="50" sortable="true" align="center"><fmt:message key="ui.label.OccurDate" /></th>  
+						            <th field="DATA2" width="70" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.OccurSite" /></th>  
+						            <th field="DATA3" width="90" sortable="true" align="center"><fmt:message key="ui.label.RegPlace" /></th>  
+						            <th field="DATA4" width="90" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.OccurPlace" /></th>
+						            <th field="DATA5" width="60" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.OccurLine" /></th>  
+						            <th field="DATA6" width="60" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.OccurProc" /></th>  
+						            <th field="DATA7" width="40" sortable="true" align="center"><fmt:message key="ui.label.Car" /></th>  
+						            <th field="DATA8" width="40" sortable="true" align="center"><fmt:message key="ui.label.Model" /></th>  
+						            <th field="DATA9" width="120" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.OccurPartNo" /></th>
+						            <th field="DATA10" width="100" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.OccurPartNm" /></th>  
+						            <th field="DATA11" width="60" sortable="true" align="center"><fmt:message key="ui.label.LotNo" /></th>  
+						            <th field="DATA12" width="70" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.DefectAmount" /></th>  
+						            <th field="DATA13" width="70" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.DefectL" /></th>  
+						            <th field="DATA14" width="70" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.DefectM" /></th>
+						            <th field="DATA15" width="70" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.DefectS" /></th>  
+						            <th field="DATA16" width="70" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.Explanation" /></th>  
+						            <th field="DATA17" width="80" sortable="true" align="center"><fmt:message key="ui.label.RegDate" /></th>  
+						            <th field="DATA18" width="60" sortable="true" align="center"><fmt:message key="ui.label.File1" /></th>  
+						            <th field="DATA19" width="60" sortable="true" align="center"><fmr:message key="ui.label.File2" /></th>						            						            						              
+
+  
       						  </tr> 
 					</thead>
 					

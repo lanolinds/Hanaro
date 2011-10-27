@@ -137,5 +137,29 @@ public class QualityIssueDAO {
 		});
 	}
 	
-
+	
+	//품질등록리스트를 조회한다.
+	public List<Map<String,Object>> getQualityIssueRegList(Locale locale,String division, String occurSite, String stdDt, String endDt){
+		final List<Map<String,Object>> resultList = new ArrayList<Map<String,Object>>();
+		SqlParameterSource params = new MapSqlParameterSource()
+		.addValue("locale",locale.getCountry())
+		.addValue("division",division)
+		.addValue("occurSite",occurSite)
+		.addValue("occurDateStd",stdDt)
+		.addValue("occurDateEnd",endDt);		
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueDAO_getQualityIssueRegList").returningResultSet("issueRegList", new RowMapper<Map<String,Object>>(){			
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int i)
+					throws SQLException {				
+				Map<String,Object> m = new HashMap<String,Object>();
+				for(int x=0;x<rs.getMetaData().getColumnCount();x++){
+					m.put("DATA"+x,rs.getObject((x+1)));
+				}
+				resultList.add(m);
+				return null;
+			}
+		});
+		sp.execute(params);
+		return resultList;
+	}
 }

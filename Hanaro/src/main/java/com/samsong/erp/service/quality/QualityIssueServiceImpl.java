@@ -40,4 +40,9 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 		return dao.getUndoneIssueList(locale);
 	}
 
+	@Override
+	public List<Map<String, Object>> getQualityIssueRegList(Locale locale, String division, String occurSite, String stdDt, String endDt) {
+			return dao.getQualityIssueRegList(locale, division, occurSite, stdDt, endDt);
+	}
+
 }

@@ -21,13 +21,6 @@ public class HomeServiceImpl implements HomeService {
 		this.jdbc = new JdbcTemplate(dataSource);
 	}
 	
-	public String getMyName(String empNo) {
-		return dao.getMyName("080504");
-	}
 
-	public void insertBulkData() {
-		dao.insertBulkData();
-		
-	}
 
 }

@@ -2,6 +2,8 @@ package com.samsong.erp.ctrl.quality;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.samsong.erp.model.quality.QualityIssueRegSheet;
 import com.samsong.erp.service.cust.CustManagementService;
 import com.samsong.erp.service.quality.QualityIssueService;
+import com.samsong.erp.util.HashMapComparator;
 
 @Controller
 @RequestMapping(value="/qualityDivision/qualityIssue")
@@ -106,6 +109,32 @@ public class QualityIssueController {
 	@RequestMapping(value="/codeDefectCallbak", method=RequestMethod.GET)
 	public @ResponseBody Map<String,Object> codeDefectCallbak(Locale locale, @RequestParam("searchLevel") int searchLevel, @RequestParam(value="code", required = false) String code){
 		return service.getCodeDefect(locale, searchLevel, code);
+	}
+	
+	
+	//품질불량등록 메뉴의 등록된 목록조회
+	@RequestMapping(value="/getQualityIssueRegList", method=RequestMethod.POST)
+	public @ResponseBody Map<String,Object> getQualityIssueRegList(Locale locale, @RequestParam("division") String division, @RequestParam("occurSite") String occurSite,
+			@RequestParam("stdDt") String stdDt, @RequestParam("endDt") String endDt,@RequestParam("page") int page,@RequestParam("rows") int rows,
+			@RequestParam(value="sort",required=false) String sortKey,@RequestParam(value="order",required=false) String order){
+		
+		Map<String,Object> table = new LinkedHashMap<String,Object>();
+		List<Map<String,Object>> resultList = service.getQualityIssueRegList(locale, division, occurSite, stdDt, endDt);
+		
+		if(resultList!=null){			
+			if(sortKey!=null){
+				Collections.sort(resultList,new HashMapComparator(sortKey, order.equalsIgnoreCase("asc")));
+			}
+			
+			table.put("total",resultList.size());
+			int start =  (page-1)*rows;
+			int end  = start +rows;
+			if(end>resultList.size())end = resultList.size();
+			table.put("rows",resultList.subList(start,end));
+		}else{
+			table.put("total",0);
+		}
+		return table;
 	}
 	
 

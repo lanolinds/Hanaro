@@ -17,4 +17,6 @@ public interface QualityIssueService {
 	
 	public List<Map<String,Object>> getUndoneIssueList(Locale locale);
 	
+	public List<Map<String,Object>> getQualityIssueRegList(Locale locale, String division, String occurSite, String stdDt, String endDt);
+	
 }
