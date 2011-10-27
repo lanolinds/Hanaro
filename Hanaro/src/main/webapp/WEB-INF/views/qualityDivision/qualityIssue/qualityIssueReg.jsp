@@ -123,6 +123,10 @@
 		$.messager.alert("24245","424","424");
 	}
 	
+	
+	
+	
+	
 		$(document).ready(function(){			
 			if('${param.status}'=='success'){
 				$.messager.alert("<fmt:message key='ui.label.Result'/>","<fmt:message key='info.Success'/>");		
@@ -187,7 +191,7 @@
 								<td>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.RegNo"/></span>
 									</td><td>								
-									<form:input class="easyui-validatebox" readonly="true"  path="regNo" />
+									<form:input class="easyui-validatebox" readonly="true"  path="regNo"  id="regNo" />
 									<input type="hidden" name="procType" value="INSERT" >
 								</td>  
 							</tr>
@@ -340,7 +344,7 @@
 								<td>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.QualityIssue.DefectAmount"/></span>
 									</td><td>								
-									<form:input class="easyui-validatebox"  path="defectAmount"    required="true" />
+									<form:input class="easyui-numberspinner"  path="defectAmount"    required="true"   min="1"  max="9999999"  increment="1"  style="width:250px;" />
 								</td>  
 							</tr>										
 																	
@@ -409,8 +413,8 @@
 				<option value=''><fmt:message key="ui.element.All"/></option>
 		</select>
 		 <fmt:message key="ui.label.SearchDate"/>
-		<input id="searchStdDt" class="easyui-datebox" style="width:90px;"  value=${today} />~
-		<input id="searchEndDt" class="easyui-datebox" style="width:90px;"  value=${today} />
+		<input id="searchStdDt" class="easyui-datebox" style="width:90px;"  value="${today}" />~
+		<input id="searchEndDt" class="easyui-datebox" style="width:90px;"  value="${today}" />
 		<a class="easyui-linkbutton" iconCls="icon-search" onclick="javascript:searchList();"><fmt:message key="ui.button.Search"/></a>		
 		  
      </div>
