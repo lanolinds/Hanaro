@@ -121,7 +121,7 @@ public class QualityIssueDAO {
 	//처리 안 된 품질문제 리스트를 가져온다.
 	public List<Map<String,Object>> getUndoneIssueList(Locale locale){
 		final SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-		return jdbc.query("exec IssueListDAO_getUndoneIssueList ?",new Object[] { locale.getCountry()}, new RowMapper<Map<String,Object>>(){
+		return jdbc.query("exec QualityIssueDAO_getUndoneIssueList ?",new Object[] { locale.getCountry()}, new RowMapper<Map<String,Object>>(){
 
 			@Override
 			public Map<String, Object> mapRow(ResultSet rs, int index)

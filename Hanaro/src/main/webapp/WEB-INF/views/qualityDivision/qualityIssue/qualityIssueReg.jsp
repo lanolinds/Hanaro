@@ -409,8 +409,8 @@
 				<option value=''><fmt:message key="ui.element.All"/></option>
 		</select>
 		 <fmt:message key="ui.label.SearchDate"/>
-		<input id="searchStdDt" class="easyui-datebox" style="width:90px;"  value=${today} />~
-		<input id="searchEndDt" class="easyui-datebox" style="width:90px;"  value=${today} />
+		<input id="searchStdDt" class="easyui-datebox" style="width:90px;"  value="${today}" />~
+		<input id="searchEndDt" class="easyui-datebox" style="width:90px;"  value="${today}" />
 		<a class="easyui-linkbutton" iconCls="icon-search" onclick="javascript:searchList();"><fmt:message key="ui.button.Search"/></a>		
 		  
      </div>
