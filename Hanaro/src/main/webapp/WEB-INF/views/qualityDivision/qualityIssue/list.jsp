@@ -13,12 +13,14 @@
 	<script type="text/javascript" src='<c:url value="/resources/scripts/jquery/jquery.latest.js"/>'></script>
 	<script type="text/javascript" src='<c:url value="/resources/scripts/easyui/jquery.easyui.min.js"/>'></script>
 	<script type="text/javascript" src='<c:url value="/resources/scripts/easyui/locale/easyui-lang-${pageContext.response.locale.language}.js"/>'></script>
+	<script type="text/javascript" src='<c:url value="/resources/scripts/common-utils.js"/>'></script>
 	<script type="text/javascript">
 	$(document).ready(function(){
 		$("#undoneList").datagrid({onLoadSuccess:function(data){
 			$("#readyCount").css("color","blue").text("("+data.total+")");
 		}});
 	});
+	
 	</script>
 </head>
 
@@ -39,7 +41,7 @@
 						<th field="regNo" width="250" sortable="true"><fmt:message key="ui.label.RegNo"/></th>
 						<th field="date" width="150" align="center" sortable="true"><fmt:message key="ui.label.OccurHour"/></th>
 						<th field="item" width="150" sortable="true"><fmt:message key="ui.label.PartNo"/></th>
-						<th field="count" width="100" align="right" sortable="true"><fmt:message key="ui.label.count"/></th>
+						<th field="count" width="100" align="right" sortable="true" formatter="numeric"><fmt:message key="ui.label.count"/></th>
 						<th field="comment" width="100" ><fmt:message key="ui.label.remark"/></th>
 					</tr>
 				</thead>
