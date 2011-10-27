@@ -2,12 +2,12 @@ package com.samsong.erp.ctrl.quality;
 
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -37,11 +37,12 @@ public class QualityIssueController {
 	 
 	//품질문제등록 메뉴이동
 	@RequestMapping(value="/qualityIssueReg", method=RequestMethod.GET)
-	public String menuQualityIssueReg(Model model,Locale locale){				
+	public String menuQualityIssueReg(Model model,Locale locale, LocalDate date){				
 		Map<String,Object> defects = service.getCodeDefectSource(locale, "");
 		Map<String,Object> defectc = service.getCodeDefect(locale, 0, "");		
 	    model.addAttribute("defectSource",defects);
 		model.addAttribute("defectCode", defectc);
+		model.addAttribute("today",date);
 		model.addAttribute("qualityIssueRegSheet",new QualityIssueRegSheet());
 		return prefix+"/qualityIssueReg";
 	}	
@@ -49,20 +50,10 @@ public class QualityIssueController {
 	//품질문제등록
 	@RequestMapping(value="/addQualityIssueReg", method=RequestMethod.POST )
 	public String addQualityIssueReg(String procType,Locale locale, QualityIssueRegSheet sheet,Principal prin,Model model){	   
-	String user =prin.getName();
-	   try{
-		    service.procQualityIssueReg(procType,locale,sheet,user);			
-			return "redirect:"+prefix+"/qualityIssueReg";		
-	   }catch(Exception e){
-		   logger.info(e.getMessage());
-			Map<String,Object> defects = service.getCodeDefectSource(locale, "");
-			Map<String,Object> defectc = service.getCodeDefect(locale, 0, "");		
-		    model.addAttribute("defectSource",defects);
-			model.addAttribute("defectCode", defectc);
-			model.addAttribute("qualityIssueRegSheet",sheet);
-			return prefix+"/qualityIssueReg";		   
-	   }
-	   
+	  String user =prin.getName();
+	   service.procQualityIssueReg(procType,locale,sheet,user);
+	   model.addAttribute("status","success");
+	   return "redirect:"+prefix+"/qualityIssueReg";
 	}	
 	
 	//품질출처선택 하위목록

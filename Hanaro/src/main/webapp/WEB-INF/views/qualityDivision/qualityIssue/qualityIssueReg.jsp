@@ -21,17 +21,17 @@
 	
 	<script type="text/javascript">
 
-	
+	 
 	//등록전에 검사 확인하기
 	function validate(){
 		if($("#form").form("validate")){			
 			$("#form").submit();
 		}else{
 			return false;
-		} 
+		}
 	}
 	
-	
+	 
 	//품번에 대한 공급업체를 조회하는 것
 	function supplierByPartCode(partCode){
 		$.get("supplierOptionByPartCodeCallbak",{partCode:partCode,t: new Date().getTime()},function(map){
@@ -117,12 +117,20 @@
 		
 	}
 	
-		$(document).ready(function(){
-			
+	
+	//품질문제 등록 리스트 조회하기
+	function searchList(){
+		$.messager.alert("24245","424","424");
+	}
+	
+		$(document).ready(function(){			
+			if('${param.status}'=='success'){
+				$.messager.alert("<fmt:message key='ui.label.Result'/>","<fmt:message key='info.Success'/>");		
+			}
 			occurPartListCallbak("All");
 			occurPlaceCombobox();
 
-			
+			 
 			
 			$("#occurLine").change(function(){
 				occurLineProc($('#occurPlace').combobox("getValue"),$(this).val());
@@ -139,6 +147,17 @@
 				});
 			});
 			
+			//조회용 처리구분 선택시 조회용출처옵션 변경
+			$("#searchDivision").change(function(){
+				$.get("codeDefectSourceCallback",{parentCode:$(this).val(),t: new Date().getTime()},function(map){
+					var options="<option value=''>"+"<fmt:message key='ui.element.All'/>"+"</option>";				
+					for(var key in map){
+						options+='<option value='+key+'>'+map[key]+'</option>';
+					}
+					$("#searchOccurSite").empty().append(options);
+				});
+			});
+			
 			//불량현상 선택시 하위 옵션변경
 			$("#defectL").change(function(){
 				defectCode(1,$(this).val());
@@ -146,9 +165,7 @@
 			$("#defectM").change(function(){
 				defectCode(2,$(this).val());
 			});			
-	
-			
-			
+					
 		});
 	</script> 
 
@@ -157,9 +174,9 @@
 <body class="easyui-layout" style="min-width: 1024px;">
 <div region="north" title='<fmt:message key="system.title"/>'  border="false" 
 	iconCls="icon-draw-ring" style="height:80px; background-color:#fafafa; overflow: hidden;">
-<%@ include file="/WEB-INF/views/menu.jsp" %>
+<%@ include file="/WEB-INF/views/menu.jsp"%>
 </div>
-<div region="center" style="padding:10px;">
+<div region="center" style="padding:10px;">	
 	<table>
 		<tr>
 			<td>
@@ -195,7 +212,7 @@
 								<td>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.OccurDate"/></span>
 									</td><td>								
-									<form:input class="easyui-datebox"  path="occurDate"  required='true'  />
+									<form:input class="easyui-datebox"  path="occurDate"  required='true'  style="width:250px;"  />
 								</td>  
 							</tr>
 							<tr>
@@ -225,7 +242,7 @@
 								<td>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.QualityIssue.OccurPartNo"/></span>
 									</td><td>								
-									<form:input path="occurPartNo"  id='occurPartNo'   required='true'   />
+									<form:input path="occurPartNo"  id='occurPartNo'   required='true'    style="width:250px;"  />
 								</td>  
 							</tr>
 							
@@ -265,7 +282,7 @@
 								<td>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.QualityIssue.OccurPlace"/></span>
 									</td><td>								
-									<form:input  path="occurPlace"  id="occurPlace"    required="true" />
+									<form:input  path="occurPlace"  id="occurPlace"    required="true" style="width:250px;"  />
 								</td>  
 							</tr>
 							
@@ -380,7 +397,6 @@
 
  <div id="divSearch" style="padding:5px;height:auto">
        <div>        
-       	 
          <fmt:message key="ui.label.QualityIssue.Division"/>
 		<select  id='searchDivision' >
 		<option value=""><fmt:message key="ui.element.All"/></option>									
@@ -388,9 +404,14 @@
 					<option value="${item.key }"> ${item.value }</option>
 				</c:forEach>
 		</select>
-		 <fmt:message key="ui.label.QualityIssue.OccurSite"/>
-		
-		 
+		 <fmt:message key="ui.label.QualityIssue.OccurSite"/>         
+		<select  id='searchOccurSite' >
+				<option value=''><fmt:message key="ui.element.All"/></option>
+		</select>
+		 <fmt:message key="ui.label.SearchDate"/>
+		<input id="searchStdDt" class="easyui-datebox" style="width:90px;"  value=${today} />~
+		<input id="searchEndDt" class="easyui-datebox" style="width:90px;"  value=${today} />
+		<a class="easyui-linkbutton" iconCls="icon-search" onclick="javascript:searchList();"><fmt:message key="ui.button.Search"/></a>		
 		  
      </div>
       <hr/>

@@ -27,10 +27,10 @@
 	
 	<tx:advice id="txAdvice" transaction-manager="txManager">
 		<tx:attributes>
-			<tx:method name="get*" read-only="true"/> 
+			<tx:method name="get*" read-only="true"/>  
 			<tx:method name="*"/>
-		</tx:attributes>
-	</tx:advice>
+		</tx:attributes> 
+	</tx:advice>  
 	
 	<aop:config>
 		<aop:pointcut expression="execution(* com.samsong.erp.service.*.*(..))" id="defaultServiceOperation"/>
