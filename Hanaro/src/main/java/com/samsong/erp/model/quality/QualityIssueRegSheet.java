@@ -2,7 +2,7 @@ package com.samsong.erp.model.quality;
 
 public class QualityIssueRegSheet {
 	
-	private String regNo = "자동생성";
+	private String regNo;
 	private 	String division;
 	private String occurSite;
 	private String occurDate;
@@ -19,7 +19,7 @@ public class QualityIssueRegSheet {
 	private String defectL;
 	private String defectM;
 	private String defectS;
-	private int defectAmount;
+	private int defectAmount = 1;
 	private String explanation;	
 	@Override
 	public String toString() {

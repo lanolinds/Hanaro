@@ -41,7 +41,7 @@ public class QualityIssueDAO {
 		SqlParameterSource params = new MapSqlParameterSource()
 				.addValue("locale", locale.getCountry())
 				.addValue("parentCode",parentCode);
-		sp = new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueRegDAO_getCodeDefectSource").returningResultSet("category", new RowMapper(){
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueDAO_getCodeDefectSource").returningResultSet("category", new RowMapper(){
 			public Map<String,String> mapRow(ResultSet rs, int i) throws SQLException {
 				defects.put(rs.getString("code"),rs.getString("name"));
 				return null;
@@ -59,7 +59,7 @@ public class QualityIssueDAO {
 				.addValue("uid",uid)
 				.addValue("partType",partType)
 				.addValue("term",q);
-		sp = new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueRegDAO_getOccurPartListForReg").returningResultSet("partList", new RowMapper<List<Map<String,Object>>>(){
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueDAO_getOccurPartListForReg").returningResultSet("partList", new RowMapper<List<Map<String,Object>>>(){
 
 			public List<Map<String,Object>> mapRow(ResultSet rs, int i) throws SQLException {
 				 Map<String,Object> cell = new LinkedHashMap<String,Object>();
@@ -70,7 +70,7 @@ public class QualityIssueDAO {
 				 partList.add(cell);
 				return null;
 			}
-			
+			 
 		});
 		sp.execute(params);
 		return partList;		
@@ -114,7 +114,7 @@ public class QualityIssueDAO {
 		   params.put("file1",sheet.getFile1());
 		   params.put("file2",sheet.getFile2());
 		   params.put("user",user);		
-		   sp = new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueRegDAO_procQualityIssueReg");		
+		   sp = new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueDAO_procQualityIssueReg");		
 		   sp.execute(params);   	
      }
 	

@@ -9,6 +9,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,12 +29,16 @@ public class QualityIssueController {
 	private String prefix ="/qualityDivision/qualityIssue"; 
 	private static final Logger logger = Logger.getLogger(QualityIssueController.class);
 	
+	
 	@Autowired
 	private QualityIssueService service;
 	
 	@Autowired
 	private CustManagementService serviceCust;
 	
+	
+	@Autowired
+	private MessageSource message;
 	 
 	//품질문제등록 메뉴이동
 	@RequestMapping(value="/qualityIssueReg", method=RequestMethod.GET)
@@ -43,7 +48,9 @@ public class QualityIssueController {
 	    model.addAttribute("defectSource",defects);
 		model.addAttribute("defectCode", defectc);
 		model.addAttribute("today",date);
-		model.addAttribute("qualityIssueRegSheet",new QualityIssueRegSheet());
+		QualityIssueRegSheet sheet = new QualityIssueRegSheet();
+		sheet.setRegNo(message.getMessage("ui.label.AutoCreate",null, locale));
+		model.addAttribute("qualityIssueRegSheet",sheet);
 		return prefix+"/qualityIssueReg";
 	}	
 	
