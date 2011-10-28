@@ -65,7 +65,7 @@
    
    
     <div class="easyui-tabs" style="width:1024px;height:720px;">  
-        <div title='<fmt:message key="ui.label.qualityIssue.ready" /><span id="readyCount"></span>'  iconCls="icon-document-prepare"  >  
+        <div title='<fmt:message key="ui.label.qualityIssue.ready" /><span id="readyCount" style="margin-left:.3em;"></span>'  iconCls="icon-document-prepare"  >  
             <table id="undoneList" iconCls="icon-to-do-list" pagination="true" pageList="[50,100,200,300]"  border="false"
 						fit="true" fitColumns="true" idField="regNo" url="list/gridCallback"  toolbar="#toolbar" >			
 				<thead>
@@ -76,7 +76,7 @@
 						<th field="item" width="150" sortable="true"><fmt:message key="ui.label.PartNo"/></th>
 						<th field="count" width="100" align="right" sortable="true" formatter="numeric"><fmt:message key="ui.label.count"/></th>
 						<th field="comment" width="100" ><fmt:message key="ui.label.remark"/></th>
-					</tr>
+					</tr>	
 				</thead>
 			</table>
         </div>  
@@ -84,7 +84,7 @@
         </div>  
     </div>
     
-    
+     
     <!-- 툴바 -->
     <div  id="toolbar" style="padding:5px;height:auto;">
     <div style="margin-top:.5em;">
