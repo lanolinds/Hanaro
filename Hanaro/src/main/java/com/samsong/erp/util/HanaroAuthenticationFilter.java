@@ -18,7 +18,7 @@ public class HanaroAuthenticationFilter extends UsernamePasswordAuthenticationFi
 		String userIp = request.getRemoteAddr();
 		String userName = authResult.getName();
 		String authorities=authResult.getAuthorities().toString();
-		logger.info("사용자 "+userName+" 이(가) 로그인하였습니다. IP:"+userIp+", 소유권한:"+authorities);
+		logger.info("사용자가"+userName+" 이(가) 로그인 하였습니다. IP:"+userIp+",소유권한:"+authorities);
 		super.successfulAuthentication(request, response, authResult);
 				
 	}

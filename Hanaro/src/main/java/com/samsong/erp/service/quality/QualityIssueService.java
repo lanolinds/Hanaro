@@ -20,4 +20,8 @@ public interface QualityIssueService {
 
 	public List<Map<String, Object>> getAssistItemList(Locale locale,String status);
 	
+	public List<Map<String,Object>> getQualityIssueRegList(Locale locale, String division, String occurSite, String stdDt, String endDt);
+	
+
+	
 }
