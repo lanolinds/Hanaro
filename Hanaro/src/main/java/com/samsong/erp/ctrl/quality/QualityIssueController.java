@@ -135,8 +135,7 @@ public class QualityIssueController {
 			table.put("total",0);
 		}
 		return table;
-	}
-	
+	}	
 
 	 
 }

@@ -45,4 +45,5 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 			return dao.getQualityIssueRegList(locale, division, occurSite, stdDt, endDt);
 	}
 
+
 }

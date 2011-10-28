@@ -18,7 +18,7 @@
 	<script type="text/javascript" src='<c:url value="/resources/scripts/jquery/jquery.latest.js"/>'></script>	
 	<script type="text/javascript" src='<c:url value="/resources/scripts/easyui/jquery.easyui.min.js"/>'></script>
 	<script type="text/javascript" src='<c:url value="/resources/scripts/easyui/locale/easyui-lang-${pageContext.response.locale.language}.js"/>'></script>
-	
+	<script type="text/javascript" src='<c:url value="/resources/scripts/common-utils.js" />' ></script>
 	<script type="text/javascript">
 
 	 
@@ -114,7 +114,6 @@
 				$("#defectS").empty().append(options);
 			}
 		});
-		
 	}
 	
 	
@@ -125,17 +124,64 @@
 		params.occurSite = $("#searchOccurSite").val(); 
 		params.stdDt = $("#searchStdDt").datebox("getValue");
 		params.endDt=$("#searchEndDt").datebox("getValue");
-			$("#resultDataGrid").datagrid({url:"getQualityIssueRegList",queryParams:params}).datagrid("reload");
+		$("#resultDataGrid").datagrid({url:"getQualityIssueRegList",queryParams:params});
 		
 	}
 	
+	//품질문제등록 리스트 삭제하기
+	function deleteList(){
+		var record = $("#resultDataGrid").datagrid("getSelected");
+		if(record ==null){
+			$.messager.alert("<fmt:message key='warn.infoWarn' />","<fmt:message key='warn.notSelectedItem' />");
+			return;
+		}
+		$.messager.confirm("<fmt:message key='info.confirm' />","<fmt:message key='warn.wannaDelete' />",function(r){  
+		    if (r){  
+				$("input[name='procType']").val("DELETE");
+				var form = document.frm;		
+				form.regNo.value = record.DATA0;		
+				form.occurHour.value=1;
+				form.submit();		  
+		    }  
+		});	
+	}
 	
+	//품질문제등록 내용을 폼에 넣는다.
+	function insertForm(){
+		var record = $("#resultDataGrid").datagrid("getSelected");
+		if(record ==null){
+			$.messager.alert("<fmt:message key='warn.infoWarn' />","<fmt:message key='warn.notSelectedItem' />");
+			return;
+		}
+		
+		$("#regNo").val(record.DATA0);
+		$("input[name='procType']").val("UPDATE");
+		$("#division").val(record.DATA20);
+		$("#occurSite").empty().append("<option value='"+record.DATA21+"'>"+record.DATA2+"</option>");
+		$("#occurDate").datebox('setValue',record.DATA22);		
+		$("#occurAmPm").val(record.DATA23);
+		$("#occurHour").val(record.DATA24);
+		$("#occurPartNo").combogrid("setValue",record.DATA9);
+		$("#partSupplier").val(record.DATA25);
+		$("#occurPlace").combobox("setValue",record.DATA27);
+		$("#occurLine").empty();
+		if(record.DATA5 !=null && record.DATA5 !="")
+			$("#occurLine").append("<option value'"+record.DATA5+"'>"+record.DATA5+"</option>");
+		if(record.DATA28 !=null && record.DATA28 !="")
+			$("#occurProc").append("<option value'"+record.DATA28+"'>"+record.DATA6+"</option>");
+		$("#lotNo").val(record.DATA11);
+		$("#defectL").val(record.DATA29);
+		$("#defectM").empty().append("<option value='"+record.DATA30+"'>"+record.DATA14+"</option>");
+		$("#defectS").empty().append("<option value='"+record.DATA31+"'>"+record.DATA15+"</option>");
+		$("#defectAmount").numberspinner("setValue",record.DATA12);
+		$("#explanation").val(record.DATA16);		
+	}
 	
 	
 	
 		$(document).ready(function(){			
 			if('${param.status}'=='success'){
-				$.messager.alert("<fmt:message key='ui.label.Result'/>","<fmt:message key='info.Success'/>");		
+				$.messager.alert("<fmt:message key='ui.label.Result'/>","<fmt:message key='info.Success'/>");			
 			}
 			occurPartListCallbak("All");
 			occurPlaceCombobox();
@@ -190,8 +236,8 @@
 	<table>
 		<tr>
 			<td>
-				<div iconCls="icon-chart-bar-delete" class="easyui-panel" style="width:400px;height:720px;" title='<fmt:message key="menu.qualityIssueReg"/>'>
-					<form:form action="addQualityIssueReg" method="POST"  modelAttribute="qualityIssueRegSheet"  id="form">
+				<div iconCls="icon-chart-bar-delete" class="easyui-panel" style="width:400px;height:725px;" title='<fmt:message key="menu.qualityIssueReg"/>'>
+					<form:form action="addQualityIssueReg" method="POST"  modelAttribute="qualityIssueRegSheet"  id="form" name="frm">
 						<table>
 							<tr>
 								<td>
@@ -205,7 +251,7 @@
 								<td>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.QualityIssue.Division"/></span>
 									</td><td>								
-									<form:select path="division"   id='division' class="easyui-validatebox" required='true' >
+									<form:select path="division"   id="division"  class="easyui-validatebox" required='true' >
 									   <form:option value=""><fmt:message key='ui.element.Select' /></form:option>
 										<form:options items="${defectSource }"  />
 									</form:select>
@@ -222,14 +268,14 @@
 								<td>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.OccurDate"/></span>
 									</td><td>								
-									<form:input class="easyui-datebox"  path="occurDate"  required='true'  style="width:250px;"  />
+									<form:input class="easyui-datebox"  path="occurDate"  required='true'  style="width:250px;"  id="occurDate"   />
 								</td>  
 							</tr>
 							<tr>
 								<td>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.OccurAmPm"/></span>
 									</td><td>								
-									<form:select class="easyui-validatebox" path="occurAmPm"   required='true'  >
+									<form:select class="easyui-validatebox" path="occurAmPm"   required='true'   id="occurAmPm">
 										<option value=""><fmt:message key="ui.element.Select"/></option>
 										<option value="am">AM</option>
 										<option value="pm">PM</option>
@@ -240,7 +286,7 @@
 								<td>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.OccurHour"/></span>
 									</td><td>								
-									<form:select class="easyui-validatebox"  path="occurHour"  required='true' >
+									<form:select class="easyui-validatebox"  path="occurHour"  required='true'  id="occurHour">
 									<option value=""><fmt:message key="ui.element.Select"/></option>									
 											<c:forEach  begin="1" end="12" step="1" varStatus="hour">
 												<option value="${hour.count }"> ${hour.count }<fmt:message key="ui.label.Hour"/></option>
@@ -316,7 +362,7 @@
 								<td>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.LotNo"/></span>
 									</td><td>								
-									<form:input class="easyui-validatebox"  path="lotNo"  required="true" />
+									<form:input class="easyui-validatebox"  path="lotNo"  required="true"  id="lotNo"  />
 								</td>  
 							</tr>
 							
@@ -350,7 +396,7 @@
 								<td>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.QualityIssue.DefectAmount"/></span>
 									</td><td>								
-									<form:input class="easyui-numberspinner"  path="defectAmount"    required="true"   min="1"  max="9999999"  increment="1"  style="width:250px;" />
+									<form:input class="easyui-numberspinner" id="defectAmount"  path="defectAmount"    required="true"   min="1"  max="9999999"  increment="1"  style="width:250px;" />
 								</td>  
 							</tr>										
 																	
@@ -358,27 +404,27 @@
 								<td>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.QualityIssue.Explanation"/></span>
 									</td><td>								
-									<form:input class="easyui-validatebox"  path="explanation"/>
+									<form:input class="easyui-validatebox"  id="explanation" path="explanation"/>
 								</td>  
 							</tr>
 							<tr>
 								<td>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.File1"/></span>
 									</td><td>								
-									<form:input class="easyui-validatebox"  path="file1"/>
+									<form:input class="easyui-validatebox"  id="file1" path="file1"/>
 								</td>  
 							</tr>							
 							<tr>
 								<td>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.File2"/></span>
 									</td><td>								
-									<form:input class="easyui-validatebox"  path="file2"/>
+									<form:input class="easyui-validatebox" id="file2"  path="file2"/>
 								</td>  
 							</tr>		
 							<tr>
 								<td colspan='2' align='center'  id="tdButton">										
-									<a onclick="javascript:validate();" class="easyui-linkbutton"  iconCls="icon-disk"  id="btInsert"><fmt:message key="ui.button.Save"/></a>																		
-									<a onclick="javascript:$('form')[0].reset();" class="easyui-linkbutton"  iconCls="icon-arrow-redo" id="btCancel"><fmt:message key="ui.button.Cancel"/></a>
+									<a href="#" onclick="javascript:validate();" class="easyui-linkbutton"  iconCls="icon-disk"  id="btInsert"><fmt:message key="ui.button.Save"/></a>																		
+									<a href="#" onclick="javascript:$('form')[0].reset();$('#procType').val('INSERT');" class="easyui-linkbutton"  iconCls="icon-arrow-redo" id="btCancel"><fmt:message key="ui.button.Cancel"/></a>
 								</td>
 							</tr>															
 						</table>
@@ -386,13 +432,17 @@
 				</div>
 			</td>
 			<td>
-				<table class="easyui-datagrid" iconCls="icon-application-view-list" style="width:800px;height:720px;" 
-				title='<fmt:message key="ui.label.RegList"/>' toolbar="#divSearch" pagination="true"  id="resultDataGrid" pageSize="30" singleSelect="true" >
-					<thead>
+				<table class="easyui-datagrid" iconCls="icon-application-view-list" style="width:800px;height:725px;" 
+				title='<fmt:message key="ui.label.RegList"/>' toolbar="#divSearch" pagination="true"  id="resultDataGrid" pageSize="30"   singleSelect="true" striped="true"   >
+					<thead frozen="true">
 						        <tr>  
 						            <th field="DATA0" width="110" sortable="true" align="center"><fmt:message key="ui.label.RegNo" /></th>  
 						            <th field="DATA1" width="50" sortable="true" align="center"><fmt:message key="ui.label.OccurDate" /></th>  
-						            <th field="DATA2" width="70" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.OccurSite" /></th>  
+						            <th field="DATA2" width="70" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.OccurSite" /></th>
+						        </tr>
+				    </thead>
+					<thead>
+						        <tr>  				      
 						            <th field="DATA3" width="90" sortable="true" align="center"><fmt:message key="ui.label.RegPlace" /></th>  
 						            <th field="DATA4" width="90" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.OccurPlace" /></th>
 						            <th field="DATA5" width="60" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.OccurLine" /></th>  
@@ -402,16 +452,18 @@
 						            <th field="DATA9" width="120" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.OccurPartNo" /></th>
 						            <th field="DATA10" width="100" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.OccurPartNm" /></th>  
 						            <th field="DATA11" width="60" sortable="true" align="center"><fmt:message key="ui.label.LotNo" /></th>  
-						            <th field="DATA12" width="70" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.DefectAmount" /></th>  
+						            <th field="DATA12" width="70" sortable="true" align="right"  formatter="numeric" ><fmt:message key="ui.label.QualityIssue.DefectAmount" /></th>  
 						            <th field="DATA13" width="70" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.DefectL" /></th>  
 						            <th field="DATA14" width="70" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.DefectM" /></th>
 						            <th field="DATA15" width="70" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.DefectS" /></th>  
 						            <th field="DATA16" width="70" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.Explanation" /></th>  
 						            <th field="DATA17" width="80" sortable="true" align="center"><fmt:message key="ui.label.RegDate" /></th>  
 						            <th field="DATA18" width="60" sortable="true" align="center"><fmt:message key="ui.label.File1" /></th>  
-						            <th field="DATA19" width="60" sortable="true" align="center"><fmr:message key="ui.label.File2" /></th>						            						            						              
-
-  
+						            <th field="DATA19" width="60" sortable="true" align="center"><fmr:message key="ui.label.File2" /></th>
+						            
+						            <c:forEach begin="20"  end="33"  step="1"  varStatus="dataKey">
+						            	<th field="DATA"+"${dataKey.count}"  hidden="true"></th>	
+						            </c:forEach>
       						  </tr> 
 					</thead>
 					
@@ -435,16 +487,16 @@
 				<option value=''><fmt:message key="ui.element.All"/></option>
 		</select>
 		 <fmt:message key="ui.label.SearchDate"/>
-		<input id="searchStdDt" class="easyui-datebox" style="width:90px;"  value="${today}" />~
-		<input id="searchEndDt" class="easyui-datebox" style="width:90px;"  value="${today}" />
-		<a class="easyui-linkbutton" iconCls="icon-search" onclick="javascript:searchList();"><fmt:message key="ui.button.Search"/></a>		
+		<input id="searchStdDt" class="easyui-datebox" style="width:90px;"  value="${today}"  />~
+		<input id="searchEndDt" class="easyui-datebox" style="width:90px;"  value="${today}"  />
+		<a  href="#" class="easyui-linkbutton" iconCls="icon-search" onclick="javascript:searchList();"><fmt:message key="ui.button.Search"/></a>		
 		  
      </div>
       <hr/>
      <div style="margin-bottom:5px" align="right"'>  
-         <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true"><fmt:message key="ui.button.Reg"/></a>  
-         <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true"><fmt:message key="ui.button.Edit"/></a>           
-         <a href="#" class="easyui-linkbutton" iconCls="icon-delete" plain="true"><fmt:message key="ui.button.Delete"/></a>
+         <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true"  onclick="javascript:$('form')[0].reset();$('#procType').val('INSERT');"><fmt:message key="ui.button.Reg"/></a>  
+         <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="javascript:insertForm();"><fmt:message key="ui.button.Edit"/></a>           
+         <a href="#" class="easyui-linkbutton" iconCls="icon-delete" plain="true" onclick="javascript:deleteList();"><fmt:message key="ui.button.Delete"/></a>
       </div>
 
  
