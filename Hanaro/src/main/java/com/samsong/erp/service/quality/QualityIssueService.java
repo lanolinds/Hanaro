@@ -1,5 +1,6 @@
 package com.samsong.erp.service.quality;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -15,6 +16,8 @@ public interface QualityIssueService {
 	
 	public void procQualityIssueReg (String procType, Locale locale, QualityIssueRegSheet sheet, String user);
 	
-	public List<Map<String,Object>> getUndoneIssueList(Locale locale);
+	public List<Map<String,Object>> getUndoneIssueList(Date fromDate, Date toDate, String item, Locale locale);
+
+	public List<Map<String, Object>> getAssistItemList(Locale locale,String status);
 	
 }

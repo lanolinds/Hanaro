@@ -1,6 +1,7 @@
 package com.samsong.erp.service.quality;
 
 
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -36,8 +37,14 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getUndoneIssueList(Locale locale) {
-		return dao.getUndoneIssueList(locale);
+	public List<Map<String, Object>> getAssistItemList(Locale locale,String status) {
+		return dao.getAssistItemList(locale,status);
+	}
+
+	@Override
+	public List<Map<String, Object>> getUndoneIssueList(Date fromDate,
+			Date toDate, String item, Locale locale) {
+		return dao.getUndoneIssueList(fromDate,toDate,item,locale);
 	}
 
 }

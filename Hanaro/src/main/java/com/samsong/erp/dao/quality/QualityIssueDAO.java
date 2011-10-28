@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,7 +30,7 @@ public class QualityIssueDAO {
 		
 	private JdbcTemplate jdbc;
 	private SimpleJdbcCall sp;
-	
+
 	@Autowired
 	public void init(DataSource ds){
 		jdbc = new JdbcTemplate(ds);
@@ -119,9 +120,10 @@ public class QualityIssueDAO {
      }
 	
 	//처리 안 된 품질문제 리스트를 가져온다.
-	public List<Map<String,Object>> getUndoneIssueList(Locale locale){
+	public List<Map<String,Object>> getUndoneIssueList(Date fromDate, Date toDate, String item, Locale locale){
 		final SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-		return jdbc.query("exec QualityIssueDAO_getUndoneIssueList ?",new Object[] { locale.getCountry()}, new RowMapper<Map<String,Object>>(){
+		return jdbc.query("exec QualityIssueDAO_getUndoneIssueList ?,?,?,?",new Object[] {fromDate,toDate,item, locale.getCountry()},
+				new RowMapper<Map<String,Object>>(){
 
 			@Override
 			public Map<String, Object> mapRow(ResultSet rs, int index)
@@ -134,6 +136,24 @@ public class QualityIssueDAO {
 				m.put("remark",rs.getString(5));
 				return m;
 			}
+		});
+	}
+
+	public List<Map<String, Object>> getAssistItemList(Locale locale,String status) {
+		return jdbc.query("exec QualityIssueDAO_getAssistItemList ?,?",new Object[]{locale.getCountry(),status},
+				new RowMapper<Map<String,Object>>(){
+
+					@Override
+					public Map<String, Object> mapRow(ResultSet rs, int i)
+							throws SQLException {
+						Map<String,Object> m = new HashMap<String,Object>();
+						m.put("item", rs.getString("item"));
+						m.put("name", rs.getString("name"));
+						m.put("car", rs.getString("car"));
+						m.put("model", rs.getString("model"));
+						return m;
+					}
+			
 		});
 	}
 	
