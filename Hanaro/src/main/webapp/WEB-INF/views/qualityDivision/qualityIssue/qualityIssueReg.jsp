@@ -177,6 +177,34 @@
 		$("#explanation").val(record.DATA16);		
 	}
 	
+	function downFile(regNo,fileName){
+		$.post("getQualityIssueFile",{regNo:regNo,fileName:fileName},function(){
+			
+		});
+	}
+	
+	
+	function fileDownImg1(value,rowData){
+		var regNo = rowData.DATA0;				
+		var format = "";		
+		if(value !="")
+			format = "<a  href='getQualityIssueFile?regNo="+regNo+"&fileName="+encodeURIComponent(value)+"&fileSeq=1'  class='icon-disk' style='padding:2px 12px;cursor:pointer;'>&nbsp;</a>";
+		
+		return format;
+		
+	}
+	
+	function fileDownImg2(value,rowData){
+		var regNo = rowData.DATA0;				
+		var format = "";		
+		if(value !="")
+			format = "<a  href='getQualityIssueFile?regNo="+regNo+"&fileName="+encodeURIComponent(value)+"&fileSeq=2'  class='icon-disk' style='padding:2px 12px;cursor:pointer;'>&nbsp;</a>";
+		
+		return format;
+		
+	}
+	
+	
 	
 	
 		$(document).ready(function(){			
@@ -186,7 +214,8 @@
 			occurPartListCallbak("All");
 			occurPlaceCombobox();
 
-			 
+		
+			
 			
 			$("#occurLine").change(function(){
 				occurLineProc($('#occurPlace').combobox("getValue"),$(this).val());
@@ -237,11 +266,11 @@
 		<tr>
 			<td>
 				<div iconCls="icon-chart-bar-delete" class="easyui-panel" style="width:400px;height:725px;" title='<fmt:message key="menu.qualityIssueReg"/>'>
-					<form:form action="addQualityIssueReg" method="POST"  modelAttribute="qualityIssueRegSheet"  id="form" name="frm">
+					<form:form action="addQualityIssueReg" method="POST"  modelAttribute="qualityIssueRegSheet"  id="form" name="frm"  enctype="multipart/form-data">
 						<table>
 							<tr>
 								<td>
-									<span  class="label-Leader-black" ><fmt:message key="ui.label.RegNo"/></span>
+									<span  class="label-Leader-black"  ><fmt:message key="ui.label.RegNo"/></span>
 									</td><td>								
 									<form:input class="easyui-validatebox" readonly="true"  path="regNo"  id="regNo" />
 									<input type="hidden" name="procType" value="INSERT" >
@@ -411,14 +440,14 @@
 								<td>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.File1"/></span>
 									</td><td>								
-									<form:input class="easyui-validatebox"  id="file1" path="file1"/>
+									<input type = "file"  id="files1"  name = "files1"/>
 								</td>  
 							</tr>							
 							<tr>
 								<td>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.File2"/></span>
 									</td><td>								
-									<form:input class="easyui-validatebox" id="file2"  path="file2"/>
+									<input  type = "file"  id="files2"  name = "files2" />
 								</td>  
 							</tr>		
 							<tr>
@@ -458,8 +487,8 @@
 						            <th field="DATA15" width="70" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.DefectS" /></th>  
 						            <th field="DATA16" width="70" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.Explanation" /></th>  
 						            <th field="DATA17" width="80" sortable="true" align="center"><fmt:message key="ui.label.RegDate" /></th>  
-						            <th field="DATA18" width="60" sortable="true" align="center"><fmt:message key="ui.label.File1" /></th>  
-						            <th field="DATA19" width="60" sortable="true" align="center"><fmr:message key="ui.label.File2" /></th>
+						            <th field="DATA18" width="60" sortable="true" align="center"  formatter="fileDownImg1" ><fmt:message key="ui.label.File1"  /></th>  
+						            <th field="DATA19" width="60" sortable="true" align="center"  formatter="fileDownImg2" ><fmt:message key="ui.label.File2"  /></th>
 						            
 						            <c:forEach begin="20"  end="33"  step="1"  varStatus="dataKey">
 						            	<th field="DATA"+"${dataKey.count}"  hidden="true"></th>	
@@ -492,7 +521,7 @@
 		<a  href="#" class="easyui-linkbutton" iconCls="icon-search" onclick="javascript:searchList();"><fmt:message key="ui.button.Search"/></a>		
 		  
      </div>
-      <hr/>
+      
      <div style="margin-bottom:5px" align="right"'>  
          <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true"  onclick="javascript:$('form')[0].reset();$('#procType').val('INSERT');"><fmt:message key="ui.button.Reg"/></a>  
          <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="javascript:insertForm();"><fmt:message key="ui.button.Edit"/></a>           
