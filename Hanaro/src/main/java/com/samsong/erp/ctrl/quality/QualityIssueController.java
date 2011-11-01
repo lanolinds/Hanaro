@@ -161,9 +161,8 @@ public class QualityIssueController {
 		BufferedOutputStream out = null;
 		file = service.getQualityIssueFile(locale, regNo, fileSeq);	    
 		
-		try {			
-			fileName = new String(fileName.getBytes("KSC5601"),"ISO-8859-1");
-		    response.setHeader("Content-Disposition","attachment;filename="+fileName);		    
+		try {
+		    response.setHeader("Content-Disposition","attachment;filename=\""+URLEncoder.encode(fileName, "UTF-8")+"\"");		    
 			out = new BufferedOutputStream(response.getOutputStream());
 			out.write(file);
 			out.close();
