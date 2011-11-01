@@ -12,7 +12,7 @@
 	<link rel="stylesheet" href='<c:url value="/resources/scripts/easyui/themes/icon.css"/>'/>
 	<link rel="stylesheet" href='<c:url value="/resources/styles/app.default.css"/>'/>	
 	<style type="text/css">
-		#form input{width:250px;}
+		#form input{width:250px;}		
 		#form select{width:250px;}
 	</style>
 	<script type="text/javascript" src='<c:url value="/resources/scripts/jquery/jquery.latest.js"/>'></script>	
@@ -174,7 +174,16 @@
 		$("#defectM").empty().append("<option value='"+record.DATA30+"'>"+record.DATA14+"</option>");
 		$("#defectS").empty().append("<option value='"+record.DATA31+"'>"+record.DATA15+"</option>");
 		$("#defectAmount").numberspinner("setValue",record.DATA12);
-		$("#explanation").val(record.DATA16);		
+		$("#explanation").val(record.DATA16);
+		$("b",$("#files1").parent()).empty();
+		$("b",$("#files2").parent()).empty();
+				
+		if(record.DATA18 !="")
+			$("b",$("#files1").parent()).append("<a  href='getQualityIssueFile?regNo="+record.DATA0+"&fileName="+encodeURIComponent(record.DATA18)+"&fileSeq=1' >"+record.DATA18+"</a>");
+		if(record.DATA19 !="")
+			$("b",$("#files2").parent()).append("<a  href='getQualityIssueFile?regNo="+record.DATA0+"&fileName="+encodeURIComponent(record.DATA19)+"&fileSeq=2' >"+record.DATA19+"</a>");
+		
+		
 	}
 	
 	function downFile(regNo,fileName){
@@ -202,6 +211,14 @@
 		
 		return format;
 		
+	}
+	
+	
+	function resetForm(){
+		$('form')[0].reset();
+		$('#procType').val('INSERT');
+		$('b',$('#files1').parent()).empty();
+		$('b',$('#files2').parent()).empty();
 	}
 	
 	
@@ -440,20 +457,20 @@
 								<td>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.File1"/></span>
 									</td><td>								
-									<input type = "file"  id="files1"  name = "files1"/>
+									<input type = "file"  id="files1"  name = "files1"  /><br><b></b>
 								</td>  
 							</tr>							
 							<tr>
 								<td>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.File2"/></span>
 									</td><td>								
-									<input  type = "file"  id="files2"  name = "files2" />
+									<input  type = "file"  id="files2"  name = "files2"   /><br><b></b>
 								</td>  
 							</tr>		
 							<tr>
 								<td colspan='2' align='center'  id="tdButton">										
 									<a href="#" onclick="javascript:validate();" class="easyui-linkbutton"  iconCls="icon-disk"  id="btInsert"><fmt:message key="ui.button.Save"/></a>																		
-									<a href="#" onclick="javascript:$('form')[0].reset();$('#procType').val('INSERT');" class="easyui-linkbutton"  iconCls="icon-arrow-redo" id="btCancel"><fmt:message key="ui.button.Cancel"/></a>
+									<a href="#" onclick="javascript:resetForm()" class="easyui-linkbutton"  iconCls="icon-arrow-redo" id="btCancel"><fmt:message key="ui.button.Cancel"/></a>
 								</td>
 							</tr>															
 						</table>
@@ -523,7 +540,7 @@
      </div>
       
      <div style="margin-bottom:5px" align="right"'>  
-         <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true"  onclick="javascript:$('form')[0].reset();$('#procType').val('INSERT');"><fmt:message key="ui.button.Reg"/></a>  
+         <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true"  onclick="javascript:resetForm();"><fmt:message key="ui.button.Reg"/></a>  
          <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="javascript:insertForm();"><fmt:message key="ui.button.Edit"/></a>           
          <a href="#" class="easyui-linkbutton" iconCls="icon-delete" plain="true" onclick="javascript:deleteList();"><fmt:message key="ui.button.Delete"/></a>
       </div>

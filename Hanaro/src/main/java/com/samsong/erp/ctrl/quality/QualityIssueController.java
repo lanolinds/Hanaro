@@ -1,13 +1,8 @@
 package com.samsong.erp.ctrl.quality;
 
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,14 +11,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -161,8 +154,7 @@ public class QualityIssueController {
 	//품질 파일 다운
 	@RequestMapping(value="/getQualityIssueFile", method=RequestMethod.GET)
 	public  void  getQualityIssueFile(Locale locale, @RequestParam("regNo") String regNo, @RequestParam("fileName") String fileName,@RequestParam("fileSeq") String fileSeq, HttpServletResponse response){		
-		
-		logger.info("file:"+fileName);
+	
 		
 		byte[] file = null;
 		BufferedOutputStream out = null;
