@@ -155,12 +155,14 @@ public class QualityIssueController {
 	@RequestMapping(value="/getQualityIssueFile", method=RequestMethod.GET)
 	public  void  getQualityIssueFile(Locale locale, @RequestParam("regNo") String regNo, @RequestParam("fileName") String fileName,@RequestParam("fileSeq") String fileSeq, HttpServletResponse response){		
 	
+		logger.info(fileName);
 		
 		byte[] file = null;
 		BufferedOutputStream out = null;
 		file = service.getQualityIssueFile(locale, regNo, fileSeq);	    
 		
-		try {
+		try {			
+			fileName = new String(fileName.getBytes("KSC5601"),"ISO-8859-1");
 		    response.setHeader("Content-Disposition","attachment;filename="+fileName);		    
 			out = new BufferedOutputStream(response.getOutputStream());
 			out.write(file);
