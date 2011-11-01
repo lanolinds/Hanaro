@@ -1,5 +1,6 @@
 package com.samsong.erp.ctrl.quality;
 
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
@@ -8,6 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,5 +96,9 @@ public class IssueListController {
 		}
 		return json;
 	}
-
+	@RequestMapping(value="/list/acceptIssues", method=RequestMethod.GET)
+	public String accept(@RequestParam("fileName") String fileName){
+		logger.info("파일명:"+fileName);
+		return "redirect:/qualityDivision/qualityIssue/list";
+	}
 }

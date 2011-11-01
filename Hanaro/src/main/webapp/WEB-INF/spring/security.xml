@@ -10,6 +10,8 @@
 		<intercept-url pattern="/index.jsp" filters="none"/><!-- index 는 더미로 활용했다. security 필터 해지. -->
 		<intercept-url pattern="/resources/**"  filters="none"/> <!--  공용 자원은 security 필터 적용 안함. -->
 		<intercept-url pattern="/login" access="isAnonymous()"/> <!-- 로그인 페이지는 익명 사용자 접근 허용. -->
+<!-- 		<intercept-url pattern="/accessDenied.jsp" access="isAuthenticated()"/>접근 권한 경고 페이지. 로그인한 사용자면 누구나 -->
+<!-- 		<intercept-url pattern="/dataAccessFailure.jsp" access="isAuthenticated()"/>DB error  페이지. 로그인한 사용자면 누구나 -->
  		<intercept-url pattern="/home" access="hasAnyRole('ROLE_USER','ROLE_CUST')"/><!-- 기본 사용자 역할 --> 		
  		<intercept-url pattern="/qualityDivision/**" access="hasAnyRole('ROLE_USER','ROLE_CUST')"/><!-- 기본 사용자 역할 -->
 		<intercept-url pattern="/**"  access="denyAll"/>  <!-- 기본 원칙은 아무도 접근 못한다!!!  -->

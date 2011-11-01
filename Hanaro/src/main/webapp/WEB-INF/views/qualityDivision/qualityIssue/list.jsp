@@ -20,8 +20,15 @@
 	$(document).ready(function(){
 		
 		// 그리드 랜더링.
-		$("#undoneList").datagrid({queryParams:{fromDate:'${fromDate}',toDate:'${toDate}',item:''},
-			onLoadSuccess:function(data){$("#readyCount").css("color","blue").text("("+data.total+")");}});
+		$("#undoneList").datagrid({queryParams:{fromDate:'<fmt:formatDate value="${fromDate}" pattern="yyyy-MM-dd"/>',
+			toDate:'<fmt:formatDate value="${toDate}" pattern="yyyy-MM-dd"/>',item:''},
+			onLoadSuccess:function(data){
+				$("#readyCount").css("color","blue").text("("+data.total+")");
+			},
+			onLoadError:function(error){
+				handleAjaxError(error);
+			}
+		});
 		
 		//검색 필터 아이템에 자동완성 랜더링.
 		$("#item").combogrid({
@@ -35,6 +42,11 @@
 			          {field:"model",title:'<fmt:message key="ui.label.Model"/>',width:50,align:"center"}
 			          ]]
 		});
+		
+		$(".icon-disk").live("click",function(){
+			var src = "list/acceptIssues?fileName="+"안녕하세요.txt";
+			$(this).attr("href",src);
+		});
 	});
 	
 	function validFilter(){
@@ -43,15 +55,14 @@
 		params.toDate=$("#toDate").datebox("getValue");
 		params.item=$("#item").combogrid("getValue");
 		
+		$("#undoneList").datagrid("clearSelections");
 		$("#undoneList").datagrid("load",params);
 		
 	}
 	
 	function proceedSelectedIssues(){
 		var selected =$("#undoneList").datagrid("getSelections");
-		alert(selected.length);
 	}
-	
 	</script>
 </head>
 
@@ -97,7 +108,8 @@
 	    <span style="margin-left:2em;"><a href="javascript:validFilter()" class="easyui-linkbutton" iconCls="icon-search"><fmt:message key="ui.button.Search"/></a></span>
     </div>
     <div style="text-align:right;">
-    	<a href="javascript:proceedSelectedIssues()" class="easyui-linkbutton" iconCls="icon-document-todo" plain="true"><fmt:message key="ui.label.doSelected"/></a>
+<%--     	<a href="javascript:proceedSelectedIssues()" class="easyui-linkbutton" iconCls="icon-document-todo" plain="true"><fmt:message key="ui.label.doSelected"/></a> --%>
+<a href="#" class="icon-disk"  style="padding:4px 8px;">&nbsp;</a>
     </div>
     </div>
      

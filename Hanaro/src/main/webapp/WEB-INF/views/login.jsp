@@ -4,7 +4,7 @@
     pageEncoding="UTF-8"%>
 <%@page import="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter" %>
 <c:set var="caching" value="14" scope="page" />
-
+<%response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -18,9 +18,11 @@
 </style>	
  
 <script type="text/javascript" src="resources/scripts/jquery/jquery.latest.js"></script>
+<script type="text/javascript" src="resources/scripts/jqueryui/js/jquery-ui-latest.min.js"></script>
 <script type="text/javascript" src="resources/scripts/easyui/jquery.easyui.min.js"></script>
 <script type="text/javascript" src="resources/scripts/easyui/locale/easyui-lang-${pageContext.response.locale.language}.js"></script>
 <script type="text/javascript" src="resources/scripts/cookie/jquery.cookie.js"></script>
+
 <script type="text/javascript">
 $(document).ready(function(){
 	//쿠키를 읽어온다.
@@ -41,11 +43,18 @@ $(document).ready(function(){
 		}
 		$(this).blur();
 	});
+	
+	//로그인 에러가 있는지 확인.(에러가 있으면 로그인 폼 한 번 떨어주자 ㅋㅋ)
+	if($.trim($(".loginError").text()).length>0){
+			$("#loginDlg").dialog("dialog").effect("shake",{},50); //로그인 창.
+			$(".window-shadow").effect("shake",{},50); // 로그인 창 그림자.
+	}	
 });
+
 </script>
 </head>
 <body onload="javascript:$('#j_username').select().focus();">
-<div class="easyui-dialog" title="Please enter your credentials" closable="false" draggable="false" resizable="false" buttons="#buttonBag" style="width:300px; height:210px;padding:10px;">
+<div id="loginDlg" class="easyui-dialog" title="Please enter your credentials" closable="false" draggable="false" resizable="false" buttons="#buttonBag" style="width:300px; height:210px;padding:10px;">
 <form name="loginForm" action="j_spring_security_check" method="post">
 <table style="width:250px;margin-left:auto; margin-right:auto;margin-top:5px;">
 <tr>
