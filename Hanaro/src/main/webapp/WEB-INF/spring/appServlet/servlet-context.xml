@@ -59,7 +59,8 @@
 			<beans:props>
 				<!--<beans:prop key="org.springframework.web.servlet.PageNotFound">pageNotFound</beans:prop> -->
 				<beans:prop key="org.springframework.dao.DataAccessException">dataAccessFailure</beans:prop>
-				<beans:prop key="org.springframework.transaction.TransactionException">dataAccessFailure</beans:prop>
+				<beans:prop key="org.springframework.transaction.TransactionException">dataAccessFailure</beans:prop>				
+				<beans:prop key="org.springframework.web.multipart.MaxUploadSizeExceededException">fileUploadFailure</beans:prop>								
 			</beans:props>
 		</beans:property>
 	</beans:bean>

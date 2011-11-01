@@ -128,13 +128,13 @@ public class QualityIssueController {
 	
 	//품질불량등록 메뉴의 등록된 목록조회
 	@RequestMapping(value="/getQualityIssueRegList", method=RequestMethod.POST)
-	public @ResponseBody Map<String,Object> getQualityIssueRegList(Locale locale, @RequestParam("division") String division, @RequestParam("occurSite") String occurSite,
-			@RequestParam("stdDt") String stdDt, @RequestParam("endDt") String endDt,@RequestParam("page") int page,@RequestParam("rows") int rows,
+	public @ResponseBody Map<String,Object> getQualityIssueRegList(Locale locale, @RequestParam(value="division",required=false) String division, @RequestParam(value="occurSite",required=false) String occurSite,
+			@RequestParam(value="stdDt",required=false) String stdDt, @RequestParam(value="endDt",required=false) String endDt,@RequestParam("page") int page,@RequestParam("rows") int rows,
 			@RequestParam(value="sort",required=false) String sortKey,@RequestParam(value="order",required=false) String order){
 		
 		Map<String,Object> table = new LinkedHashMap<String,Object>();
 		List<Map<String,Object>> resultList = service.getQualityIssueRegList(locale, division, occurSite, stdDt, endDt);
-		
+				
 		if(resultList!=null){			
 			if(sortKey!=null){
 				Collections.sort(resultList,new HashMapComparator(sortKey, order.equalsIgnoreCase("asc")));
@@ -155,15 +155,13 @@ public class QualityIssueController {
 	@RequestMapping(value="/getQualityIssueFile", method=RequestMethod.GET)
 	public  void  getQualityIssueFile(Locale locale, @RequestParam("regNo") String regNo, @RequestParam("fileName") String fileName,@RequestParam("fileSeq") String fileSeq, HttpServletResponse response){		
 	
-		logger.info(fileName);
 		
 		byte[] file = null;
 		BufferedOutputStream out = null;
 		file = service.getQualityIssueFile(locale, regNo, fileSeq);	    
 		
 		try {			
-			fileName = new String(fileName.getBytes("KSC5601"),"ISO-8859-1");
-		    response.setHeader("Content-Disposition","attachment;filename="+fileName);		    
+		    response.setHeader("Content-Disposition","attachment;filename=\""+URLEncoder.encode(fileName,"UTF-8")+"\"");		    
 			out = new BufferedOutputStream(response.getOutputStream());
 			out.write(file);
 			out.close();

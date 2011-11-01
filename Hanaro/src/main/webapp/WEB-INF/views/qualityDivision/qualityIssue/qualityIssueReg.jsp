@@ -124,7 +124,7 @@
 		params.occurSite = $("#searchOccurSite").val(); 
 		params.stdDt = $("#searchStdDt").datebox("getValue");
 		params.endDt=$("#searchEndDt").datebox("getValue");
-		$("#resultDataGrid").datagrid({url:"getQualityIssueRegList",queryParams:params});
+		$("#resultDataGrid").datagrid("load",params);
 		
 	}
 	
@@ -186,13 +186,7 @@
 		
 	}
 	
-	function downFile(regNo,fileName){
-		$.post("getQualityIssueFile",{regNo:regNo,fileName:fileName},function(){
-			
-		});
-	}
-	
-	
+
 	function fileDownImg1(value,rowData){
 		var regNo = rowData.DATA0;				
 		var format = "";		
@@ -479,7 +473,7 @@
 			</td>
 			<td>
 				<table class="easyui-datagrid" iconCls="icon-application-view-list" style="width:800px;height:725px;" 
-				title='<fmt:message key="ui.label.RegList"/>' toolbar="#divSearch" pagination="true"  id="resultDataGrid" pageSize="30"   singleSelect="true" striped="true"   >
+				title='<fmt:message key="ui.label.RegList"/>' toolbar="#divSearch" pagination="true"  id="resultDataGrid" pageSize="30"   singleSelect="true" striped="true"   url="getQualityIssueRegList" >
 					<thead frozen="true">
 						        <tr>  
 						            <th field="DATA0" width="110" sortable="true" align="center"><fmt:message key="ui.label.RegNo" /></th>  
