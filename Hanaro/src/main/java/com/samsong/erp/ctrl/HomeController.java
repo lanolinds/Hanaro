@@ -24,13 +24,14 @@ public class HomeController {
 		return "home";
 	}
 	
-	@RequestMapping(value="/timeout", method=RequestMethod.GET)
-	public String timeout(){
-		return "timeout";
-	}
 	@RequestMapping(value="/accessDenied", method=RequestMethod.GET)
 	public String accessDenied(){
 		return "accessDenied";
+	}
+	
+	@RequestMapping(value="/dataAccessFailure", method=RequestMethod.GET)
+	public String dataAccessFailure(){
+		return "dataAccessFailure";
 	}
 	
 	@RequestMapping(value = "/help/manual", method = RequestMethod.GET)

@@ -1,6 +1,8 @@
 package com.samsong.erp.ctrl.quality;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.samsong.erp.service.quality.QualityIssueService;
 import com.samsong.erp.util.HashMapComparator;
@@ -80,7 +83,7 @@ public class IssueListController {
 	
 	@RequestMapping(value="/list/itemAssistCallback", method=RequestMethod.POST)
 	public @ResponseBody Map<String,Object> getAssistItemList(Locale locale){
-		List<Map<String,Object>> list = service.getAssistItemList(locale,"ING");	
+		List<Map<String,Object>> list = service.getAssistItemList(locale,"ready");	
 		Map<String,Object> json = new HashMap<String, Object>();
 		if(list!=null){
 			json.put("total",list.size());
@@ -92,5 +95,10 @@ public class IssueListController {
 		}
 		return json;
 	}
-
+	@RequestMapping(value="/list/acceptIssues", method=RequestMethod.POST)
+	public String accept(@RequestParam("regNo") String[] regNums,Model model){
+		List<String> issues = Arrays.asList(regNums);
+		model.addAttribute("issues",issues);
+		return "qualityDivision/qualityIssue/acceptIssues";
+	}
 }

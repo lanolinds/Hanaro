@@ -20,8 +20,15 @@
 	$(document).ready(function(){
 		
 		// 그리드 랜더링.
-		$("#undoneList").datagrid({queryParams:{fromDate:'${fromDate}',toDate:'${toDate}',item:''},
-			onLoadSuccess:function(data){$("#readyCount").css("color","blue").text("("+data.total+")");}});
+		$("#undoneList").datagrid({queryParams:{fromDate:'<fmt:formatDate value="${fromDate}" pattern="yyyy-MM-dd"/>',
+			toDate:'<fmt:formatDate value="${toDate}" pattern="yyyy-MM-dd"/>',item:''},
+			onLoadSuccess:function(data){
+				$("#readyCount").css("color","blue").text("("+data.total+")");
+			},
+			onLoadError:function(error){
+				handleAjaxError(error);
+			}
+		});
 		
 		//검색 필터 아이템에 자동완성 랜더링.
 		$("#item").combogrid({
@@ -43,15 +50,22 @@
 		params.toDate=$("#toDate").datebox("getValue");
 		params.item=$("#item").combogrid("getValue");
 		
+		$("#undoneList").datagrid("clearSelections");
 		$("#undoneList").datagrid("load",params);
 		
 	}
 	
-	function proceedSelectedIssues(){
+	function acceptSelectedIssues(){
 		var selected =$("#undoneList").datagrid("getSelections");
-		alert(selected.length);
+		if(!selected || selected.length===0){
+			$.messager.alert("Warnning",'<fmt:message key="warn.notSelectedItem"/>',"warning");
+			return false;
+		}
+		$.each(selected,function(i,issue){
+			$("form[name='acceptForm']").append("<input type='hidden' name='regNo' value='"+issue.regNo+"'/>");
+		});
+		$("form[name='acceptForm']").submit();
 	}
-	
 	</script>
 </head>
 
@@ -97,7 +111,8 @@
 	    <span style="margin-left:2em;"><a href="javascript:validFilter()" class="easyui-linkbutton" iconCls="icon-search"><fmt:message key="ui.button.Search"/></a></span>
     </div>
     <div style="text-align:right;">
-    	<a href="javascript:proceedSelectedIssues()" class="easyui-linkbutton" iconCls="icon-document-todo" plain="true"><fmt:message key="ui.label.doSelected"/></a>
+    	<form name="acceptForm" method="post" action="list/acceptIssues"/>
+    	<a href="#" class="easyui-linkbutton" iconCls="icon-document-todo" onclick="acceptSelectedIssues()" plain="true"><fmt:message key="ui.label.doSelected"/></a>
     </div>
     </div>
      

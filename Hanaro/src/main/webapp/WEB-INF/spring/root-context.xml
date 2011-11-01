@@ -29,7 +29,7 @@
 		<tx:attributes>
 			<tx:method name="get*" read-only="true"/>  
 			<tx:method name="*"/>
-		</tx:attributes> 
+		</tx:attributes>  
 	</tx:advice>  
 	
 	<aop:config>
