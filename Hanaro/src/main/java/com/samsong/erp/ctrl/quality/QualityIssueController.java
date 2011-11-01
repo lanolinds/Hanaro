@@ -32,7 +32,7 @@ import com.samsong.erp.service.quality.QualityIssueService;
 import com.samsong.erp.util.HashMapComparator;
 
 @Controller
-@RequestMapping(value="/qualityDivision/qualityIssue")
+@RequestMapping("/qualityDivision/qualityIssue")
 public class QualityIssueController {
 
 	private String prefix ="/qualityDivision/qualityIssue"; 

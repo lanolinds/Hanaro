@@ -8,8 +8,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.samsong.erp.service.quality.QualityIssueService;
 
-@RequestMapping("/qualityDivision/qualityIssue")
+
 @Controller
+@RequestMapping("/qualityDivision/qualityIssue")
 public class NcrManageListController {
 	private String prefix = "/qualityDivision/qualityIssue";	
 	private static final Logger logger = Logger.getLogger(NcrManageListController.class);
