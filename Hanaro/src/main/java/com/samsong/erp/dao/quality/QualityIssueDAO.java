@@ -15,7 +15,9 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -91,7 +93,7 @@ public class QualityIssueDAO {
 	}
 	
 	
-	public void procQualityIssueReg(String procType, Locale locale, QualityIssueRegSheet sheet, String user){
+	public void procQualityIssueReg(String procType, Locale locale, QualityIssueRegSheet sheet, String user, byte[] files1, byte[] files2){
 		   Map<String ,Object> params = new HashMap<String,Object>();
 		   params.put("procType",procType);
 		   params.put("locale",locale.getCountry());
@@ -112,9 +114,11 @@ public class QualityIssueDAO {
 		   params.put("defectS",sheet.getDefectS());
 		   params.put("defectAmount",sheet.getDefectAmount());
 		   params.put("explanation",sheet.getExplanation());
-		   params.put("file1",sheet.getFile1());
-		   params.put("file2",sheet.getFile2());
-		   params.put("user",user);		
+		   params.put("file1Name",sheet.getFile1());
+		   params.put("file2Name",sheet.getFile2());		   
+		   params.put("file1",files1);
+		   params.put("file2",files2);
+		   params.put("user",user);
 		   sp = new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueDAO_procQualityIssueReg");		
 		   sp.execute(params);   	
      }
@@ -181,6 +185,20 @@ public class QualityIssueDAO {
 		});
 		sp.execute(params);
 		return resultList;
+	}
+	
+	// 품질 파일을 조회한다.
+	public byte[] getQualityIssueFile(Locale locale, String regNo, String fileSeq){
+		String sql = "select [file] from qis_quality_defect_file where  LOCALE =   ?   AND  REG_NO = ?   AND  [file_seq] = ?";
+		
+		return  jdbc.queryForObject(sql,new Object[]{locale.getCountry(),regNo,fileSeq},new RowMapper<byte[]>(){
+			@Override
+			public byte[] mapRow(ResultSet rs, int rowNum) throws SQLException {		
+				 return rs.getBytes(1);
+			}
+			 
+		 });
+		
 	}
 	
 

@@ -1,6 +1,7 @@
 package com.samsong.erp.service.quality;
 
 
+import java.io.FileOutputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -32,8 +33,8 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	}
 
 	@Override
-	public void procQualityIssueReg(String procType, Locale locale, QualityIssueRegSheet sheet, String user) { 
-		dao.procQualityIssueReg(procType, locale, sheet, user);
+	public void procQualityIssueReg(String procType, Locale locale, QualityIssueRegSheet sheet, String user, byte[] files1, byte[] files2) { 
+		dao.procQualityIssueReg(procType, locale, sheet, user, files1, files2);
 	}
 
 	@Override
@@ -50,6 +51,12 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	@Override
 	public List<Map<String, Object>> getQualityIssueRegList(Locale locale, String division, String occurSite, String stdDt, String endDt) {
 			return dao.getQualityIssueRegList(locale, division, occurSite, stdDt, endDt);
+	}
+
+	@Override
+	public byte[] getQualityIssueFile(Locale locale, String regNo,
+			String fileSeq) {
+		return dao.getQualityIssueFile(locale, regNo, fileSeq);
 	}
 
 
