@@ -299,7 +299,7 @@
 				<artifactId>tomcat-maven-plugin</artifactId>
 				<version>1.0-beta-1</version>
 				<configuration>
-					<charset>UTF-8</charset>
+				<charset>UTF-8</charset>
 				</configuration>
 			</plugin>						
 		</plugins>
