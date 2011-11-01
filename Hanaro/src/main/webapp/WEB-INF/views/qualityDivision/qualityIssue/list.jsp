@@ -42,11 +42,6 @@
 			          {field:"model",title:'<fmt:message key="ui.label.Model"/>',width:50,align:"center"}
 			          ]]
 		});
-		
-		$(".icon-disk").live("click",function(){
-			var src = "list/acceptIssues?fileName="+"안녕하세요.txt";
-			$(this).attr("href",src);
-		});
 	});
 	
 	function validFilter(){
@@ -60,8 +55,16 @@
 		
 	}
 	
-	function proceedSelectedIssues(){
+	function acceptSelectedIssues(){
 		var selected =$("#undoneList").datagrid("getSelections");
+		if(!selected || selected.length===0){
+			$.messager.alert("Warnning",'<fmt:message key="warn.notSelectedItem"/>',"warning");
+			return false;
+		}
+		$.each(selected,function(i,issue){
+			$("form[name='acceptForm']").append("<input type='hidden' name='regNo' value='"+issue.regNo+"'/>");
+		});
+		$("form[name='acceptForm']").submit();
 	}
 	</script>
 </head>
@@ -108,8 +111,8 @@
 	    <span style="margin-left:2em;"><a href="javascript:validFilter()" class="easyui-linkbutton" iconCls="icon-search"><fmt:message key="ui.button.Search"/></a></span>
     </div>
     <div style="text-align:right;">
-<%--     	<a href="javascript:proceedSelectedIssues()" class="easyui-linkbutton" iconCls="icon-document-todo" plain="true"><fmt:message key="ui.label.doSelected"/></a> --%>
-<a href="#" class="icon-disk"  style="padding:4px 8px;">&nbsp;</a>
+    	<form name="acceptForm" method="post" action="list/acceptIssues"/>
+    	<a href="#" class="easyui-linkbutton" iconCls="icon-document-todo" onclick="acceptSelectedIssues()" plain="true"><fmt:message key="ui.label.doSelected"/></a>
     </div>
     </div>
      
