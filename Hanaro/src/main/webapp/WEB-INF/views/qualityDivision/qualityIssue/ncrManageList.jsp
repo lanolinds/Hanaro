@@ -22,7 +22,9 @@
 <%@ include file="/WEB-INF/views/menu.jsp" %>
 </div>
 <div region="center" style="padding:10px;">
-
+	<table>
+		
+	</table>
 </div>
 </body>
 
