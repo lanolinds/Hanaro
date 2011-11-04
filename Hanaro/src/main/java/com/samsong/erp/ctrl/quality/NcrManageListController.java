@@ -30,7 +30,9 @@ public class NcrManageListController {
 	@RequestMapping(value="/ncrManageDetail", method=RequestMethod.GET)
 	public String menuNcrManageDetail(Model model){
 	
+		String[] standardNames = {"ui.label.quality.fmea","ui.label.quality.managePlan","ui.label.quality.workStandard","ui.label.quality.csheet"};
 		
+		model.addAttribute("stanNames",standardNames);
 		model.addAttribute("ncrInForm",new NcrInformSheet());
 		model.addAttribute("measure1",new NcrMeasureReportSheet1());
 		model.addAttribute("measure2", new NcrMeasureReportSheet2());
