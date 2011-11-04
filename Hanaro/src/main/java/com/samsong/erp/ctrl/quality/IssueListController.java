@@ -7,12 +7,14 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +34,9 @@ public class IssueListController {
 	
 	@Autowired
 	private QualityIssueService service;
+	
+	@Autowired
+	private MessageSource message;
 	
 	@RequestMapping(value="/list",method=RequestMethod.GET)
 	public String list(Model model){
@@ -95,10 +100,26 @@ public class IssueListController {
 		}
 		return json;
 	}
-	@RequestMapping(value="/list/acceptIssues", method=RequestMethod.POST)
-	public String accept(@RequestParam("regNo") String[] regNums,Model model){
+	@RequestMapping(value="/acceptIssues", method=RequestMethod.POST)
+	public String accept(@RequestParam("regNo") String[] regNums,@RequestParam("placeCode") String placeCode
+			,Model model, Locale locale){
 		List<String> issues = Arrays.asList(regNums);
+		Map<String,String> m = getHandleMethods(placeCode,locale);
 		model.addAttribute("issues",issues);
+		model.addAttribute("methods",m);
+		model.addAttribute("place",placeCode);
 		return "qualityDivision/qualityIssue/acceptIssues";
+	}
+	private Map<String,String> getHandleMethods(String code,Locale locale){
+		Map<String,String> m = new LinkedHashMap<String,String>();
+		if(code.equalsIgnoreCase("CD")){
+			m.put("resend", message.getMessage("system.resend",null,locale));
+		}
+		else{
+			m.put("reuse", message.getMessage("system.option.reuse",null,locale));
+			m.put("rework", message.getMessage("system.option.rework",null,locale));
+			m.put("abandon", message.getMessage("system.option.abandon",null,locale));
+		}
+		return m;
 	}
 }

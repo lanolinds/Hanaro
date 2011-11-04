@@ -59,5 +59,15 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 		return dao.getQualityIssueFile(locale, regNo, fileSeq);
 	}
 
+	@Override
+	public Map<String, Object> getIssueDetails(String regNo, Locale locale) {
+		// TODO Auto-generated method stub
+		return dao.getIssueDetails(regNo,locale);
+	}
+
+	@Override
+	public List<Map<String, Object>> getDefectTreeData(Locale locale) {
+		return dao.getDefectTreeData(locale);
+	}
 
 }

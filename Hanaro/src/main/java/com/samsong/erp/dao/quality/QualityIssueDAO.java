@@ -4,7 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -15,7 +14,6 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -135,9 +133,11 @@ public class QualityIssueDAO {
 				Map<String,Object> m = new HashMap<String,Object>();
 				m.put("regNo",rs.getString(1));
 				m.put("date",fmt.format(rs.getObject(2)));
-				m.put("item",rs.getString(3));
-				m.put("count",rs.getInt(4));
-				m.put("remark",rs.getString(5));
+				m.put("place", rs.getString(3));
+				m.put("placeCode", rs.getString(4));
+				m.put("item",rs.getString(5));
+				m.put("count",rs.getInt(6));
+				m.put("remark",rs.getString(7));
 				return m;
 			}
 		});
@@ -200,6 +200,87 @@ public class QualityIssueDAO {
 		 });
 		
 	}
-	
+
+	public Map<String, Object> getIssueDetails(String regNo, Locale locale) {
+		return jdbc.queryForMap("exec QualityIssueDAO_getIssueDetails ?,?; ", new Object[]{regNo,locale.getCountry()});
+	}
+
+	public List<Map<String, Object>> getDefectTreeData(Locale locale) {
+		// 테이블 구성이 tree에 적합하지 않음. 재귀함수 적용 포기.
+		
+		String country=locale.getCountry();
+		//1단계
+		String sql = "select code, name from code_defect where locale=? and (len(code) - len(replace(code,'-','')))=?;";
+		List<Map<String,Object>> level0=jdbc.query(sql,new Object[]{country,0}, new RowMapper<Map<String,Object>>(){
+
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int i)
+					throws SQLException {
+				Map<String,Object> node = new HashMap<String,Object>();
+				List<Map<String,Object>> children = new ArrayList<Map<String,Object>>();
+				node.put("id", rs.getString(1));
+				node.put("text", rs.getString(2));
+				node.put("state","closed");
+				node.put("iconCls", "icon-brick-add");
+				node.put("children", children);
+				return node;
+			}
+		});
+		//2단계
+			List<Map<String,Object>> level1=jdbc.query(sql,new Object[]{country,1}, new RowMapper<Map<String,Object>>(){
+
+				@Override
+				public Map<String, Object> mapRow(ResultSet rs, int i)
+						throws SQLException {
+					Map<String,Object> node = new HashMap<String,Object>();
+					List<Map<String,Object>> children = new ArrayList<Map<String,Object>>();
+					node.put("id", rs.getString(1));
+					node.put("text", rs.getString(2));
+					node.put("state","closed");
+					node.put("iconCls", "icon-error-add");
+					node.put("children", children);
+					return node;
+				}
+			});
+		//3단계
+		List<Map<String,Object>> level2=jdbc.query(sql,new Object[]{country,2}, new RowMapper<Map<String,Object>>(){
+
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int i)
+					throws SQLException {
+				Map<String,Object> node = new HashMap<String,Object>();
+				node.put("id", rs.getString(1));
+				node.put("text", rs.getString(2));
+				node.put("iconCls", "icon-bullet-error");
+				node.put("checked", true);
+				return node;
+			}
+		});
+		
+		//3단계를 2단계에 넣기.
+		for(Map<String,Object> node: level2){
+			String parent =(String)node.get("id");
+			parent = parent.substring(0,parent.lastIndexOf("-"));
+			for(Map<String,Object> n: level1){
+				if(n.get("id").equals(parent)){
+					((List<Map<String,Object>>)n.get("children")).add(node);
+					break;
+				}
+			}
+		}
+		
+		//2단계를 1단계에 넣기.
+		for(Map<String,Object> node: level1){
+			String parent =(String)node.get("id");
+			parent = parent.substring(0,parent.lastIndexOf("-"));
+			for(Map<String,Object> n: level0){
+				if(n.get("id").equals(parent)){
+					((List<Map<String,Object>>)n.get("children")).add(node);
+					break;
+				}
+			}
+		}
+		return level0;
+	}
 
 }
