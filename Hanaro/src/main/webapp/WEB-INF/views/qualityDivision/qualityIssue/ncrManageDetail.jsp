@@ -12,24 +12,26 @@
 	<link rel="stylesheet" href='<c:url value="/resources/scripts/easyui/themes/icon.css"/>'/>
 	<link rel="stylesheet" href='<c:url value="/resources/styles/app.default.css"/>'/>		
 	<style type="text/css">
-		#form1 th {background-color: #FAFAFA;height:22px; font-weight:normal; text-align: left; white-space:nowrap;width: 120px; }
-		#form1 td {border:1px dotted #CBC7C4	r;width:170px;}
-		#form1 input{border:0px;width:100%;}		
+		#headTable th {background-color: #FAFAFA;height:22px; font-weight:normal; text-align: left; white-space:nowrap;width: 120px; }
+		#headTable td {border:1px dotted #CBC7C4	r;width:170px;}
+		#headTable input{border:0px;width:100%;}		
+		
+		#measureTable1 th {background-color: #FAFAFA;height:22px; font-weight:normal; text-align: left; white-space:nowrap;width: 120px; }
+		#measureTable1 .group{background-color: #E1E8F3;}
+		
+		#measureTable2 th {background-color: #FAFAFA;height:22px; font-weight:normal; text-align: left; white-space:nowrap;width: 120px; }
+		#measureTable2 .group{background-color: #E1E8F3;}
+		
+		#measureTable3 th {background-color: #FAFAFA;height:22px; font-weight:normal; text-align: left; white-space:nowrap;width: 120px; }
+		#measureTable3 td {border:1px dotted #CBC7C4	r;width:170px;}
+		#measureTable3 input{border:0px;width:100%;}
+		
+		#measureTable4 th {background-color: #FAFAFA;height:22px; font-weight:normal; text-align: left; white-space:nowrap;width: 120px; }
 		
 		#form2 th {background-color: #FAFAFA;height:22px; font-weight:normal; text-align: left; white-space:nowrap;width: 120px; }
-		#form2 .group{background-color: #E1E8F3;}
-		
-		#form3 th {background-color: #FAFAFA;height:22px; font-weight:normal; text-align: left; white-space:nowrap;width: 120px; }
-		#form3 .group{background-color: #E1E8F3;}
-		
-		#form4 th {background-color: #FAFAFA;height:22px; font-weight:normal; text-align: left; white-space:nowrap;width: 120px; }
-		#form4table td {border:1px dotted #CBC7C4	r;width:170px;}
-		#form4table input{border:0px;width:100%;}
-		
-		#form5 th {background-color: #FAFAFA;height:22px; font-weight:normal; text-align: left; white-space:nowrap;width: 120px; }
-		#form5 td {border:1px dotted #CBC7C4	r;width:170px;}
-		#form5 input{border:0px;width:100%;}
-		#form5 .group{background-color: #E1E8F3;}								
+		#form2 td {border:1px dotted #CBC7C4	r;width:170px;}
+		#form2 input{border:0px;width:100%;}
+		#form2 .group{background-color: #E1E8F3;}								
 		
 		
 	</style>
@@ -98,7 +100,16 @@
 		}
 		idx = $("#"+dataGridName).datagrid("getRowIndex",idx);
 		$("#"+dataGridName).datagrid("deleteRow",idx);
-	}		
+	}	
+	
+	//대책서를 등록한다.
+	function insertData(){
+		if($("#form1").form("validate")){			
+			$("#form1").submit();			
+		}else{
+			return false;
+		}
+	}
 	
 	
 	
@@ -108,18 +119,20 @@
 
 <body class="easyui-layout" style="min-width: 1024px;">
 <div region="center" style="padding:10px;">
+	<form:form id="form1" modelAttribute="ncrInForm" enctype="multipart/form-data" action="addNcrMeasureForm">
 	<table>
 		<tr>
 			<td>
+			
 				<div iconCls="icon-table-chart" class="easyui-panel" style="width:600px;height:725px;" title='<fmt:message key="ui.label.ncrInformReport"/>'>
-					<form:form id="form1" modelAttribute="ncrInForm" >
-						<table style="padding:10px;" class="groupTable" width="100%">
+					
+						<table style="padding:10px;" class="groupTable" width="100%" id="headTable">
 							<tr>
 								<th colspan='4' ><label class="label-Leader-blue"><fmt:message key="ui.label.Occur" /></label><hr/></th>								
 							</tr>						
 							<tr>
 								<th><label><fmt:message key="ui.label.title" /></label></th>
-								<td><form:input path="title" /></td>
+								<td><form:input path="title" class="easyui-validatebox" required="true" /></td>
 								<th><label><fmt:message key="ui.label.ncrNo" /></label></th>
 								<td><form:input path="ncrNo" readonly="true" /></td>
 							</tr>
@@ -265,19 +278,19 @@
 							</tr>
 							<tr>
 								<th><label><fmt:message key="ui.label.ncrTreatReport"><fmt:param value=""/></fmt:message></label></th>
-								<td><input type="file" /></td>
+								<td><input type="file" name="treatFile" /></td>
 								<th colspan="2"><span></span></th>
 							</tr>																																																													
 																																								
 							</table>
-						</form:form>
+						
 				</div>
 			</td>
 			<td>
 				<div class="easyui-tabs"  style="width:500px;height:725px;">
 					  <div title="<fmt:message key='ui.label.ncrTreatReport'><fmt:param value='1' /></fmt:message>-<fmt:message key='ui.label.qualityIssue.reasonAnlysis'/> " >
-					  <form:form id="form2" modelAttribute="measure1" >
-					  	<table style="padding:10px;" class="groupTable" width="100%">
+					  
+					  	<table style="padding:10px;" class="groupTable" width="100%" id="measureTable1">
 							<tr>
 								<th colspan='2' class="group"><label class="label-Leader-blue"><fmt:message key="ui.label.qualityIssue.reasonIssue" /></label></th>								
 							</tr>	
@@ -292,10 +305,10 @@
 							</tr>
 							<tr>								
 								<th>
-									<input type="file" />
+									<input type="file" name="imgReasonFile1" />
 								</th>
 								<th>
-									<input type="file" />
+									<input type="file" name="imgReasonFile2" />
 								</th>
 							</tr>
 							<tr><th colspan='2'></th></tr>														
@@ -324,11 +337,11 @@
 								</th>
 							</tr>																								
 					  	</table>
-					  </form:form>
+					  
 					  </div>  
 					  <div title="<fmt:message key='ui.label.ncrTreatReport'><fmt:param value='2' /></fmt:message>-<fmt:message key='ui.label.qualityIssue.measure'/> " >  
-						<form:form id="form3" modelAttribute="measure2">
-							<table style="padding:10px;" class="groupTable" width="100%">
+						
+							<table style="padding:10px;" class="groupTable" width="100%" id="measureTable2">
 								<tr>
 									<th colspan="2" class="group"><label class="label-Leader-blue"><fmt:message key="ui.label.qualityIssue.tempMeasure" /></label></th>								
 								</tr>	
@@ -404,11 +417,12 @@
 									</th>
 								</tr>																																								
 							</table>
-						</form:form>					
+																	
 					  </div>
+					  
 					  <div title="<fmt:message key='ui.label.ncrTreatReport'><fmt:param value='3' /></fmt:message>-<fmt:message key='ui.label.qualityIssue.applyStandard'/> " >
-						<form id="form4" >
-							<table style="padding:10px;" class="groupTable" width="100%" id="form4Table">
+						
+							<table style="padding:10px;" class="groupTable" width="100%" id="measureTable3">
 							<c:forEach items="${stanNames}"  var="item" varStatus="state" >
 								<tr>
 									<th colspan='2'><label class="label-Leader-black"><fmt:message key="${item}" /></label></th>								
@@ -437,7 +451,7 @@
 									<th colspan='2'><label class="label-Leader-black"><fmt:message key="ui.label.etc" /></label></th>								
 								</tr>	
 							</table>
-							<table style="padding:10px;" class="groupTable" width="100%">
+							<table style="padding:10px;" class="groupTable" width="100%" id="measureTable4">
 								<tr>	
 									<th colspan="2">
 									<table id="datagridStandard"  class="easyui-datagrid"  style="width:473px;height:200px;"  toolbar="#pageNavForStandard" pageSize="100" fitColumns="true" singleSelect="true" striped="true" >
@@ -451,11 +465,11 @@
 									</table>
 									</th>
 								</tr>													
-							</table>
-						</form>							
-					  </div>  					    
-					  <div title='<fmt:message key="ui.label.evaluation"/>' >  
-						<form id="form5" >
+							</table>												
+					  </div>  			
+					  <c:if test="${head.status=='AGREE'}">
+					  <div title='<fmt:message key="ui.label.evaluation"/>'  id="displayValuation">  
+						<form id="form2" enctype="multipart/form-data" action="addNcrMeasureEvaluation">
 							<table style="padding:10px;" class="groupTable" width="100%">
 								<tr>
 									<th colspan='3' class="group"><label class="label-Leader-blue"><fmt:message key="ui.label.ncrEvaluation" /></label></th>								
@@ -490,17 +504,19 @@
 								<tr>
 									<th><fmt:message key="ui.label.approver" /></th>
 									<td colspan="2"><input class="easyui-validatebox" name="evalApprover" required="true" /></td>
-								</tr>																
-																																				
-							</table>
-						</form>					
-					  </div>  				
-				</div>			
+								</tr>																											
+							</table>		
+							</form>		
+					  </div>
+					  </c:if>
+					    				
+				</div>
+											
 			</td>
 		</tr>
 		<tr>
 			<td colspan="2" align="center">
-				<a href="#" iconCls="icon-disk" class="easyui-linkbutton"><fmt:message key="ui.button.Reg" /></a>
+				<a href="#" iconCls="icon-disk" class="easyui-linkbutton" onclick="javascript:insertData();"><fmt:message key="ui.button.Reg" /></a>
 				<a href="#" iconCls="icon-pencil" class="easyui-linkbutton"><fmt:message key="ui.button.Edit" /></a>
 				<a href="#" iconCls="icon-delete" class="easyui-linkbutton"><fmt:message key="ui.button.Delete" /></a>
 				<a href="#" iconCls="icon-information" class="easyui-linkbutton"><fmt:message key="ui.button.inform" /></a>
@@ -508,11 +524,10 @@
 				<a href="#" iconCls="icon-accept" class="easyui-linkbutton"><fmt:message key="ui.button.agree" /></a>
 				<a href="#" iconCls="icon-table-edit" class="easyui-linkbutton"><fmt:message key="ui.button.evaluation" /></a>
 				<a href="#" iconCls="icon-arrow-redo" class="easyui-linkbutton"><fmt:message key="ui.button.Cancel" /></a>
-				
-				
 			</td>
 		</tr>
 	</table>
+	</form:form>
 </div>
 
 
