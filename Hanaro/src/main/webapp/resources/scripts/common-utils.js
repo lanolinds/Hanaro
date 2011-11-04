@@ -21,3 +21,13 @@ function handleAjaxError(err){
 	}
 	
 }
+//input file 에서 선택된 파일의 파일명만 추출합니다.
+function searchFileName(path){
+	var arr=("file:///"+path.replace(/ /gi,"%20").replace(/\\/gi,"/")).split("/");
+	return arr[arr.length-1];	
+}
+
+
+	
+
+

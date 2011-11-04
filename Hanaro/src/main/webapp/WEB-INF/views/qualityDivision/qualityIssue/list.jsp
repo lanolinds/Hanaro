@@ -126,6 +126,7 @@
     </div>
     <div style="text-align:right;">
     	<form name="acceptForm" method="post" action="acceptIssues"></form>
+
     	<a href="#" class="easyui-linkbutton" iconCls="icon-document-todo" onclick="acceptSelectedIssues()" plain="true"><fmt:message key="ui.label.doSelected"/></a>
     </div>
     </div>
