@@ -61,10 +61,22 @@
 			$.messager.alert("Warnning",'<fmt:message key="warn.notSelectedItem"/>',"warning");
 			return false;
 		}
+		var placeCode = selected[0].placeCode;
+		var c = 0;
 		$.each(selected,function(i,issue){
+			if(placeCode==issue.placeCode)
+				c++;
 			$("form[name='acceptForm']").append("<input type='hidden' name='regNo' value='"+issue.regNo+"'/>");
 		});
-		$("form[name='acceptForm']").submit();
+		if(c!==selected.length){
+			$.messager.alert("Warnning",'<fmt:message key="warn.invalidOrigin"/>',"warning");
+			$("form[name='acceptForm'] :hidden").remove();
+		}
+		else{
+			$("form[name='acceptForm']").append("<input type='hidden' name='placeCode' value='"+placeCode+"'/>");
+			$("form[name='acceptForm']").submit();
+		}
+		
 	}
 	</script>
 </head>
@@ -87,6 +99,8 @@
 						<th field="ck" checkbox="true"></th>  
 						<th field="regNo" width="250" sortable="true"><fmt:message key="ui.label.RegNo"/></th>
 						<th field="date" width="150" align="center" sortable="true"><fmt:message key="ui.label.OccurHour"/></th>
+						<th field="place" width="100" sortable="true"><fmt:message key="ui.label.RegPlace"/></th>
+						<th field="placeCode" hidden="true"></th>
 						<th field="item" width="150" sortable="true"><fmt:message key="ui.label.PartNo"/></th>
 						<th field="count" width="100" align="right" sortable="true" formatter="numeric"><fmt:message key="ui.label.count"/></th>
 						<th field="comment" width="100" ><fmt:message key="ui.label.remark"/></th>
@@ -103,15 +117,16 @@
     <div  id="toolbar" style="padding:5px;height:auto;">
     <div style="margin-top:.5em;">
 	    <span style="margin-right:.5em"><fmt:message key="ui.label.SearchDate"/></span>
-	    <input id="fromDate" class="easyui-datebox" required="true" editable="false" value='<fmt:formatDate value="${fromDate}" pattern='yyyy-MM-dd'/>' style="width:100px;"/>
+	    <input id="fromDate" class="easyui-datebox" editable="false" value='<fmt:formatDate value="${fromDate}" pattern="yyyy-MM-dd"/>' style="width:100px;"></input>
 	    <span style="margin: 0em .3em;">~</span>
-	    <input id="toDate" class="easyui-datebox"  required="true" editable="false" value='<fmt:formatDate value="${toDate}" pattern='yyyy-MM-dd'/>' style="width:100px;"/>
+	    <input id="toDate" class="easyui-datebox" editable="false" value='<fmt:formatDate value="${toDate}" pattern="yyyy-MM-dd"/>' style="width:100px;"></input>
 	     <span style="margin-left:1em;margin-right:.5em;"><fmt:message key="ui.label.PartNo"/></span>
 	    <input id="item" style="width:200px;"/>
 	    <span style="margin-left:2em;"><a href="javascript:validFilter()" class="easyui-linkbutton" iconCls="icon-search"><fmt:message key="ui.button.Search"/></a></span>
     </div>
     <div style="text-align:right;">
-    	<form name="acceptForm" method="post" action="list/acceptIssues"></form>
+    	<form name="acceptForm" method="post" action="acceptIssues"></form>
+
     	<a href="#" class="easyui-linkbutton" iconCls="icon-document-todo" onclick="acceptSelectedIssues()" plain="true"><fmt:message key="ui.label.doSelected"/></a>
     </div>
     </div>
