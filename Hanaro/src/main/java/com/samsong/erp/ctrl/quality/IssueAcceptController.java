@@ -29,7 +29,7 @@ public class IssueAcceptController {
 	
 	@RequestMapping("/issueDetailCallback")
 	public @ResponseBody Map<String,Object> getIssueDetails(@RequestParam("no") String regNo,Locale locale){
-		return service.getIssueDetails(regNo,locale);
+		return service.getIssueDetails(regNo, locale);
 	}
 	@RequestMapping("/downloadFile")
 	public void downloadFile(@RequestParam("seq") int seq,@RequestParam("no") String regNo,@RequestParam("name") String name,

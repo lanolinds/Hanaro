@@ -61,7 +61,6 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 
 	@Override
 	public Map<String, Object> getIssueDetails(String regNo, Locale locale) {
-		// TODO Auto-generated method stub
 		return dao.getIssueDetails(regNo,locale);
 	}
 

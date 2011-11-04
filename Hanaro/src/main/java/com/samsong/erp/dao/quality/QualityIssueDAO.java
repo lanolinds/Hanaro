@@ -283,4 +283,5 @@ public class QualityIssueDAO {
 		return level0;
 	}
 
+
 }

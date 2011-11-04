@@ -23,10 +23,10 @@ public interface QualityIssueService {
 	
 	public List<Map<String,Object>> getQualityIssueRegList(Locale locale, String division, String occurSite, String stdDt, String endDt);
 	
-	public byte[]  getQualityIssueFile(Locale locale, String regNo, String fileSeq);
-
-	public Map<String, Object> getIssueDetails(String regNo, Locale locale);
+	public byte[]  getQualityIssueFile(Locale locale, String regNo, String fileSeq);	
 
 	public List<Map<String, Object>> getDefectTreeData(Locale locale);
+
+	public Map<String, Object> getIssueDetails(String regNo, Locale locale);
 	
 }
