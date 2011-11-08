@@ -1,6 +1,8 @@
 package com.samsong.erp.service.quality;
 
 
+import java.io.FileOutputStream;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -31,13 +33,19 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	}
 
 	@Override
-	public void procQualityIssueReg(String procType, Locale locale, QualityIssueRegSheet sheet, String user) { 
-		dao.procQualityIssueReg(procType, locale, sheet, user);
+	public void procQualityIssueReg(String procType, Locale locale, QualityIssueRegSheet sheet, String user, byte[] files1, byte[] files2) { 
+		dao.procQualityIssueReg(procType, locale, sheet, user, files1, files2);
 	}
 
 	@Override
-	public List<Map<String, Object>> getUndoneIssueList(Locale locale) {
-		return dao.getUndoneIssueList(locale);
+	public List<Map<String, Object>> getAssistItemList(Locale locale,String status) {
+		return dao.getAssistItemList(locale,status);
+	}
+
+	@Override
+	public List<Map<String, Object>> getUndoneIssueList(Date fromDate,
+			Date toDate, String item, Locale locale) {
+		return dao.getUndoneIssueList(fromDate,toDate,item,locale);
 	}
 
 	@Override
@@ -45,5 +53,20 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 			return dao.getQualityIssueRegList(locale, division, occurSite, stdDt, endDt);
 	}
 
+	@Override
+	public byte[] getQualityIssueFile(Locale locale, String regNo,
+			String fileSeq) {
+		return dao.getQualityIssueFile(locale, regNo, fileSeq);
+	}
+
+	@Override
+	public Map<String, Object> getIssueDetails(String regNo, Locale locale) {
+		return dao.getIssueDetails(regNo,locale);
+	}
+
+	@Override
+	public List<Map<String, Object>> getDefectTreeData(Locale locale) {
+		return dao.getDefectTreeData(locale);
+	}
 
 }

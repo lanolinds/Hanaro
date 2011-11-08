@@ -12,8 +12,11 @@
 	<link rel="stylesheet" href='<c:url value="/resources/scripts/easyui/themes/icon.css"/>'/>
 	<link rel="stylesheet" href='<c:url value="/resources/styles/app.default.css"/>'/>	
 	<style type="text/css">
-		#form input{width:250px;}
+		#form th {background-color: #FAFAFA;height:22px; font-weight:normal; text-align: left; white-space:nowrap;width: 120px; }
+		#form td {border:1px dotted silver;width:170px;}
+		#form input{border:0px;width:250px;}
 		#form select{width:250px;}
+						
 	</style>
 	<script type="text/javascript" src='<c:url value="/resources/scripts/jquery/jquery.latest.js"/>'></script>	
 	<script type="text/javascript" src='<c:url value="/resources/scripts/easyui/jquery.easyui.min.js"/>'></script>
@@ -124,7 +127,7 @@
 		params.occurSite = $("#searchOccurSite").val(); 
 		params.stdDt = $("#searchStdDt").datebox("getValue");
 		params.endDt=$("#searchEndDt").datebox("getValue");
-		$("#resultDataGrid").datagrid({url:"getQualityIssueRegList",queryParams:params});
+		$("#resultDataGrid").datagrid("load",params);
 		
 	}
 	
@@ -174,8 +177,47 @@
 		$("#defectM").empty().append("<option value='"+record.DATA30+"'>"+record.DATA14+"</option>");
 		$("#defectS").empty().append("<option value='"+record.DATA31+"'>"+record.DATA15+"</option>");
 		$("#defectAmount").numberspinner("setValue",record.DATA12);
-		$("#explanation").val(record.DATA16);		
+		$("#explanation").val(record.DATA16);
+		$("b",$("#files1").parent()).empty();
+		$("b",$("#files2").parent()).empty();
+				
+		if(record.DATA18 !="")
+			$("b",$("#files1").parent()).append("<a  href='getQualityIssueFile?regNo="+record.DATA0+"&fileName="+encodeURIComponent(record.DATA18)+"&fileSeq=1' >"+record.DATA18+"</a>");
+		if(record.DATA19 !="")
+			$("b",$("#files2").parent()).append("<a  href='getQualityIssueFile?regNo="+record.DATA0+"&fileName="+encodeURIComponent(record.DATA19)+"&fileSeq=2' >"+record.DATA19+"</a>");
+		
+		
 	}
+	
+
+	function fileDownImg1(value,rowData){
+		var regNo = rowData.DATA0;				
+		var format = "";		
+		if(value !="")
+			format = "<a  href='getQualityIssueFile?regNo="+regNo+"&fileName="+encodeURIComponent(value)+"&fileSeq=1'  class='icon-disk' style='padding:2px 12px;cursor:pointer;'>&nbsp;</a>";
+		
+		return format;
+		
+	}
+	
+	function fileDownImg2(value,rowData){
+		var regNo = rowData.DATA0;				
+		var format = "";		
+		if(value !="")
+			format = "<a  href='getQualityIssueFile?regNo="+regNo+"&fileName="+encodeURIComponent(value)+"&fileSeq=2'  class='icon-disk' style='padding:2px 12px;cursor:pointer;'>&nbsp;</a>";
+		
+		return format;
+		
+	}
+	
+	
+	function resetForm(){
+		$('form')[0].reset();
+		$('#procType').val('INSERT');
+		$('b',$('#files1').parent()).empty();
+		$('b',$('#files2').parent()).empty();
+	}
+	
 	
 	
 	
@@ -183,10 +225,13 @@
 			if('${param.status}'=='success'){
 				$.messager.alert("<fmt:message key='ui.label.Result'/>","<fmt:message key='info.Success'/>");			
 			}
-			occurPartListCallbak("All");
+			
 			occurPlaceCombobox();
-
-			 
+			
+			//초기에 사용할수 있는 품번은 없는것으로 한다.
+			occurPartListCallbak("NONE");
+		
+			
 			
 			$("#occurLine").change(function(){
 				occurLineProc($('#occurPlace').combobox("getValue"),$(this).val());
@@ -201,6 +246,20 @@
 					}
 					$("#occurSite").empty().append(options);
 				});
+			});
+			
+			//출처 선택시 사용가능한 품번을 선택한다.
+			$("#occurSite").change(function(){
+				
+				var partType = "";
+				switch($(this).val())
+				{
+					case 'CD' : partType = "1001"; break;
+					case 'CB' : partType = "1001"; break;
+					case 'CC' : partType = "1002"; break;
+					default : partType = "ALL"; break;
+				}
+				occurPartListCallbak(partType);
 			});
 			
 			//조회용 처리구분 선택시 조회용출처옵션 변경
@@ -237,20 +296,20 @@
 		<tr>
 			<td>
 				<div iconCls="icon-chart-bar-delete" class="easyui-panel" style="width:400px;height:725px;" title='<fmt:message key="menu.qualityIssueReg"/>'>
-					<form:form action="addQualityIssueReg" method="POST"  modelAttribute="qualityIssueRegSheet"  id="form" name="frm">
-						<table>
+					<form:form action="addQualityIssueReg" method="POST"  modelAttribute="qualityIssueRegSheet"  id="form" name="frm"  enctype="multipart/form-data">
+						<table class="groupTable"  >
 							<tr>
-								<td>
-									<span  class="label-Leader-black" ><fmt:message key="ui.label.RegNo"/></span>
-									</td><td>								
+								<th>
+									<span  class="label-Leader-black"  ><fmt:message key="ui.label.RegNo"/></span>
+									</th><td>								
 									<form:input class="easyui-validatebox" readonly="true"  path="regNo"  id="regNo" />
 									<input type="hidden" name="procType" value="INSERT" >
 								</td>  
 							</tr>
 							<tr>
-								<td>
+								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.QualityIssue.Division"/></span>
-									</td><td>								
+									</th><td>								
 									<form:select path="division"   id="division"  class="easyui-validatebox" required='true' >
 									   <form:option value=""><fmt:message key='ui.element.Select' /></form:option>
 										<form:options items="${defectSource }"  />
@@ -258,23 +317,23 @@
 								</td>  
 							</tr>	
 							<tr>
-								<td>
+								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.QualityIssue.OccurSite"/></span>
-									</td><td>								
+									</th><td>								
 									<form:select class="easyui-validatebox" path="occurSite"  id='occurSite' required='true'  />
 								</td>  
 							</tr>
 							<tr>
-								<td>
+								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.OccurDate"/></span>
-									</td><td>								
+									</th><td>								
 									<form:input class="easyui-datebox"  path="occurDate"  required='true'  style="width:250px;"  id="occurDate"   />
 								</td>  
 							</tr>
 							<tr>
-								<td>
+								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.OccurAmPm"/></span>
-									</td><td>								
+									</th><td>								
 									<form:select class="easyui-validatebox" path="occurAmPm"   required='true'   id="occurAmPm">
 										<option value=""><fmt:message key="ui.element.Select"/></option>
 										<option value="am">AM</option>
@@ -283,9 +342,9 @@
 								</td>  
 							</tr>
 							<tr>
-								<td>
+								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.OccurHour"/></span>
-									</td><td>								
+									</th><td>								
 									<form:select class="easyui-validatebox"  path="occurHour"  required='true'  id="occurHour">
 									<option value=""><fmt:message key="ui.element.Select"/></option>									
 											<c:forEach  begin="1" end="12" step="1" varStatus="hour">
@@ -295,31 +354,31 @@
 								</td>  
 							</tr>				
 							<tr>
-								<td>
+								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.QualityIssue.OccurPartNo"/></span>
-									</td><td>								
+									</th><td>								
 									<form:input path="occurPartNo"  id='occurPartNo'   required='true'    style="width:250px;"  />
 								</td>  
 							</tr>
 							
 							<tr>
-								<td>
+								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.QualityIssue.OccurPartNm"/></span>
-									</td><td>								
+									</th><td>								
 									<input class="easyui-validatebox"  id="occurPartNm" readonly="true" id="occurPartNm"/>
 								</td>  
 							</tr>
 							<tr>
-								<td>
+								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.Car"/></span>
-									</td><td>								
+									</th><td>								
 									<form:input class="easyui-validatebox"  path="car"  id="car"  readonly ="true" />
 								</td>  
 							</tr>
 							<tr>
-								<td>
+								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.Model"/></span>
-									</td><td>								
+									</th><td>								
 									<input class="easyui-validatebox"  path="model"  id="model"  readonly ="true"  />
 								</td>  
 							</tr>
@@ -327,49 +386,49 @@
 							
 							
 							<tr>
-								<td>
+								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.PartSupplier"/></span>
-									</td><td>								
+									</th><td>								
 									<form:select class="easyui-validatebox"  path="partSupplier"  id="partSupplier"/>
 								</td>  
 							</tr>
 							
 							<tr>
-								<td>
+								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.QualityIssue.OccurPlace"/></span>
-									</td><td>								
+									</th><td>								
 									<form:input  path="occurPlace"  id="occurPlace"    required="true" style="width:250px;"  />
 								</td>  
 							</tr>
 							
 							<tr>
-								<td>
+								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.QualityIssue.OccurLine"/></span>
-									</td><td>								
+									</th><td>								
 									<form:select  path="occurLine"  id="occurLine"  />
 								</td>  
 							</tr>
 							
 							<tr>
-								<td>
+								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.QualityIssue.OccurProc"/></span>
-									</td><td>								
+									</th><td>								
 									<form:select  path="occurProc"  id="occurProc"/>
 								</td>  
 							</tr>			
 							
 							<tr>
-								<td>
+								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.LotNo"/></span>
-									</td><td>								
+									</th><td>								
 									<form:input class="easyui-validatebox"  path="lotNo"  required="true"  id="lotNo"  />
 								</td>  
 							</tr>
 							
 							<tr>
-								<td>
+								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.QualityIssue.DefectL"/></span>
-									</td><td>								
+									</th><td>								
 									<form:select class="easyui-validatebox"  path="defectL"  id="defectL"    required="true"  >
 										<form:option value=""><fmt:message key='ui.element.Select' /></form:option>
 										<form:options items="${defectCode }"  />
@@ -377,55 +436,55 @@
 								</td>  
 							</tr>
 							<tr>
-								<td>
+								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.QualityIssue.DefectM"/></span>
-									</td><td>								
+									</th><td>								
 									<form:select class="easyui-validatebox"  path="defectM" id="defectM"    required="true" />
 								</td>  
 							</tr>
 							<tr>
-								<td>
+								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.QualityIssue.DefectS"/></span>
-									</td><td>								
+									</th><td>								
 									<form:select class="easyui-validatebox"  path="defectS" id="defectS"    required="true" />
 								</td>  
 							</tr>											
 							
 							
 							<tr>
-								<td>
+								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.QualityIssue.DefectAmount"/></span>
-									</td><td>								
+									</th><td>								
 									<form:input class="easyui-numberspinner" id="defectAmount"  path="defectAmount"    required="true"   min="1"  max="9999999"  increment="1"  style="width:250px;" />
 								</td>  
 							</tr>										
 																	
 							<tr>
-								<td>
+								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.QualityIssue.Explanation"/></span>
-									</td><td>								
+									</th><td>								
 									<form:input class="easyui-validatebox"  id="explanation" path="explanation"/>
 								</td>  
 							</tr>
 							<tr>
-								<td>
+								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.File1"/></span>
-									</td><td>								
-									<form:input class="easyui-validatebox"  id="file1" path="file1"/>
+									</th><td>								
+									<input type = "file"  id="files1"  name = "files1"  /><br><b></b>
 								</td>  
 							</tr>							
 							<tr>
-								<td>
+								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.File2"/></span>
-									</td><td>								
-									<form:input class="easyui-validatebox" id="file2"  path="file2"/>
+									</th><td>								
+									<input  type = "file"  id="files2"  name = "files2"   /><br><b></b>
 								</td>  
 							</tr>		
 							<tr>
-								<td colspan='2' align='center'  id="tdButton">										
+								<th colspan='2' style="text-align:center;"  id="tdButton">										
 									<a href="#" onclick="javascript:validate();" class="easyui-linkbutton"  iconCls="icon-disk"  id="btInsert"><fmt:message key="ui.button.Save"/></a>																		
-									<a href="#" onclick="javascript:$('form')[0].reset();$('#procType').val('INSERT');" class="easyui-linkbutton"  iconCls="icon-arrow-redo" id="btCancel"><fmt:message key="ui.button.Cancel"/></a>
-								</td>
+									<a href="#" onclick="javascript:resetForm()" class="easyui-linkbutton"  iconCls="icon-arrow-redo" id="btCancel"><fmt:message key="ui.button.Cancel"/></a>
+								</th>
 							</tr>															
 						</table>
 					</form:form>
@@ -433,7 +492,7 @@
 			</td>
 			<td>
 				<table class="easyui-datagrid" iconCls="icon-application-view-list" style="width:800px;height:725px;" 
-				title='<fmt:message key="ui.label.RegList"/>' toolbar="#divSearch" pagination="true"  id="resultDataGrid" pageSize="30"   singleSelect="true" striped="true"   >
+				title='<fmt:message key="ui.label.RegList"/>' toolbar="#divSearch" pagination="true"  id="resultDataGrid" pageSize="30"   singleSelect="true" striped="true"   url="getQualityIssueRegList" >
 					<thead frozen="true">
 						        <tr>  
 						            <th field="DATA0" width="110" sortable="true" align="center"><fmt:message key="ui.label.RegNo" /></th>  
@@ -458,8 +517,8 @@
 						            <th field="DATA15" width="70" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.DefectS" /></th>  
 						            <th field="DATA16" width="70" sortable="true" align="center"><fmt:message key="ui.label.QualityIssue.Explanation" /></th>  
 						            <th field="DATA17" width="80" sortable="true" align="center"><fmt:message key="ui.label.RegDate" /></th>  
-						            <th field="DATA18" width="60" sortable="true" align="center"><fmt:message key="ui.label.File1" /></th>  
-						            <th field="DATA19" width="60" sortable="true" align="center"><fmr:message key="ui.label.File2" /></th>
+						            <th field="DATA18" width="60" sortable="true" align="center"  formatter="fileDownImg1" ><fmt:message key="ui.label.File1"  /></th>  
+						            <th field="DATA19" width="60" sortable="true" align="center"  formatter="fileDownImg2" ><fmt:message key="ui.label.File2"  /></th>
 						            
 						            <c:forEach begin="20"  end="33"  step="1"  varStatus="dataKey">
 						            	<th field="DATA"+"${dataKey.count}"  hidden="true"></th>	
@@ -492,9 +551,9 @@
 		<a  href="#" class="easyui-linkbutton" iconCls="icon-search" onclick="javascript:searchList();"><fmt:message key="ui.button.Search"/></a>		
 		  
      </div>
-      <hr/>
+      
      <div style="margin-bottom:5px" align="right"'>  
-         <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true"  onclick="javascript:$('form')[0].reset();$('#procType').val('INSERT');"><fmt:message key="ui.button.Reg"/></a>  
+         <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true"  onclick="javascript:resetForm();"><fmt:message key="ui.button.Reg"/></a>  
          <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="javascript:insertForm();"><fmt:message key="ui.button.Edit"/></a>           
          <a href="#" class="easyui-linkbutton" iconCls="icon-delete" plain="true" onclick="javascript:deleteList();"><fmt:message key="ui.button.Delete"/></a>
       </div>

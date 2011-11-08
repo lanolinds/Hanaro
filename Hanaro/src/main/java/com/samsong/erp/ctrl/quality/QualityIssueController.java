@@ -1,5 +1,8 @@
 package com.samsong.erp.ctrl.quality;
 
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,6 +10,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.joda.time.LocalDate;
@@ -19,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.samsong.erp.model.quality.QualityIssueRegSheet;
 import com.samsong.erp.service.cust.CustManagementService;
@@ -26,7 +32,7 @@ import com.samsong.erp.service.quality.QualityIssueService;
 import com.samsong.erp.util.HashMapComparator;
 
 @Controller
-@RequestMapping(value="/qualityDivision/qualityIssue")
+@RequestMapping("/qualityDivision/qualityIssue")
 public class QualityIssueController {
 
 	private String prefix ="/qualityDivision/qualityIssue"; 
@@ -59,9 +65,17 @@ public class QualityIssueController {
 	
 	//품질문제등록
 	@RequestMapping(value="/addQualityIssueReg", method=RequestMethod.POST )
-	public String addQualityIssueReg(String procType,Locale locale, QualityIssueRegSheet sheet,Principal prin,Model model){	   
-	  String user =prin.getName();
-	   service.procQualityIssueReg(procType,locale,sheet,user);
+	public String addQualityIssueReg(String procType,Locale locale, QualityIssueRegSheet sheet,Principal prin,Model model, @RequestParam("files1") MultipartFile files1, @RequestParam("files2") MultipartFile files2){
+	   String user =prin.getName();
+	  try {
+	   //선택된 파일이름은 모델에 담는다.		  
+	   sheet.setFile1(files1.getOriginalFilename());
+	   sheet.setFile2(files2.getOriginalFilename());
+	   //선택된 파일객체는 직접 입력한다.	   
+		service.procQualityIssueReg(procType,locale,sheet,user, files1.getBytes(), files2.getBytes());
+	  } catch (IOException e) {
+		e.printStackTrace();
+	  }	  
 	   model.addAttribute("status","success");
 	   return "redirect:"+prefix+"/qualityIssueReg";
 	}	
@@ -114,13 +128,13 @@ public class QualityIssueController {
 	
 	//품질불량등록 메뉴의 등록된 목록조회
 	@RequestMapping(value="/getQualityIssueRegList", method=RequestMethod.POST)
-	public @ResponseBody Map<String,Object> getQualityIssueRegList(Locale locale, @RequestParam("division") String division, @RequestParam("occurSite") String occurSite,
-			@RequestParam("stdDt") String stdDt, @RequestParam("endDt") String endDt,@RequestParam("page") int page,@RequestParam("rows") int rows,
+	public @ResponseBody Map<String,Object> getQualityIssueRegList(Locale locale, @RequestParam(value="division",required=false) String division, @RequestParam(value="occurSite",required=false) String occurSite,
+			@RequestParam(value="stdDt",required=false) String stdDt, @RequestParam(value="endDt",required=false) String endDt,@RequestParam("page") int page,@RequestParam("rows") int rows,
 			@RequestParam(value="sort",required=false) String sortKey,@RequestParam(value="order",required=false) String order){
 		
 		Map<String,Object> table = new LinkedHashMap<String,Object>();
 		List<Map<String,Object>> resultList = service.getQualityIssueRegList(locale, division, occurSite, stdDt, endDt);
-		
+				
 		if(resultList!=null){			
 			if(sortKey!=null){
 				Collections.sort(resultList,new HashMapComparator(sortKey, order.equalsIgnoreCase("asc")));
@@ -136,6 +150,28 @@ public class QualityIssueController {
 		}
 		return table;
 	}	
+	
+	//품질 파일 다운
+	@RequestMapping(value="/getQualityIssueFile", method=RequestMethod.GET)
+	public  void  getQualityIssueFile(Locale locale, @RequestParam("regNo") String regNo, @RequestParam("fileName") String fileName,@RequestParam("fileSeq") String fileSeq, HttpServletResponse response){		
+	
+		
+		byte[] file = null;
+		BufferedOutputStream out = null;
+		file = service.getQualityIssueFile(locale, regNo, fileSeq);	    
+		
+
+		try {
+		    response.setHeader("Content-Disposition","attachment;filename=\""+URLEncoder.encode(fileName, "UTF-8")+"\"");	    
+
+			out = new BufferedOutputStream(response.getOutputStream());
+			out.write(file);
+			out.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	 
 }

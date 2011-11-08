@@ -37,7 +37,7 @@
 	<div style="width:150px;">			
 			<div href='<c:url value="/qualityDivision/qualityIssue/qualityIssueReg"/>'><fmt:message key="menu.qualityIssueReg"/></div>
 			<div href='<c:url value="/qualityDivision/qualityIssue/list"/>'><fmt:message key="menu.qualityIssueList"/></div>
-			<div ><fmt:message key="menu.qualityNcrManagement"/></div>
+			<div href='<c:url value="/qualityDivision/qualityIssue/ncrManageList"/>'><fmt:message key="menu.qualityNcrManagement"/></div>
 			<div ><fmt:message key="menu.qualityNcrStatus"/></div>			
 			<div ><fmt:message key="menu.qualityClaimSearch"/></div>
 	</div>

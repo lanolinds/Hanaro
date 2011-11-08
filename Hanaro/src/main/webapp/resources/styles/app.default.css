@@ -40,19 +40,25 @@ html * {
 }
 
 
+.groupTable{
+	background-color:'#F4F4F4';
+}
+
+
+
 
 
 
 /* Leader */
 .label-Leader-black{background:url('../scripts/easyui/themes/icons/bullet_black.png') no-repeat;padding-left:1.5em;margin-right:0.5em;}
-.label-Leader-blue{background:url('../scripts/easyui/themes/icons/bullet_blue.png') no-repeat;padding-left:1.5em;margin-right:0.5em;}
-.label-Leader-green{background:url('../scripts/easyui/themes/icons/bullet_green.png') no-repeat;padding-left:1.5em;margin-right:0.5em;}
-.label-Leader-orange{background:url('../scripts/easyui/themes/icons/bullet_orange.png') no-repeat;padding-left:1.5em;margin-right:0.5em;}
-.label-Leader-pink{background:url('../scripts/easyui/themes/icons/bullet_pink.png') no-repeat;padding-left:1.5em;margin-right:0.5em;}
-.label-Leader-white{background:url('../scripts/easyui/themes/icons/bullet_white.png') no-repeat;padding-left:1.5em;margin-right:0.5em;}
-.label-Leader-yellow{background:url('../scripts/easyui/themes/icons/bullet_yellow.png') no-repeat;padding-left:1.5em;margin-right:0.5em;}
-.label-Leader-purple{background:url('../scripts/easyui/themes/icons/bullet_purple.png') no-repeat;padding-left:1.5em;margin-right:0.5em;}
-.label-Leader-red{background:url('../scripts/easyui/themes/icons/bullet_red.png') no-repeat;padding-left:1.5em;margin-right:0.5em;}
+.label-Leader-blue{background:url('../scripts/easyui/themes/icons/bullet_blue.png') no-repeat;padding-left:1.5em;margin-right:0.5em;color:#0A0D92;}
+.label-Leader-green{background:url('../scripts/easyui/themes/icons/bullet_green.png') no-repeat;padding-left:1.5em;margin-right:0.5em;color:#036D0A;}
+.label-Leader-orange{background:url('../scripts/easyui/themes/icons/bullet_orange.png') no-repeat;padding-left:1.5em;margin-right:0.5em;color:#CB7702;}
+.label-Leader-pink{background:url('../scripts/easyui/themes/icons/bullet_pink.png') no-repeat;padding-left:1.5em;margin-right:0.5em;color:#CB7702;}
+.label-Leader-white{background:url('../scripts/easyui/themes/icons/bullet_white.png') no-repeat;padding-left:1.5em;margin-right:0.5em;color:#A2005E;}
+.label-Leader-yellow{background:url('../scripts/easyui/themes/icons/bullet_yellow.png') no-repeat;padding-left:1.5em;margin-right:0.5em;color:#A28400;}
+.label-Leader-purple{background:url('../scripts/easyui/themes/icons/bullet_purple.png') no-repeat;padding-left:1.5em;margin-right:0.5em;color:#4E0075;}
+.label-Leader-red{background:url('../scripts/easyui/themes/icons/bullet_red.png') no-repeat;padding-left:1.5em;margin-right:0.5em;color:#D60205;}
 
 
 

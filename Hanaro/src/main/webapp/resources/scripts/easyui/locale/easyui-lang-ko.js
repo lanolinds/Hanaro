@@ -12,6 +12,12 @@ if ($.fn.treegrid && $.fn.datagrid){
 if ($.messager){
 	$.messager.defaults.ok = '확인';
 	$.messager.defaults.cancel = '취소';
+	$.messager.http401='세션이 만료되었습니다. 다시 로그인 하십시오.';
+	$.messager.http403='요청을 처리하기위한 권한이 없습니다.';
+	$.messager.http404='요청을 처리할 수 없습니다.';
+	$.messager.http500='서버에서 데이터를 처리하던 중 에러가 발생하였습니다.';
+	$.messager.httpUnknown='알 수 없는 에러';
+	
 }
 if ($.fn.validatebox){
 	$.fn.validatebox.defaults.missingMessage = '값을 입력하세요.';
@@ -58,3 +64,4 @@ if ($.fn.datetimebox && $.fn.datebox){
 		missingMessage: $.fn.datebox.defaults.missingMessage
 	});
 }
+

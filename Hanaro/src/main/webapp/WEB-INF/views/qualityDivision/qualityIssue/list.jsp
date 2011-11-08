@@ -15,43 +15,122 @@
 	<script type="text/javascript" src='<c:url value="/resources/scripts/easyui/locale/easyui-lang-${pageContext.response.locale.language}.js"/>'></script>
 	<script type="text/javascript" src='<c:url value="/resources/scripts/common-utils.js"/>'></script>
 	<script type="text/javascript">
+	
+	
 	$(document).ready(function(){
-		$("#undoneList").datagrid({onLoadSuccess:function(data){
-			$("#readyCount").css("color","blue").text("("+data.total+")");
-		}});
+		
+		// 그리드 랜더링.
+		$("#undoneList").datagrid({queryParams:{fromDate:'<fmt:formatDate value="${fromDate}" pattern="yyyy-MM-dd"/>',
+			toDate:'<fmt:formatDate value="${toDate}" pattern="yyyy-MM-dd"/>',item:''},
+			onLoadSuccess:function(data){
+				$("#readyCount").css("color","blue").text("("+data.total+")");
+			},
+			onLoadError:function(error){
+				handleAjaxError(error);
+			}
+		});
+		
+		//검색 필터 아이템에 자동완성 랜더링.
+		$("#item").combogrid({
+			panelWidth:500,
+			idField:"item",
+			textField:"item",
+			url:"list/itemAssistCallback",
+			columns:[[{field:"item",title:'<fmt:message key="ui.label.PartNo"/>',width:150},
+			          {field:"name",title:'<fmt:message key="ui.label.PartName"/>',width:200},
+			          {field:"car",title:'<fmt:message key="ui.label.Car"/>',width:50,align:"center"},
+			          {field:"model",title:'<fmt:message key="ui.label.Model"/>',width:50,align:"center"}
+			          ]]
+		});
 	});
 	
+	function validFilter(){
+		var params={};
+		params.fromDate=$("#fromDate").datebox("getValue");
+		params.toDate=$("#toDate").datebox("getValue");
+		params.item=$("#item").combogrid("getValue");
+		
+		$("#undoneList").datagrid("clearSelections");
+		$("#undoneList").datagrid("load",params);
+		
+	}
+	
+	function acceptSelectedIssues(){
+		var selected =$("#undoneList").datagrid("getSelections");
+		if(!selected || selected.length===0){
+			$.messager.alert("Warnning",'<fmt:message key="warn.notSelectedItem"/>',"warning");
+			return false;
+		}
+		var placeCode = selected[0].placeCode;
+		var c = 0;
+		$.each(selected,function(i,issue){
+			if(placeCode==issue.placeCode)
+				c++;
+			$("form[name='acceptForm']").append("<input type='hidden' name='regNo' value='"+issue.regNo+"'/>");
+		});
+		if(c!==selected.length){
+			$.messager.alert("Warnning",'<fmt:message key="warn.invalidOrigin"/>',"warning");
+			$("form[name='acceptForm'] :hidden").remove();
+		}
+		else{
+			$("form[name='acceptForm']").append("<input type='hidden' name='placeCode' value='"+placeCode+"'/>");
+			$("form[name='acceptForm']").submit();
+		}
+		
+	}
 	</script>
 </head>
 
 <body class="easyui-layout" style="min-width: 1024px;">
+
 <div region="north" title='<fmt:message key="system.title"/>'  border="false" 
 	iconCls="icon-draw-ring" style="height:80px; background-color:#fafafa; overflow: hidden;">
 <%@ include file="/WEB-INF/views/menu.jsp" %>
 </div>
 <div region="center" style="padding:10px;">
-
-    <div class="easyui-tabs" style="width:1000px;height:700px;">  
-        <div title='<fmt:message key="ui.label.qualityIssue.ready"/><span id="readyCount"></span>' iconCls="icon-document-prepare" style="padding:10px;">  
-            <table id="undoneList" iconCls="icon-to-do-list" pagination="true" pageList="[50,100,200,300]"
-						style="width: 900px; height: 600px;" fitColumns="true" title='<fmt:message key="ui.label.qualityIssue.readyList"/>' idField="regNo" url="list/gridCallback" >			
+   
+   
+    <div class="easyui-tabs" style="width:1024px;height:720px;">  
+        <div title='<fmt:message key="ui.label.qualityIssue.ready" /><span id="readyCount" style="margin-left:.3em;"></span>'  iconCls="icon-document-prepare"  >  
+            <table id="undoneList" iconCls="icon-to-do-list" pagination="true" pageList="[50,100,200,300]"  border="false"
+						fit="true" fitColumns="true" idField="regNo" url="list/gridCallback"  toolbar="#toolbar" >			
 				<thead>
 					<tr>
 						<th field="ck" checkbox="true"></th>  
 						<th field="regNo" width="250" sortable="true"><fmt:message key="ui.label.RegNo"/></th>
 						<th field="date" width="150" align="center" sortable="true"><fmt:message key="ui.label.OccurHour"/></th>
+						<th field="place" width="100" sortable="true"><fmt:message key="ui.label.RegPlace"/></th>
+						<th field="placeCode" hidden="true"></th>
 						<th field="item" width="150" sortable="true"><fmt:message key="ui.label.PartNo"/></th>
 						<th field="count" width="100" align="right" sortable="true" formatter="numeric"><fmt:message key="ui.label.count"/></th>
 						<th field="comment" width="100" ><fmt:message key="ui.label.remark"/></th>
-					</tr>
+					</tr>	
 				</thead>
 			</table>
         </div>  
         <div title='<fmt:message key="ui.label.qualityIssue.done"/>'  iconCls="icon-document-mark-as-final">
-
         </div>  
-    </div>  
+    </div>
+    
+     
+    <!-- 툴바 -->
+    <div  id="toolbar" style="padding:5px;height:auto;">
+    <div style="margin-top:.5em;">
+	    <span style="margin-right:.5em"><fmt:message key="ui.label.SearchDate"/></span>
+	    <input id="fromDate" class="easyui-datebox" editable="false" value='<fmt:formatDate value="${fromDate}" pattern="yyyy-MM-dd"/>' style="width:100px;"></input>
+	    <span style="margin: 0em .3em;">~</span>
+	    <input id="toDate" class="easyui-datebox" editable="false" value='<fmt:formatDate value="${toDate}" pattern="yyyy-MM-dd"/>' style="width:100px;"></input>
+	     <span style="margin-left:1em;margin-right:.5em;"><fmt:message key="ui.label.PartNo"/></span>
+	    <input id="item" style="width:200px;"/>
+	    <span style="margin-left:2em;"><a href="javascript:validFilter()" class="easyui-linkbutton" iconCls="icon-search"><fmt:message key="ui.button.Search"/></a></span>
+    </div>
+    <div style="text-align:right;">
+    	<form name="acceptForm" method="post" action="acceptIssues"></form>
 
+    	<a href="#" class="easyui-linkbutton" iconCls="icon-document-todo" onclick="acceptSelectedIssues()" plain="true"><fmt:message key="ui.label.doSelected"/></a>
+    </div>
+    </div>
+     
 </div>
 </body>
 
