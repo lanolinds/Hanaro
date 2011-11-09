@@ -30,7 +30,7 @@
 <p style="max-width: 400px;"><fmt:message key="warn.needPermission"/></p>
 <a href="javascript:history.go(-1)" class="easyui-linkbutton"  iconCls="icon-back" ><fmt:message key="ui.label.goback"/></a>
 </div>
-</td>
+</td> 
 </tr>
 </table> 
 

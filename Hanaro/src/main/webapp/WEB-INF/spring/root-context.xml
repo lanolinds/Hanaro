@@ -27,7 +27,7 @@
 	
 	<tx:advice id="txAdvice" transaction-manager="txManager">
 		<tx:attributes>
-			<tx:method name="get*" read-only="true"/>  
+			<tx:method name="get*" read-only="true"/> 
 			<tx:method name="*"/>
 		</tx:attributes>  
 	</tx:advice>  
