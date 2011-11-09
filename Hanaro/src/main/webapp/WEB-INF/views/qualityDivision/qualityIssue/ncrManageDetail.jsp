@@ -31,7 +31,9 @@
 		#form2 th {background-color: #FAFAFA;height:22px; font-weight:normal; text-align: left; white-space:nowrap;width: 120px; }
 		#form2 td {border:1px dotted #CBC7C4	r;width:170px;}
 		#form2 input{border:0px;width:100%;}
-		#form2 .group{background-color: #E1E8F3;}								
+		#form2 .group{background-color: #E1E8F3;}
+		.fileDown{cursor:pointer;color:blue;font-weight:bold;}
+		.fileDelete{cursor:pointer;}								
 		
 		
 	</style>
@@ -45,45 +47,178 @@
 	//임시파일 등록처리
 	function insertReasonFile(){		
 		var row={};
-		row.reasonFile="<input type='file' name='inputAddFile' size='11' />";
+		row.DATAFIlE="";
+		row.DATA0="";
+		row.DATA1="";
+		row.DATASTATE="a";
 		$("#datagridReasonFile").datagrid("insertRow",{row:row});
 	}
+	//임시파일 삭제처리
+	function deleteReasonFile(){
+		var idx;		
+		idx = $("#datagridReasonFile").datagrid("getSelected");
+		if(!idx)
+		{
+			$.messager.alert("<fmt:message key='warn.infoWarn' />","<fmt:message key='warn.notSelectedItem' />");
+			return;
+		}	
+		idx = $("#datagridReasonFile").datagrid("getRowIndex",idx);
+		var row={};		
+		row.DATA0="<fmt:message key='ui.label.reserveDelete' />";
+		row.DATASTATE="d";
+		$("#datagridReasonFile").datagrid("updateRow",{index:idx,row:row});		
+	}
+	//임시파일 업데이트처리
+	function updateReason(){
+		var row;		
+		row = $("#datagridReasonFile").datagrid("getSelected");
+		idx = $("#datagridReasonFile").datagrid("getRowIndex",row);
+		if(row.DATASTATE=="a"  || row.DATASTATE=="d")
+			return;
+		var row={};		
+		row.DATA0="<fmt:message key='ui.label.reserveUpdate' />";
+		row.DATASTATE="u";
+		$("#datagridReasonFile").datagrid("updateRow",{index:idx,row:row});			
+	}	
+	
+	function rFile(value){
+		return "<input type='file' name='inputAddFile' onchange='javascript:updateReason()' size='11' />";
+	}
+	function rFileName(value){
+		if(value!="") return "<a href=#>"+value+"</a>";
+		else return"";
+	}
+	function rFileSeq(value){		
+		return "<input type='hidden' name='reasonFileSeq' value='"+value+"' />";
+	}
+	function rFileState(value){
+		return "<input type='hidden' name='reasonFileState' value='"+value+"' />";
+	}
+	
+	
 
 	
 	//임시대책 처리	
 	function insertTempData(){
 		var row={};
-		row.tempMeasureContents="<textarea name='tempMeasure' cols='29' rows='3'></textarea>";
-		row.tempMeasureDate="<input type='text' size='9' name='tempMeasureDate'  />";
+		row.DATA0="";
+		row.DATA1="";
 		$("#datagridTempMeasure").datagrid("insertRow",{row:row});
 	}
 	
-	//근본대책 처리
+	function tMeasure(value){		
+		return "<textarea name='tempMeasure' cols='29' rows='3'>"+value+"</textarea>";
+	}
+	function tMeasureDate(value){		
+		return "<input type='text' size='9' name='tempMeasureDate' value='"+value+"' />";
+	}	
 	
+	//근본대책 처리	
 	function insertMeasureData(){
 		var row={};
-		row.measureContents="<textarea name='measure' cols='29' rows='3'></textarea>";
-		row.measureDate="<input type='text' size='9' name='measureDate'  />";
+		row.DATA0="";
+		row.DATA1="";
 		$("#datagridMeasure").datagrid("insertRow",{row:row});
 	}
+	
+	function measure(value){
+		return "<textarea name='measure' cols='29' rows='3'>"+value+"</textarea>";
+	}
+	function measureDate(value){
+		return "<input type='text' size='9' name='measureDate' value='"+value+"'  />";
+	}
+	
 	
 	//부적합 전/후 LOT확인
 	function insertLotConfirm(){
 		var row={};
-		row.lotNo="<input type='text' size='9' name='lotNo'  />";
-		row.contents="<input type='text' size='30' name='confirm'  />";
-		row.remark="<input type='text' size='27' name='remark'  />";
+		row.DATA0="";
+		row.DATA1="";
+		row.DATA2="";
 		$("#datagridLotConfirm").datagrid("insertRow",{row:row});		
 	}
 	
-	//표준반영사항 처리
+	function lot(value){
+		return "<input type='text' size='9' name='lotNo' value='"+value+"'  />";
+	}
+	function confirm(value){
+		return "<input type='text' size='30' name='confirm' value='"+value+"' />";
+	}
+	function remark(value){
+		return "<input type='text' size='27' name='remark' value='"+value+"' />";	
+	}
+
+	//표준반영사항 기준4개 파일 상태 변경
+	function modifyFile(state,thisP){
+		
+		$("input[name='inputChangeState']",thisP.parent().parent()).val(state);
+		if(state=="d")		
+			thisP.parent().empty().append("<fmt:message key='ui.label.reserveDelete' />");
+		
+	}
+	
+	
+	
+	//표준반영사항 등록처리
 	function insertStandard(){
 		var row={};
-		row.stanContents="<textarea name='stanContents' cols='34' rows='3'></textarea>";
-		row.stanFile="<input type='file' name='stanFile' size='1'  />";
-		row.stanFileDown="";
+		row.DATA0="";
+		row.stanFile="";
+		row.DATA1="";
+		row.DATASTATE="a";
 		$("#datagridStandard").datagrid("insertRow",{row:row});		
 	}
+	function deleteStandard(){
+		var idx;		
+		idx = $("#datagridStandard").datagrid("getSelected");
+		if(!idx)
+		{
+			$.messager.alert("<fmt:message key='warn.infoWarn' />","<fmt:message key='warn.notSelectedItem' />");
+			return;
+		}	
+		idx = $("#datagridStandard").datagrid("getRowIndex",idx);
+		var row={};		
+		row.DATA1="delete";
+		row.DATASTATE="d";
+		$("#datagridStandard").datagrid("updateRow",{index:idx,row:row});			
+	}
+	function updateStandard(){
+		var row;		
+		row = $("#datagridStandard").datagrid("getSelected");
+		idx = $("#datagridStandard").datagrid("getRowIndex",row);
+		if(row.DATASTATE=="a" || row.DATASTATE=="d")
+			return;
+		var row={};		
+		row.DATA1="update";
+		row.DATASTATE="u";
+		$("#datagridStandard").datagrid("updateRow",{index:idx,row:row});	
+	}
+	
+	function stanContent(value){
+		return "<textarea name='stanContents' cols='34' rows='3'>"+value+"</textarea>";
+	}
+	function stanFile(value){
+		return "<input type='file' name='stanFile' size='1' onchange='javascript:updateStandard()'  />"; 
+	}
+	function stanFileName(value){
+		if(value=="delete")
+			return "<a href='#' class='fileDown'><fmt:message key='ui.button.Delete' /></a>";
+		else if(value=="update")
+			return "<a href='#' class='fileDown'><fmt:message key='ui.label.change' /></a>";
+		else if(value!="")
+			return "<a href='#' title='"+value+"' class='fileDown'><fmt:message key='ui.label.down' /></a>";			
+		else
+			return "";
+	}
+	function stanState(value){
+		return "<input type='hidden' name='standardState' value='"+value+"' />";
+	}	
+	function stanEtcSeq(value){
+		return "<input type='hidden' name='standardEtcSeq' value='"+value+"' />";
+	}
+	
+	
+	
 	
 	 
 	
@@ -110,6 +245,34 @@
 			return false;
 		}
 	}
+	//대책서를 수정한다.
+	function updateData(){
+		if($("#form1").form("validate")){
+			document.form1.measureProcType.value = "UPDATE";
+			$("#form1").submit();			
+		}else{
+			return false;
+		}		
+	}
+	
+	//대책서를 삭제한다.
+	function deleteData(){
+		document.form1.measureProcType.value = "DELETE";
+		$("#form1").submit();
+	}
+	
+	$(document).ready(function(){
+		$("#datagridReasonFile").datagrid({queryParams:{ncrNo:$("#ncrNo").val(),gridType:"reasonFile"}});
+		$("#datagridTempMeasure").datagrid({queryParams:{ncrNo:$("#ncrNo").val(),gridType:"tempMeasure"}});
+		$("#datagridMeasure").datagrid({queryParams:{ncrNo:$("#ncrNo").val(),gridType:"measure"}});
+		$("#datagridLotConfirm").datagrid({queryParams:{ncrNo:$("#ncrNo").val(),gridType:"lotConfirm"}});
+		$("#datagridStandard").datagrid({queryParams:{ncrNo:$("#ncrNo").val(),gridType:"standardEtc"}});
+		
+		$(".fileDelete").live("click",function(){
+			modifyFile('d',$(this));
+		});
+		
+	});
 	
 	
 	
@@ -119,7 +282,7 @@
 
 <body class="easyui-layout" style="min-width: 1024px;">
 <div region="center" style="padding:10px;">
-	<form:form id="form1" modelAttribute="ncrInForm" enctype="multipart/form-data" action="addNcrMeasureForm">
+	<form:form id="form1" name="form1" modelAttribute="ncrInForm" enctype="multipart/form-data" action="procNcrMeasure">
 	<table>
 		<tr>
 			<td>
@@ -134,7 +297,10 @@
 								<th><label><fmt:message key="ui.label.title" /></label></th>
 								<td><form:input path="title" class="easyui-validatebox" required="true" /></td>
 								<th><label><fmt:message key="ui.label.ncrNo" /></label></th>
-								<td><form:input path="ncrNo" readonly="true" /></td>
+								<td>
+									<form:input path="ncrNo" readonly="true" id="ncrNo" />
+									<input type="hidden" name="measureProcType" value="INSERT" >
+								</td>
 							</tr>
 							<tr>
 								<th><label><fmt:message key="ui.label.PartNo" /></label></th>
@@ -326,11 +492,14 @@
 							</tr>								
 							<tr>								
 								<th colspan="2">
-								<table id="datagridReasonFile"  class="easyui-datagrid"  style="width:490px;height:200px;"  toolbar="#pageNavForReasonfile" pageSize="100" fitColumns="true" singleSelect="true" striped="true" >
+								<table id="datagridReasonFile"  style="width:490px;height:200px;"  toolbar="#pageNavForReasonfile" pageSize="100" fitColumns="true" singleSelect="true" striped="true"
+								url="getNcrMeasureDataGrid" >
 									<thead >
 										<tr >
-											<th field="reasonFile" width="200px" resizable="false"><fmt:message key="ui.label.File" /></th>
-											<th field="reasonFileName" width="290px" resizable="false"></th>
+											<th field="DATAFILE" width="200px" resizable="false" formatter="rFile"><fmt:message key="ui.label.File" /></th>
+											<th field="DATA0" width="290px" resizable="false" formatter="rFileName"></th>
+											<th field="DATA1" hidden="true" formatter="rFileSeq"></th>
+											<th field="DATASTATE" hidden="true" formatter="rFileState"></th>
 										</tr>
 									</thead>									
 								</table>
@@ -347,11 +516,11 @@
 								</tr>	
 								<tr>								
 									<th rowspan="2">
-										<table  id="datagridTempMeasure"   class="easyui-datagrid" style="width:340px;height:200px;"   nowrap="false" toolbar="#pageNavForTempMeasure" pageSize="100" fitColumns="true" singleSelect="true" striped="true" > 
+										<table  id="datagridTempMeasure"  style="width:340px;height:200px;"   nowrap="false" toolbar="#pageNavForTempMeasure" pageSize="100" fitColumns="true" singleSelect="true" striped="true" url="getNcrMeasureDataGrid"  > 
 											<thead>
 												<tr>
-													<th field="tempMeasureContents"  resizable="false" width="240" ><fmt:message key="ui.label.contents" /></th>
-													<th field="tempMeasureDate" resizable="false"  width="90"><fmt:message key="ui.label.date" /></th>
+													<th field="DATA0"  resizable="false" width="240" formatter="tMeasure" ><fmt:message key="ui.label.contents" /></th>
+													<th field="DATA1" resizable="false"  width="90" formatter="tMeasureDate" ><fmt:message key="ui.label.date" /></th>
 												</tr>
 											</thead>
 										</table>
@@ -371,11 +540,11 @@
 								</tr>									
 								<tr>								
 									<th rowspan="4">
-										<table  id="datagridMeasure"   class="easyui-datagrid" style="width:340px;height:410px;"   nowrap="false" toolbar="#pageNavForMeasure" pageSize="100" fitColumns="true" singleSelect="true" striped="true" > 
+										<table  id="datagridMeasure"   style="width:340px;height:410px;"   nowrap="false" toolbar="#pageNavForMeasure" pageSize="100" fitColumns="true" singleSelect="true" striped="true" url="getNcrMeasureDataGrid" > 
 											<thead>
 												<tr>
-													<th field="measureContents" resizable="false"  width="240" ><fmt:message key="ui.label.contents" /></th>
-													<th field="measureDate"  resizable="false"  width="90"><fmt:message key="ui.label.date" /></th>
+													<th field="DATA0" resizable="false"  width="240"  formatter="measure"><fmt:message key="ui.label.contents" /></th>
+													<th field="DATA1"  resizable="false"  width="90" formatter="measureDate" ><fmt:message key="ui.label.date" /></th>
 												</tr>
 											</thead>
 										</table>
@@ -396,7 +565,7 @@
 								</tr>
 								<tr>
 									<th>
-										<input type="file" name="imgMeasureName1File"  size="1" />
+										<input type="file" name="imgMeasureName2File"  size="1" />
 									</th>
 								</tr>
 						        <tr><th colspan='2'></th></tr>								
@@ -405,12 +574,12 @@
 								</tr>								
 								<tr>								
 									<th colspan="2">
-									<table id="datagridLotConfirm"  class="easyui-datagrid"  style="width:473px;height:200px;"  toolbar="#pageNavForLotConfirm" pageSize="100" fitColumns="true" singleSelect="true" striped="true" >
+									<table id="datagridLotConfirm" url="getNcrMeasureDataGrid"  style="width:473px;height:200px;"  toolbar="#pageNavForLotConfirm" pageSize="100" fitColumns="true" singleSelect="true" striped="true" >
 										<thead >
 											<tr >
-												<th field="lotNo" width="90px" resizable="false"><fmt:message key="ui.label.LotNo" /></th>
-												<th field="contents" width="200px" resizable="false"><fmt:message key="ui.label.qualityIssue.confirmPhenomenon" /></th>
-												<th field="remark" width="185px" resizable="false"><fmt:message key="ui.label.remark" /></th>
+												<th field="DATA0" width="90px" resizable="false" formatter="lot"><fmt:message key="ui.label.LotNo" /></th>
+												<th field="DATA1" width="200px" resizable="false" formatter="confirm"><fmt:message key="ui.label.qualityIssue.confirmPhenomenon" /></th>
+												<th field="DATA2" width="185px" resizable="false" formatter="remark"><fmt:message key="ui.label.remark" /></th>
 											</tr>
 										</thead>									
 									</table>
@@ -425,41 +594,55 @@
 							<table style="padding:10px;" class="groupTable" width="100%" id="measureTable3">
 							<c:forEach items="${stanNames}"  var="item" varStatus="state" >
 								<tr>
-									<th colspan='2'><label class="label-Leader-black"><fmt:message key="${item}" /></label></th>								
+									<th colspan='3'><label class="label-Leader-black"><fmt:message key="${item}" /></label></th>								
 								</tr>
 								<tr>
 									<th><fmt:message key="ui.label.beforeChange" /></th>
-									<td>			
-										<input type="text" name="inputBeforChange" />
+									<td colspan='2'>			
+										<input type="text" name="inputBeforChange" value="${standard[state.index].DATA0}" />
 										<input type="hidden" name="inputStandardSeq" value="${state.count}" />
 									</td>
 								</tr>		
 								<tr>
 									<th><fmt:message key="ui.label.afterChange" /></th>
-									<td><input type="text" name="inputAfterChange" /></td>
+									<td colspan='2'><input type="text" name="inputAfterChange" value="${standard[state.index].DATA1}" /></td>
 								</tr>
 								<tr>
 									<th><fmt:message key="ui.label.changeDate" /></th>
-									<td><input class="easyui-datebox" name="inputChangeDate" /></td>
+									<td colspan='2'><input class="easyui-datebox" name="inputChangeDate" value="${standard[state.index].DATA2}"  /></td>
 								</tr>
 								<tr>
 									<th><fmt:message key="ui.label.File" /></th>
-									<td><input type="file" name="inputChangeFile" /></td>
+									<td>
+										<input type="file" name="inputChangeFile" size="1"  />
+										<input type="hidden" name="inputChangeState" />
+									</td>
+									<td style="width:150px;">
+									
+									<c:if test="${standard[state.index].DATA3!='' && standard[state.index].DATA3!=null}">
+									<a title="${standard[state.index].DATA3}" class="fileDown">[<fmt:message key="ui.label.File" />]</a>
+									<span class="icon-delete fileDelete" style="width:16px;">&nbsp;</span>
+									</c:if>
+									
+									</td>
 								</tr>																																																																										
-							</c:forEach>
+								</c:forEach>
 								<tr>
-									<th colspan='2'><label class="label-Leader-black"><fmt:message key="ui.label.etc" /></label></th>								
+									<th colspan='3'><label class="label-Leader-black"><fmt:message key="ui.label.etc" /></label></th>								
 								</tr>	
 							</table>
 							<table style="padding:10px;" class="groupTable" width="100%" id="measureTable4">
 								<tr>	
-									<th colspan="2">
-									<table id="datagridStandard"  class="easyui-datagrid"  style="width:473px;height:200px;"  toolbar="#pageNavForStandard" pageSize="100" fitColumns="true" singleSelect="true" striped="true" >
+									<th colspan="3">
+									<table id="datagridStandard" url="getNcrMeasureDataGrid"  style="width:473px;height:200px;"  toolbar="#pageNavForStandard" pageSize="100" fitColumns="true" singleSelect="true" striped="true" >
 										<thead >
 											<tr >
-												<th field="stanContents" width="283px" resizable="false"><fmt:message key="ui.label.contents" /></th>
-												<th field="stanFile" width="140px" resizable="false"><fmt:message key="ui.label.File" /></th>
-												<th field="stanFileDown" width="50px" resizable="false"></th>
+												<th field="DATA0" width="283px" resizable="false" formatter="stanContent"><fmt:message key="ui.label.contents" /></th>
+												<th field="stanFile" width="140px" resizable="false" formatter="stanFile"><fmt:message key="ui.label.File" /></th>
+												<th field="DATA1" width="50px" resizable="false" formatter="stanFileName"></th>
+												<th field="DATASTATE" hidden="true" formatter="stanState" ></th>
+												<th field="DATA2" hidden="true" formatter="stanEtcSeq" ></th>
+												
 											</tr>
 										</thead>									
 									</table>
@@ -467,7 +650,7 @@
 								</tr>													
 							</table>												
 					  </div>  			
-					  <c:if test="${head.status=='AGREE'}">
+					  <c:if test="${ncrInForm.status=='AGREE'}">
 					  <div title='<fmt:message key="ui.label.evaluation"/>'  id="displayValuation">  
 						<form id="form2" enctype="multipart/form-data" action="addNcrMeasureEvaluation">
 							<table style="padding:10px;" class="groupTable" width="100%">
@@ -476,7 +659,11 @@
 								</tr>				
 								<tr>
 									<th><fmt:message key="ui.label.evaluation"/><fmt:message key="ui.label.contents" /></th>
-									<td><textarea name="inputEvaluation" cols=35 rows=5 ></textarea>
+									<td>
+										<textarea name="inputEvaluation" cols=35 rows=5 ></textarea>
+										<input type="hidden" name="validateProcType" value="INSERT" >
+										<input type="hidden" name="validateNcrNo">
+									</td>
 									<th><img src='<c:url value="/resources/images/samsong_logo.gif" />'  width="100px" height="80px" /></th>
 								</tr>
 								<tr>
@@ -517,8 +704,8 @@
 		<tr>
 			<td colspan="2" align="center">
 				<a href="#" iconCls="icon-disk" class="easyui-linkbutton" onclick="javascript:insertData();"><fmt:message key="ui.button.Reg" /></a>
-				<a href="#" iconCls="icon-pencil" class="easyui-linkbutton"><fmt:message key="ui.button.Edit" /></a>
-				<a href="#" iconCls="icon-delete" class="easyui-linkbutton"><fmt:message key="ui.button.Delete" /></a>
+				<a href="#" iconCls="icon-pencil" class="easyui-linkbutton" onclick="javascript:updateData();" ><fmt:message key="ui.button.Edit" /></a>
+				<a href="#" iconCls="icon-delete" class="easyui-linkbutton" onclick="javascript:deleteData();" ><fmt:message key="ui.button.Delete" /></a>
 				<a href="#" iconCls="icon-information" class="easyui-linkbutton"><fmt:message key="ui.button.inform" /></a>
 				<a href="#" iconCls="icon-comment-delete" class="easyui-linkbutton"><fmt:message key="ui.button.reject" /></a>
 				<a href="#" iconCls="icon-accept" class="easyui-linkbutton"><fmt:message key="ui.button.agree" /></a>
@@ -536,7 +723,7 @@
 		<tr>
 			<td align="right">						
 			<a  class="easyui-linkbutton" href="#" iconCls="icon-add" onclick="javascript:insertReasonFile();"><fmt:message key="ui.button.Add" /></a>
-			<a  class="easyui-linkbutton" href="#" iconCls="icon-delete" onclick="javascript:deleteDataGrid('datagridReasonFile');"><fmt:message key="ui.button.Delete" /></a>
+			<a  class="easyui-linkbutton" href="#" iconCls="icon-delete" onclick="javascript:deleteReasonFile();"><fmt:message key="ui.button.Delete" /></a>
 			</td>
 		</tr>
 	</table>
@@ -580,7 +767,7 @@
 		<tr>
 			<td align="right">						
 			<a  class="easyui-linkbutton" href="#" iconCls="icon-add" onclick="javascript:insertStandard();"><fmt:message key="ui.button.Add" /></a>
-			<a  class="easyui-linkbutton" href="#" iconCls="icon-delete" onclick="javascript:deleteDataGrid('datagridStandard');"><fmt:message key="ui.button.Delete" /></a>
+			<a  class="easyui-linkbutton" href="#" iconCls="icon-delete" onclick="javascript:deleteStandard();"><fmt:message key="ui.button.Delete" /></a>
 			</td>
 		</tr>
 	</table>

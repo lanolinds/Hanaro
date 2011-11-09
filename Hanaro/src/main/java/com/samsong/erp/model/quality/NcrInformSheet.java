@@ -3,13 +3,28 @@ package com.samsong.erp.model.quality;
 import java.util.Arrays;
 
 public class NcrInformSheet {
+	String measureProcType;
 	String ncrNo;
 	String title;
 	String custManager;
 	String custConfirmer;
 	String custAppover;	
+	
+	String measureFileName;
+	
 	String reasonIssue;
 	String reasonOutflow;
+	
+	String imgReason1FileName;
+	String imgReason2FileName;
+	String imgTempMeasureFileName;
+	String imgMeasure1FileName;
+	String imgMeasure2FileName;
+	
+	
+	String[] reasonFileSeq;
+	String[] reasonFileState;
+	
 	String[] tempMeasure;
 	String[] tempMeasureDate;
 	String[] measure;
@@ -17,53 +32,235 @@ public class NcrInformSheet {
 	String[] lotNo;
 	String[] confirm;
 	String[] remark;	
+	String[] inputChangeState;
+	
 	
 	String[] inputBeforChange;
-	int[] inputStandardSeq;
 	String[] inputAfterChange;
 	String[] inputChangeDate;
-	
+	int[] inputStandardSeq;	
 	String[] stanContents;
 	
-	
+	String[] standardState;
+	String[] standardEtcSeq;
 	
 	String sampleDate;
 	String supplierDate;
 	String insideIncomeDate;
 	String applyProcDate;
-	String applyCustDate;		
+	String applyCustDate;
+	
+	String status;
 	
 	
-	
 
 
-
-
-
-
-	@Override
-	public String toString() {
-		return "NcrInformSheet [ncrNo=" + ncrNo + ", title=" + title
-				+ ", custManager=" + custManager + ", custConfirmer="
-				+ custConfirmer + ", custAppover=" + custAppover
-				+ ", reasonIssue=" + reasonIssue + ", reasonOutflow="
-				+ reasonOutflow + ", tempMeasure="
-				+ Arrays.toString(tempMeasure) + ", tempMeasureDate="
-				+ Arrays.toString(tempMeasureDate) + ", measure="
-				+ Arrays.toString(measure) + ", measureDate="
-				+ Arrays.toString(measureDate) + ", lotNo="
-				+ Arrays.toString(lotNo) + ", confirm="
-				+ Arrays.toString(confirm) + ", remark="
-				+ Arrays.toString(remark) + ", inputBeforChange="
-				+ Arrays.toString(inputBeforChange) + ", inputStandardSeq="
-				+ Arrays.toString(inputStandardSeq) + ", inputAfterChange="
-				+ Arrays.toString(inputAfterChange) + ", inputChangeDate="
-				+ Arrays.toString(inputChangeDate) + ", stanContents="
-				+ Arrays.toString(stanContents) + ", sampleDate=" + sampleDate
-				+ ", supplierDate=" + supplierDate + ", insideIncomeDate="
-				+ insideIncomeDate + ", applyProcDate=" + applyProcDate
-				+ ", applyCustDate=" + applyCustDate + "]";
+	public String[] getStandardState() {
+		return standardState;
 	}
+
+
+
+
+
+	public void setStandardState(String[] standardState) {
+		this.standardState = standardState;
+	}
+
+
+
+
+
+	public String[] getStandardEtcSeq() {
+		return standardEtcSeq;
+	}
+
+
+
+
+
+	public void setStandardEtcSeq(String[] standardEtcSeq) {
+		this.standardEtcSeq = standardEtcSeq;
+	}
+
+
+
+
+
+	public String[] getInputChangeState() {
+		return inputChangeState;
+	}
+
+
+
+
+
+	public void setInputChangeState(String[] inputChangeState) {
+		this.inputChangeState = inputChangeState;
+	}
+
+
+
+
+
+	public String[] getReasonFileState() {
+		return reasonFileState;
+	}
+
+
+
+
+
+	public void setReasonFileState(String[] reasonFileState) {
+		this.reasonFileState = reasonFileState;
+	}
+
+
+
+
+
+	public String[] getReasonFileSeq() {
+		return reasonFileSeq;
+	}
+
+
+
+
+
+	public void setReasonFileSeq(String[] reasonFileSeq) {
+		this.reasonFileSeq = reasonFileSeq;
+	}
+
+
+
+
+
+	public String getImgReason1FileName() {
+		return imgReason1FileName;
+	}
+
+
+
+
+
+	public void setImgReason1FileName(String imgReason1FileName) {
+		this.imgReason1FileName = imgReason1FileName;
+	}
+
+
+
+
+
+	public String getImgReason2FileName() {
+		return imgReason2FileName;
+	}
+
+
+
+
+
+	public void setImgReason2FileName(String imgReason2FileName) {
+		this.imgReason2FileName = imgReason2FileName;
+	}
+
+
+
+
+
+	public String getImgTempMeasureFileName() {
+		return imgTempMeasureFileName;
+	}
+
+
+
+
+
+	public void setImgTempMeasureFileName(String imgTempMeasureFileName) {
+		this.imgTempMeasureFileName = imgTempMeasureFileName;
+	}
+
+
+
+
+
+	public String getImgMeasure1FileName() {
+		return imgMeasure1FileName;
+	}
+
+
+
+
+
+	public void setImgMeasure1FileName(String imgMeasure1FileName) {
+		this.imgMeasure1FileName = imgMeasure1FileName;
+	}
+
+
+
+
+
+	public String getImgMeasure2FileName() {
+		return imgMeasure2FileName;
+	}
+
+
+
+
+
+	public void setImgMeasure2FileName(String imgMeasure2FileName) {
+		this.imgMeasure2FileName = imgMeasure2FileName;
+	}
+
+
+
+
+
+	public String getStatus() {
+		return status;
+	}
+
+
+
+
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+
+
+
+
+	public String getMeasureFileName() {
+		return measureFileName;
+	}
+
+
+
+
+
+	public void setMeasureFileName(String measureFileName) {
+		this.measureFileName = measureFileName;
+	}
+
+
+
+
+
+	public String getMeasureProcType() {
+		return measureProcType;
+	}
+
+
+
+
+
+	public void setMeasureProcType(String measureProcType) {
+		this.measureProcType = measureProcType;
+	}
+
+
+
 
 
 	public String[] getInputBeforChange() {

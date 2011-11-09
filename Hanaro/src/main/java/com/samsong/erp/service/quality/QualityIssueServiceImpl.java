@@ -1,14 +1,17 @@
 package com.samsong.erp.service.quality;
 
 
-import java.io.FileOutputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.samsong.erp.dao.quality.QualityIssueDAO;
+import com.samsong.erp.model.quality.NcrInformSheet;
 import com.samsong.erp.model.quality.QualityIssueRegSheet;
 
 @Service
@@ -67,6 +70,38 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	@Override
 	public List<Map<String, Object>> getDefectTreeData(Locale locale) {
 		return dao.getDefectTreeData(locale);
+	}
+
+	@Override
+	public void addNcrMeasure(Locale locale, String user, NcrInformSheet sheet,
+			byte[] measureFile,  byte[] imgReason1,
+			byte[] imgReason2, byte[] imgTempMeasure, byte[] imgMeasure1, byte[] imgMeasure2,
+			MultipartFile[] inputAddFile, MultipartFile[] inputChangeFile, MultipartFile[] stanFile) {
+		dao.addNcrMeasure(locale, sheet, user, measureFile, imgReason1, imgReason2, imgTempMeasure,
+				imgMeasure1, imgMeasure2,inputAddFile, inputChangeFile, stanFile);
+		
+	}
+
+	@Override
+	public void deleteNcrMeasure(Locale locale, NcrInformSheet sheet) {
+		dao.deleteNcrMeasure(locale, sheet);
+	}
+
+	@Override
+	public void updateNcrMeasure(Locale locale, String user,
+			NcrInformSheet sheet, byte[] measureFile, byte[] imgReason1,
+			byte[] imgReason2, byte[] imgTempMeasure, byte[] imgMeasure1,
+			byte[] imgMeasure2, MultipartFile[] inputAddFile,
+			MultipartFile[] inputChangeFile, MultipartFile[] stanFile) {
+			dao.updateNcrMeasure(locale, sheet, user, measureFile, imgReason1, imgReason2,
+					imgTempMeasure, imgMeasure1, imgMeasure2, inputAddFile, inputChangeFile, stanFile);
+		
+	}
+
+	@Override
+	public List<Map<String, Object>> getNcrMeasureDataGrid(Locale locale,
+			String ncrNo, String gridType) {
+			return dao.getNcrMeasureDataGrid(locale, ncrNo, gridType);
 	}
 
 }

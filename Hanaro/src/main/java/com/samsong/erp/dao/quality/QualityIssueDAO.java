@@ -1,5 +1,7 @@
 package com.samsong.erp.dao.quality;
 
+import java.io.IOException;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -14,15 +16,19 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.samsong.erp.model.quality.NcrInformSheet;
 import com.samsong.erp.model.quality.QualityIssueRegSheet;
 
 @Repository
@@ -281,6 +287,487 @@ public class QualityIssueDAO {
 			}
 		}
 		return level0;
+	}
+	
+	
+	public void addNcrMeasure(Locale locale, final NcrInformSheet sheet, String user, byte[] measureFile, byte[] imgReason1,
+			byte[] imgReason2, byte[] imgTempMeasure, byte[] imgMeasure1, byte[] imgMeasure2,
+			final MultipartFile[] inputAddFile, final MultipartFile[] inputChangeFile, final MultipartFile[] stanFile){
+		
+		   String sqlHead = "UPDATE [qis_ncr_step1_head] SET [locale] = ? , [title] = ?";
+		   sqlHead+=" ,[custManager] = ?, [custConfirmer] = ? ,[custApprover] = ? ,[measureReportName] = ?";
+		   sqlHead+=" ,[status] = 'REG', [rejectCount] = 0 ,[inputBy] = ?, [inputDt] = getdate()";
+		   sqlHead+=" WHERE ncrNo = ?";		   
+		   jdbc.update(sqlHead,new Object[]{locale.getCountry(),sheet.getTitle()
+				   ,sheet.getCustManager(),sheet.getCustConfirmer(),sheet.getCustAppover()
+				   ,sheet.getMeasureFileName(),user,sheet.getNcrNo()});
+		   
+		   String sqlHeadFile ="INSERT INTO [qis_ncr_step1_head_measure_file] ([ncrNo],[measureReport])";
+		   sqlHeadFile+=" VALUES (?,?)";
+		   jdbc.update(sqlHeadFile,new Object[]{sheet.getNcrNo(),measureFile});	   
+		   		   
+		   String sqlMeasureReason="INSERT INTO [qis_ncr_step1_measure_reason] ([ncrNo],[occurReason] ";
+		   sqlMeasureReason+=",[otherReason] ,[imgReason1] ,[imgReason2] ,[imgTempMeasure] ,[imgMeasure1] ,[imgMeasure2])";
+		   sqlMeasureReason+=" VALUES (?,?,?,?,?,?,?,?)";
+		   jdbc.update(sqlMeasureReason, new Object[]{sheet.getNcrNo(),sheet.getReasonIssue(),sheet.getReasonOutflow(),
+				   sheet.getImgReason1FileName(),sheet.getImgReason2FileName(),sheet.getImgTempMeasureFileName(),
+				   sheet.getImgMeasure1FileName(),sheet.getImgMeasure2FileName()});		   
+		   
+		   String sqlMeasureReasonFile="INSERT INTO [qis_ncr_step1_measure_reason_file] ";
+		   sqlMeasureReasonFile+="([ncrNo],[imgReason1],[imgReason2],[imgTempMeasure],[imgMeasure1],[imaMeasure2])";
+		   sqlMeasureReasonFile+=" VALUES (?,?,?,?,?,?)";
+		   jdbc.update(sqlMeasureReasonFile,new Object[]{sheet.getNcrNo(),imgReason1,imgReason2,imgTempMeasure,imgMeasure1,imgMeasure2});
+		   
+		   
+		   if(inputAddFile!=null){
+			   String sqlReasonFile="INSERT INTO [qis_ncr_step1_reason_file]([ncrNo],[file],[fileName])";
+			   sqlReasonFile+=" VALUES (?,?,?)";
+			   jdbc.batchUpdate(sqlReasonFile,new BatchPreparedStatementSetter() {			
+					@Override
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						try {
+							ps.setString(1,sheet.getNcrNo());
+							ps.setBytes(2, inputAddFile[i].getBytes());
+							ps.setString(3, inputAddFile[i].getOriginalFilename());
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+					@Override
+					public int getBatchSize() {
+						return inputAddFile.length;
+					}
+			   	});
+		   }
+		   
+		   if(sheet.getTempMeasure()!=null){
+			   String sqlTempMeasure="INSERT INTO [qis_ncr_step1_temp_measure]([ncrNo],[contents],[date])";
+			   sqlTempMeasure+=" VALUES (?,?,?)";
+				   jdbc.batchUpdate(sqlTempMeasure,new BatchPreparedStatementSetter() {
+					
+					@Override
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						ps.setString(1,sheet.getNcrNo());
+						ps.setString(2,sheet.getTempMeasure()[i]);
+						ps.setString(3,(sheet.getTempMeasureDate()[i].trim().equals(""))?null:sheet.getTempMeasureDate()[i]);
+					}
+					@Override
+					public int getBatchSize() {
+						return sheet.getTempMeasure().length;
+					}
+				});
+		   }
+			   
+		   if(sheet.getMeasure()!=null){
+				String sqlLastMeasure="INSERT INTO [qis_ncr_step1_last_measure]([ncrNo],[contens],[date])";
+				sqlLastMeasure+=" VALUES(?,?,?)";
+				jdbc.batchUpdate(sqlLastMeasure, new BatchPreparedStatementSetter() {
+					
+					@Override
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+							ps.setString(1,sheet.getNcrNo());
+							ps.setString(2,sheet.getMeasure()[i]);
+							ps.setString(3,(sheet.getMeasureDate()[i].trim().equals(""))?null:sheet.getMeasureDate()[i]);
+					}
+					@Override
+					public int getBatchSize() {
+						return sheet.getMeasure().length;
+					}
+				});
+		   }
+			
+		   if(sheet.getLotNo()!=null){
+				String sqlLotConfirm="INSERT INTO [qis_ncr_step1_confirm_lotno]([ncrNo],[lotNo],[contents],[remark])";
+				sqlLotConfirm+=" VALUES(?,?,?,?)";
+				jdbc.batchUpdate(sqlLotConfirm,new BatchPreparedStatementSetter() {
+					@Override
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						ps.setString(1,sheet.getNcrNo());
+						ps.setString(2,sheet.getLotNo()[i]);
+						ps.setString(3,sheet.getConfirm()[i]);
+						ps.setString(4,sheet.getRemark()[i]);
+					}
+					@Override
+					public int getBatchSize() {
+						return sheet.getLotNo().length;
+					}
+				});
+		   }
+		    
+		   if(sheet.getInputBeforChange()!=null){
+			   String sqlStandard="INSERT INTO [qis_ncr_step1_standard]([ncrNo],[before],[after],[changeDate],[fileSeq],[standardSeq],[fileName])";
+			   sqlStandard+=" VALUES(?,?,?,?,?,?,?)";
+			   jdbc.batchUpdate(sqlStandard,new BatchPreparedStatementSetter() {
+					@Override
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						ps.setString(1,sheet.getNcrNo());
+						ps.setString(2,sheet.getInputBeforChange()[i]);
+						ps.setString(3,sheet.getInputAfterChange()[i]);
+						ps.setString(4,(sheet.getInputChangeDate()[i].trim().equals(""))?null:sheet.getInputChangeDate()[i]);
+						ps.setInt(5,sheet.getInputStandardSeq()[i]);
+						ps.setInt(6,sheet.getInputStandardSeq()[i]);
+						ps.setString(7,inputChangeFile[i].getOriginalFilename());
+					}
+					
+					@Override
+					public int getBatchSize() {
+						return sheet.getInputBeforChange().length;
+					}
+				});			   
+		 
+			   String sqlStandardFile1="INSERT INTO [qis_ncr_step1_standard_file]([ncrNo],[fileSeq],[file])";
+			   sqlStandardFile1+=" VALUES(?,?,?)";			   
+			   
+			   jdbc.batchUpdate(sqlStandardFile1, new BatchPreparedStatementSetter() {
+				
+					@Override
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+							try {
+								ps.setString(1,sheet.getNcrNo());
+								ps.setInt(2,sheet.getInputStandardSeq()[i]);
+								ps.setBytes(3,inputChangeFile[i].getBytes());
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+					}
+					
+					@Override
+					public int getBatchSize() {
+						return inputChangeFile.length;
+					}
+				});
+		   }
+		   
+		   if(sheet.getStanContents()!=null){
+			   String sqlStandardEtc="INSERT INTO [qis_ncr_step1_standard_etc]([ncrNo],[contents],[fileSeq],[fileName])";
+			   sqlStandardEtc+=" VALUES(?,?,?,?)";
+			   jdbc.batchUpdate(sqlStandardEtc,new BatchPreparedStatementSetter() {
+					@Override
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						ps.setString(1,sheet.getNcrNo());
+						ps.setString(2,sheet.getStanContents()[i]);
+						ps.setInt(3,(i+5));
+						ps.setString(4,stanFile[i].getOriginalFilename());
+					}
+					
+					@Override
+					public int getBatchSize() {
+						return sheet.getStanContents().length;
+					}
+				});
+			   
+			   String sqlStandardFile2="INSERT INTO [qis_ncr_step1_standard_file]([ncrNo],[fileSeq],[file])";
+			   sqlStandardFile2+=" VALUES(?,?,?)";
+			   jdbc.batchUpdate(sqlStandardFile2,new BatchPreparedStatementSetter() {
+					@Override
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						try {
+							ps.setString(1,sheet.getNcrNo());
+							ps.setInt(2,(i+5));							
+							ps.setBytes(3,stanFile[i].getBytes());
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+					
+					@Override
+					public int getBatchSize() {
+						return sheet.getStanContents().length;
+					}
+				});			   
+		   }
+		   
+	}
+	
+	public void updateNcrMeasure(Locale locale, final NcrInformSheet sheet, String user, byte[] measureFile, byte[] imgReason1,
+			byte[] imgReason2, byte[] imgTempMeasure, byte[] imgMeasure1, byte[] imgMeasure2,
+			final MultipartFile[] inputAddFile, final MultipartFile[] inputChangeFile, final MultipartFile[] stanFile){
+		
+		   String sqlHead = "UPDATE [qis_ncr_step1_head] SET [locale] = ? , [title] = ?";
+		   sqlHead+=" ,[custManager] = ?, [custConfirmer] = ? ,[custApprover] = ?";
+		   sqlHead+=" ,[status] = 'REG', [rejectCount] = 0 ,[updateBy] = ?, [updateDt] = getdate()";
+		   sqlHead+=" WHERE ncrNo = ?";		   
+		   jdbc.update(sqlHead,new Object[]{locale.getCountry(),sheet.getTitle()
+				   ,sheet.getCustManager(),sheet.getCustConfirmer(),sheet.getCustAppover()
+				   ,user,sheet.getNcrNo()});
+		   
+		   if(!sheet.getMeasureFileName().equals("")){
+			   String sqlHeadFile ="UPDATE [qis_ncr_step1_head_measure_file] SET [measureReport] = ?";
+			   sqlHeadFile+=" WHERE ncrNo = ?";
+			   jdbc.update(sqlHeadFile,new Object[]{measureFile,sheet.getNcrNo()});
+			   sqlHeadFile =" UPDATE [qis_ncr_step1_head] SET [measureReportName] = ?";
+			   sqlHeadFile+=" WHERE ncrNo = ?";				   
+			   jdbc.update(sqlHeadFile,new Object[]{sheet.getMeasureFileName(),sheet.getNcrNo()});
+		   }
+		   
+		   String sqlMeasureReason="UPDATE [qis_ncr_step1_measure_reason] SET [occurReason] = ?,[otherReason] = ?";
+		   sqlMeasureReason+=" WHERE ncrNo = ?";
+		   jdbc.update(sqlMeasureReason, new Object[]{sheet.getReasonIssue(),sheet.getReasonOutflow(),sheet.getNcrNo()});
+		   
+		   if(!sheet.getImgReason1FileName().equals("")){
+			   String sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason] SET [imgReason1] = ?";
+			   sqlMeasureReasonFile+=" WHERE ncrNo = ?";
+			   jdbc.update(sqlMeasureReasonFile, new Object[]{sheet.getImgReason1FileName(),sheet.getNcrNo()});
+			   sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason_file] SET [imgReason1] = ?";
+			   sqlMeasureReasonFile+=" WHERE ncrNo = ?";
+			   jdbc.update(sqlMeasureReasonFile, new Object[]{imgReason1,sheet.getNcrNo()});
+		   }
+		   if(!sheet.getImgReason2FileName().equals("")){
+			   String sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason] SET [imgReason2] = ?";
+			   sqlMeasureReasonFile+=" WHERE ncrNo = ?";
+			   jdbc.update(sqlMeasureReasonFile, new Object[]{sheet.getImgReason2FileName(),sheet.getNcrNo()});
+			   sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason_file] SET [imgReason2] = ?";
+			   sqlMeasureReasonFile+=" WHERE ncrNo = ?";
+			   jdbc.update(sqlMeasureReasonFile, new Object[]{imgReason2,sheet.getNcrNo()});
+		   }
+		   if(!sheet.getImgTempMeasureFileName().equals("")){
+			   String sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason] SET [imgTempMeasure] = ?";
+			   sqlMeasureReasonFile+=" WHERE ncrNo = ?";
+			   jdbc.update(sqlMeasureReasonFile, new Object[]{sheet.getImgTempMeasureFileName(),sheet.getNcrNo()});
+			   sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason_file] SET [imgTempMeasure] = ?";
+			   sqlMeasureReasonFile+=" WHERE ncrNo = ?";
+			   jdbc.update(sqlMeasureReasonFile, new Object[]{imgTempMeasure,sheet.getNcrNo()});
+		   }		   
+		   if(!sheet.getImgMeasure1FileName().equals("")){
+			   String sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason] SET [imgMeasure1] = ?";
+			   sqlMeasureReasonFile+=" WHERE ncrNo = ?";
+			   jdbc.update(sqlMeasureReasonFile, new Object[]{sheet.getImgMeasure1FileName(),sheet.getNcrNo()});
+			   sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason_file] SET [imgMeasure1] = ?";
+			   sqlMeasureReasonFile+=" WHERE ncrNo = ?";
+			   jdbc.update(sqlMeasureReasonFile, new Object[]{imgMeasure1,sheet.getNcrNo()});
+		   }
+		   if(!sheet.getImgMeasure2FileName().equals("")){
+			   String sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason] SET [imgMeasure2] = ?";
+			   sqlMeasureReasonFile+=" WHERE ncrNo = ?";
+			   jdbc.update(sqlMeasureReasonFile, new Object[]{sheet.getImgMeasure2FileName(),sheet.getNcrNo()});
+			   sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason_file] SET [imgMeasure2] = ?";
+			   sqlMeasureReasonFile+=" WHERE ncrNo = ?";
+			   jdbc.update(sqlMeasureReasonFile, new Object[]{imgMeasure2,sheet.getNcrNo()});
+		   }		   		   		   
+
+		   
+		   if(sheet.getReasonFileSeq()!=null){
+			  for(int i=0;i<sheet.getReasonFileSeq().length;i++){
+				  String sql="";
+				  if(sheet.getReasonFileState()[i].equals("a")){
+					  sql = "INSERT INTO [qis_ncr_step1_reason_file]([ncrNo],[file],[fileName])";
+				  	  sql+=" VALUES(?,?,?)";
+				  	  try {
+						jdbc.update(sql, new Object[]{sheet.getNcrNo(),inputAddFile[i].getBytes(),inputAddFile[i].getOriginalFilename()});
+					} catch (Exception e) {
+						e.printStackTrace();
+					}   
+				  }
+				  else if(sheet.getReasonFileState()[i].equals("u")){
+					  sql="UPDATE [qis_ncr_step1_reason_file] SET [file] = ?, [fileName] = ?";
+					  sql+=" WHERE ncrNo = ? and fileSeq = ?";
+					  try {
+						jdbc.update(sql, new Object[]{inputAddFile[i].getBytes(),inputAddFile[i].getOriginalFilename(),sheet.getNcrNo(),sheet.getReasonFileSeq()[i]});
+					}  catch (Exception e) {
+						e.printStackTrace();
+					}  
+				  }
+				  else if(sheet.getReasonFileState()[i].equals("d")){
+					 sql="DELETE FROM [qis_ncr_step1_reason_file] WHERE ncrNo = ? and fileSeq = ?";
+					 jdbc.update(sql, new Object[]{sheet.getNcrNo(),sheet.getReasonFileSeq()[i]});
+				  }
+				  	    
+			  }
+		   }
+		   
+		   String sqlTempMeasureDelete="DELETE FROM [qis_ncr_step1_temp_measure] WHERE ncrNo = ? ";
+		   jdbc.update(sqlTempMeasureDelete, new Object[]{sheet.getNcrNo()});
+		   
+		   if(sheet.getTempMeasure()!=null){
+			   String sqlTempMeasure="INSERT INTO [qis_ncr_step1_temp_measure]([ncrNo],[contents],[date])";
+			   sqlTempMeasure+=" VALUES (?,?,?)";
+				   jdbc.batchUpdate(sqlTempMeasure,new BatchPreparedStatementSetter() {
+					
+					@Override
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						ps.setString(1,sheet.getNcrNo());
+						ps.setString(2,sheet.getTempMeasure()[i]);
+						ps.setString(3,(sheet.getTempMeasureDate()[i].trim().equals(""))?null:sheet.getTempMeasureDate()[i]);
+					}
+					@Override
+					public int getBatchSize() {
+						return sheet.getTempMeasure().length;
+					}
+				});
+		   }
+		   
+		   String sqlMeasureDelete="DELETE FROM [qis_ncr_step1_last_measure] WHERE ncrNo = ? ";
+		   jdbc.update(sqlMeasureDelete, new Object[]{sheet.getNcrNo()});		   
+			   
+		   if(sheet.getMeasure()!=null){
+				String sqlLastMeasure="INSERT INTO [qis_ncr_step1_last_measure]([ncrNo],[contens],[date])";
+				sqlLastMeasure+=" VALUES(?,?,?)";
+				jdbc.batchUpdate(sqlLastMeasure, new BatchPreparedStatementSetter() {
+					
+					@Override
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+							ps.setString(1,sheet.getNcrNo());
+							ps.setString(2,sheet.getMeasure()[i]);
+							ps.setString(3,(sheet.getMeasureDate()[i].trim().equals(""))?null:sheet.getMeasureDate()[i]);
+					}
+					@Override
+					public int getBatchSize() {
+						return sheet.getMeasure().length;
+					}
+				});
+		   }
+		   
+		   String sqlLotDelete="DELETE FROM [qis_ncr_step1_confirm_lotno] WHERE ncrNo = ? ";
+		   jdbc.update(sqlLotDelete, new Object[]{sheet.getNcrNo()});			   
+			
+		   if(sheet.getLotNo()!=null){
+				String sqlLotConfirm="INSERT INTO [qis_ncr_step1_confirm_lotno]([ncrNo],[lotNo],[contents],[remark])";
+				sqlLotConfirm+=" VALUES(?,?,?,?)";
+				jdbc.batchUpdate(sqlLotConfirm,new BatchPreparedStatementSetter() {
+					@Override
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						ps.setString(1,sheet.getNcrNo());
+						ps.setString(2,sheet.getLotNo()[i]);
+						ps.setString(3,sheet.getConfirm()[i]);
+						ps.setString(4,sheet.getRemark()[i]);
+					}
+					@Override
+					public int getBatchSize() {
+						return sheet.getLotNo().length;
+					}
+				});
+		   }
+		   
+		   
+		    
+		   if(sheet.getInputBeforChange()!=null){
+			   for(int i=0;i<4;i++){
+				   String sqlStandard="UPDATE [qis_ncr_step1_standard] set [before] = ?,[after]=?,[changeDate]=?";
+				   sqlStandard+=" WHERE ncrNo=? and [standardSeq] = ?";
+				   jdbc.update(sqlStandard, new Object[]{
+						   sheet.getInputBeforChange()[i],
+						   sheet.getInputAfterChange()[i],
+						   (sheet.getInputChangeDate()[i].trim().equals(""))?null:sheet.getInputChangeDate()[i],								   
+						   sheet.getNcrNo(),
+						   sheet.getInputStandardSeq()[i]});
+				   
+				   
+				   
+				   if(sheet.getInputChangeState()[i].equals("d")){
+					   String sqlDelete="UPDATE [qis_ncr_step1_standard] set [fileName] = ''  WHERE ncrNo=? and [standardSeq] = ?";
+					   jdbc.update(sqlDelete, new Object[]{sheet.getNcrNo(),sheet.getInputStandardSeq()[i]});
+					   sqlDelete = "UPDATE [qis_ncr_step1_standard_file] set [file] = null  WHERE ncrNo=? and [fileSeq] = ?";
+					   jdbc.update(sqlDelete, new Object[]{sheet.getNcrNo(),sheet.getInputStandardSeq()[i]});
+				   }else if(!inputChangeFile[i].getOriginalFilename().equals("")){
+					   try {
+						   String sqlDelete="UPDATE [qis_ncr_step1_standard] set [fileName] = ?  WHERE ncrNo=? and [standardSeq] = ?";
+						   jdbc.update(sqlDelete, new Object[]{inputChangeFile[i].getOriginalFilename(),sheet.getNcrNo(),sheet.getInputStandardSeq()[i]});
+						   sqlDelete = "UPDATE [qis_ncr_step1_standard_file] set [file] = ?  WHERE ncrNo=? and [fileSeq] = ?";						   
+						jdbc.update(sqlDelete, new Object[]{inputChangeFile[i].getBytes(),sheet.getNcrNo(),sheet.getInputStandardSeq()[i]});
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+				   }
+			   }
+		   }
+		   
+		   if(sheet.getStanContents()!=null){			   
+			   for(int i=0;i<sheet.getStanContents().length;i++){
+				   String sqlStandardEtc="";
+				   int maxNum = 0;
+				   
+				   String sqlMax ="SELECT max([fileSeq]) FROM [qis_ncr_step1_standard_etc]";
+				   sqlMax+=" WHERE ncrNo=?";
+				   
+				   maxNum =  jdbc.queryForObject(sqlMax,new Object[]{sheet.getNcrNo()},new RowMapper<Integer>(){
+						@Override
+						public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {		
+							 return rs.getInt(1);
+						}
+						 
+				    });
+				   
+				   if(sheet.getStandardState()[i].equals("d")){
+					   sqlStandardEtc="DELETE FROM [qis_ncr_step1_standard_etc]";
+					   sqlStandardEtc+=" WHERE ncrNo=? and [fileSeq] = ?";
+					   jdbc.update(sqlStandardEtc, new Object[]{sheet.getNcrNo(),sheet.getStandardEtcSeq()[i]});
+					   sqlStandardEtc="DELETE FROM [qis_ncr_step1_standard_file]";
+					   sqlStandardEtc+=" WHERE ncrNo=? and [fileSeq] = ?";
+					   jdbc.update(sqlStandardEtc, new Object[]{sheet.getNcrNo(),sheet.getStandardEtcSeq()[i]});
+				   }else if(sheet.getStandardState()[i].equals("u")){
+					   sqlStandardEtc="UPDATE [qis_ncr_step1_standard_etc] set [contents]= ?, [fileName] = ?";
+					   sqlStandardEtc+=" WHERE ncrNo=? and [fileSeq] = ?";
+					   jdbc.update(sqlStandardEtc, new Object[]{sheet.getStanContents()[i],stanFile[i].getOriginalFilename(),sheet.getNcrNo(),sheet.getStandardEtcSeq()[i]});
+					   try {
+					    sqlStandardEtc="UPDATE [qis_ncr_step1_standard_file] set [file] = ?";
+					    sqlStandardEtc+=" WHERE ncrNo=? and [fileSeq] = ?";						   
+						jdbc.update(sqlStandardEtc, new Object[]{stanFile[i].getBytes(),sheet.getNcrNo(),sheet.getStandardEtcSeq()[i]});
+					   } catch (Exception e) {
+						e.printStackTrace();
+					   }			
+				   }else if(sheet.getStandardState()[i].equals("a")){
+					   sqlStandardEtc="INSERT INTO [qis_ncr_step1_standard_etc]([ncrNo],[contents],[fileSeq],[fileName])";
+					   sqlStandardEtc+=" VALUES(?,?,?,?)";
+					   jdbc.update(sqlStandardEtc, new Object[]{sheet.getNcrNo(),sheet.getStanContents()[i],maxNum+1,stanFile[i].getOriginalFilename()});
+					   try {
+						   sqlStandardEtc="INSERT INTO [qis_ncr_step1_standard_file]([ncrNo],[fileSeq],[file])";
+						   sqlStandardEtc+=" VALUES(?,?,?)";						   
+							jdbc.update(sqlStandardEtc, new Object[]{sheet.getNcrNo(),maxNum+1,stanFile[i].getBytes()});
+						} catch (Exception e) {
+							e.printStackTrace();
+						}					   
+				   }
+			   }
+					   
+		   }
+		   
+	}
+	
+	public void deleteNcrMeasure(Locale locale, NcrInformSheet sheet){
+		Map<String,Object> param = new HashMap<String,Object>();
+		param.put("locale",locale.getCountry());
+		param.put("ncrNo",sheet.getNcrNo());
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueDAO_deleteNCRMeasure");
+		sp.execute(param);
+	}
+	
+	//NCR대책서 GRID를 조회한다.
+	public List<Map<String,Object>> getNcrMeasureDataGrid(Locale locale,String ncrNo,String gridType){
+		String sql ="";
+		if(gridType.equals("reasonFile")){
+			sql= "SELECT [fileName],[fileSeq] FROM [qis_ncr_step1_reason_file]";
+			sql+=" WHERE ncrNo=?";
+		}else if(gridType.equals("tempMeasure")){
+			sql= "SELECT [contents],convert(nvarchar(10),[date],121) FROM [qis_ncr_step1_temp_measure]";
+			sql+=" WHERE ncrNo=?";
+		}else if(gridType.equals("measure")){
+			sql= "SELECT [contens],convert(nvarchar(10),[date],121) FROM [qis_ncr_step1_last_measure]";
+			sql+=" WHERE ncrNo=?";
+		}else if(gridType.equals("lotConfirm")){
+			sql= "SELECT [lotNo],[contents],[remark] FROM [qis_ncr_step1_confirm_lotno]";
+			sql+=" WHERE ncrNo=?";
+		}else if(gridType.equals("standard")){
+			sql= "SELECT [before],[after],convert(nvarchar(10),[changeDate],121),[fileName] FROM [qis_ncr_step1_standard]";
+			sql+=" WHERE ncrNo=? order by [standardSeq] asc";
+		}else if(gridType.equals("standardEtc")){
+			sql= "SELECT [contents],[fileName],[fileSeq] FROM [qis_ncr_step1_standard_etc]";
+			sql+=" WHERE ncrNo=? order by [fileSeq] asc";
+		}
+		return jdbc.query(sql, new Object[]{ncrNo}, new RowMapper<Map<String,Object>>(){
+
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int rowNum)
+					throws SQLException {
+				Map<String,Object> m = new LinkedHashMap<String,Object>();
+				for(int x=0;x<rs.getMetaData().getColumnCount();x++){
+					m.put("DATA"+x,rs.getObject(x+1));
+				}
+				return m;
+				
+			}
+			
+		});
+		
 	}
 
 

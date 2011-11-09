@@ -1,11 +1,13 @@
 package com.samsong.erp.service.quality;
 
-import java.io.FileOutputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.springframework.web.multipart.MultipartFile;
+
+import com.samsong.erp.model.quality.NcrInformSheet;
 import com.samsong.erp.model.quality.QualityIssueRegSheet;
 
 public interface QualityIssueService {
@@ -28,5 +30,17 @@ public interface QualityIssueService {
 	public List<Map<String, Object>> getDefectTreeData(Locale locale);
 
 	public Map<String, Object> getIssueDetails(String regNo, Locale locale);
+	
+	public void addNcrMeasure(Locale locale, String user, NcrInformSheet sheet, byte[] measureFile, byte[] imgReason1,
+			byte[] imgReason2, byte[] imgTempMeasure, byte[] imgMeasure1, byte[] imgMeasure2,
+			MultipartFile[] inputAddFile, MultipartFile[] inputChangeFile, MultipartFile[] stanFile);
+	
+	public void updateNcrMeasure(Locale locale, String user, NcrInformSheet sheet, byte[] measureFile, byte[] imgReason1,
+			byte[] imgReason2, byte[] imgTempMeasure, byte[] imgMeasure1, byte[] imgMeasure2,
+			MultipartFile[] inputAddFile, MultipartFile[] inputChangeFile, MultipartFile[] stanFile);
+	
+	public void deleteNcrMeasure(Locale locale, NcrInformSheet sheet);
+	
+	public List<Map<String,Object>> getNcrMeasureDataGrid(Locale locale, String ncrNo, String gridType);
 	
 }
