@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.samsong.erp.model.quality.IssueApproval;
 import com.samsong.erp.model.quality.QualityIssueRegSheet;
-
+ 
 public interface QualityIssueService {
 	public Map<String,Object> getCodeDefectSource(Locale locale,String parentCode);
 	

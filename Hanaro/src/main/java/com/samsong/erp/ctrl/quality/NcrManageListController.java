@@ -12,7 +12,7 @@ import com.samsong.erp.model.quality.NcrMeasureReportSheet1;
 import com.samsong.erp.model.quality.NcrMeasureReportSheet2;
 import com.samsong.erp.service.quality.QualityIssueService;
 
-
+ 
 @Controller
 @RequestMapping("/qualityDivision/qualityIssue")
 public class NcrManageListController {
