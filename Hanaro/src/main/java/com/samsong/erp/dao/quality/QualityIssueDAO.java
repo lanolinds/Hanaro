@@ -16,7 +16,6 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -25,7 +24,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.samsong.erp.model.quality.NcrInformSheet;
@@ -292,7 +290,9 @@ public class QualityIssueDAO {
 	
 	public void addNcrMeasure(Locale locale, final NcrInformSheet sheet, String user, byte[] measureFile, byte[] imgReason1,
 			byte[] imgReason2, byte[] imgTempMeasure, byte[] imgMeasure1, byte[] imgMeasure2,
-			final MultipartFile[] inputAddFile, final MultipartFile[] inputChangeFile, final MultipartFile[] stanFile){
+			final MultipartFile[] inputAddFile, final MultipartFile[] inputChangeFile, final MultipartFile[] stanFile
+			,String imgReasonFile1ContentType,  String imgReasonFile2ContentType, String imgTempNameFileContentType,
+			String imgMeasureName1FileContentType, String imgMeasureName2FileContentType){
 		
 		   String sqlHead = "UPDATE [qis_ncr_step1_head] SET [locale] = ? , [title] = ?";
 		   sqlHead+=" ,[custManager] = ?, [custConfirmer] = ? ,[custApprover] = ? ,[measureReportName] = ?";
@@ -314,9 +314,10 @@ public class QualityIssueDAO {
 				   sheet.getImgMeasure1FileName(),sheet.getImgMeasure2FileName()});		   
 		   
 		   String sqlMeasureReasonFile="INSERT INTO [qis_ncr_step1_measure_reason_file] ";
-		   sqlMeasureReasonFile+="([ncrNo],[imgReason1],[imgReason2],[imgTempMeasure],[imgMeasure1],[imaMeasure2])";
-		   sqlMeasureReasonFile+=" VALUES (?,?,?,?,?,?)";
-		   jdbc.update(sqlMeasureReasonFile,new Object[]{sheet.getNcrNo(),imgReason1,imgReason2,imgTempMeasure,imgMeasure1,imgMeasure2});
+		   sqlMeasureReasonFile+="([ncrNo],[imgReason1],[imgReason2],[imgTempMeasure],[imgMeasure1],[imgMeasure2],[imgReason1Type],[imgReason2Type],[imgTempMeasureType],[imgMeasure1Type],[imgMeasure2Type])";
+		   sqlMeasureReasonFile+=" VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+		   jdbc.update(sqlMeasureReasonFile,new Object[]{sheet.getNcrNo(),imgReason1,imgReason2,imgTempMeasure,imgMeasure1,imgMeasure2
+				   ,imgReasonFile1ContentType,imgReasonFile2ContentType,imgTempNameFileContentType,imgMeasureName1FileContentType,imgMeasureName2FileContentType});
 		   
 		   
 		   if(inputAddFile!=null){
@@ -481,7 +482,9 @@ public class QualityIssueDAO {
 	
 	public void updateNcrMeasure(Locale locale, final NcrInformSheet sheet, String user, byte[] measureFile, byte[] imgReason1,
 			byte[] imgReason2, byte[] imgTempMeasure, byte[] imgMeasure1, byte[] imgMeasure2,
-			final MultipartFile[] inputAddFile, final MultipartFile[] inputChangeFile, final MultipartFile[] stanFile){
+			final MultipartFile[] inputAddFile, final MultipartFile[] inputChangeFile, final MultipartFile[] stanFile
+			,String imgReasonFile1ContentType,  String imgReasonFile2ContentType, String imgTempNameFileContentType,
+			String imgMeasureName1FileContentType, String imgMeasureName2FileContentType){
 		
 		   String sqlHead = "UPDATE [qis_ncr_step1_head] SET [locale] = ? , [title] = ?";
 		   sqlHead+=" ,[custManager] = ?, [custConfirmer] = ? ,[custApprover] = ?";
@@ -508,41 +511,41 @@ public class QualityIssueDAO {
 			   String sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason] SET [imgReason1] = ?";
 			   sqlMeasureReasonFile+=" WHERE ncrNo = ?";
 			   jdbc.update(sqlMeasureReasonFile, new Object[]{sheet.getImgReason1FileName(),sheet.getNcrNo()});
-			   sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason_file] SET [imgReason1] = ?";
+			   sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason_file] SET [imgReason1] = ?, [imgReason1Type] =  ?";
 			   sqlMeasureReasonFile+=" WHERE ncrNo = ?";
-			   jdbc.update(sqlMeasureReasonFile, new Object[]{imgReason1,sheet.getNcrNo()});
+			   jdbc.update(sqlMeasureReasonFile, new Object[]{imgReason1, imgReasonFile1ContentType,sheet.getNcrNo()});
 		   }
 		   if(!sheet.getImgReason2FileName().equals("")){
 			   String sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason] SET [imgReason2] = ?";
 			   sqlMeasureReasonFile+=" WHERE ncrNo = ?";
 			   jdbc.update(sqlMeasureReasonFile, new Object[]{sheet.getImgReason2FileName(),sheet.getNcrNo()});
-			   sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason_file] SET [imgReason2] = ?";
+			   sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason_file] SET [imgReason2] = ? , [imgReason2Type] =  ?";
 			   sqlMeasureReasonFile+=" WHERE ncrNo = ?";
-			   jdbc.update(sqlMeasureReasonFile, new Object[]{imgReason2,sheet.getNcrNo()});
+			   jdbc.update(sqlMeasureReasonFile, new Object[]{imgReason2,imgReasonFile2ContentType,sheet.getNcrNo()});
 		   }
 		   if(!sheet.getImgTempMeasureFileName().equals("")){
 			   String sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason] SET [imgTempMeasure] = ?";
 			   sqlMeasureReasonFile+=" WHERE ncrNo = ?";
 			   jdbc.update(sqlMeasureReasonFile, new Object[]{sheet.getImgTempMeasureFileName(),sheet.getNcrNo()});
-			   sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason_file] SET [imgTempMeasure] = ?";
+			   sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason_file] SET [imgTempMeasure] = ?, [imgTempMeasureType] =?";
 			   sqlMeasureReasonFile+=" WHERE ncrNo = ?";
-			   jdbc.update(sqlMeasureReasonFile, new Object[]{imgTempMeasure,sheet.getNcrNo()});
+			   jdbc.update(sqlMeasureReasonFile, new Object[]{imgTempMeasure,imgTempNameFileContentType,sheet.getNcrNo()});
 		   }		   
 		   if(!sheet.getImgMeasure1FileName().equals("")){
 			   String sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason] SET [imgMeasure1] = ?";
 			   sqlMeasureReasonFile+=" WHERE ncrNo = ?";
 			   jdbc.update(sqlMeasureReasonFile, new Object[]{sheet.getImgMeasure1FileName(),sheet.getNcrNo()});
-			   sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason_file] SET [imgMeasure1] = ?";
+			   sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason_file] SET [imgMeasure1] = ?, [imgMeasure1Type]=?";
 			   sqlMeasureReasonFile+=" WHERE ncrNo = ?";
-			   jdbc.update(sqlMeasureReasonFile, new Object[]{imgMeasure1,sheet.getNcrNo()});
+			   jdbc.update(sqlMeasureReasonFile, new Object[]{imgMeasure1,imgMeasureName1FileContentType,sheet.getNcrNo()});
 		   }
 		   if(!sheet.getImgMeasure2FileName().equals("")){
 			   String sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason] SET [imgMeasure2] = ?";
 			   sqlMeasureReasonFile+=" WHERE ncrNo = ?";
 			   jdbc.update(sqlMeasureReasonFile, new Object[]{sheet.getImgMeasure2FileName(),sheet.getNcrNo()});
-			   sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason_file] SET [imgMeasure2] = ?";
+			   sqlMeasureReasonFile="UPDATE [qis_ncr_step1_measure_reason_file] SET [imgMeasure2] = ?, [imgMeasure2Type]=?";
 			   sqlMeasureReasonFile+=" WHERE ncrNo = ?";
-			   jdbc.update(sqlMeasureReasonFile, new Object[]{imgMeasure2,sheet.getNcrNo()});
+			   jdbc.update(sqlMeasureReasonFile, new Object[]{imgMeasure2,imgMeasureName2FileContentType,sheet.getNcrNo()});
 		   }		   		   		   
 
 		   
@@ -676,7 +679,7 @@ public class QualityIssueDAO {
 				   String sqlStandardEtc="";
 				   int maxNum = 0;
 				   
-				   String sqlMax ="SELECT max([fileSeq]) FROM [qis_ncr_step1_standard_etc]";
+				   String sqlMax ="SELECT max([fileSeq]) FROM [qis_ncr_step1_standard_file]";
 				   sqlMax+=" WHERE ncrNo=?";
 				   
 				   maxNum =  jdbc.queryForObject(sqlMax,new Object[]{sheet.getNcrNo()},new RowMapper<Integer>(){
@@ -735,7 +738,7 @@ public class QualityIssueDAO {
 	public List<Map<String,Object>> getNcrMeasureDataGrid(Locale locale,String ncrNo,String gridType){
 		String sql ="";
 		if(gridType.equals("reasonFile")){
-			sql= "SELECT [fileName],[fileSeq] FROM [qis_ncr_step1_reason_file]";
+			sql= "SELECT [fileName]+'?'+cast([fileSeq] as nvarchar(10)),[fileSeq] FROM [qis_ncr_step1_reason_file]";
 			sql+=" WHERE ncrNo=?";
 		}else if(gridType.equals("tempMeasure")){
 			sql= "SELECT [contents],convert(nvarchar(10),[date],121) FROM [qis_ncr_step1_temp_measure]";
@@ -750,7 +753,7 @@ public class QualityIssueDAO {
 			sql= "SELECT [before],[after],convert(nvarchar(10),[changeDate],121),[fileName] FROM [qis_ncr_step1_standard]";
 			sql+=" WHERE ncrNo=? order by [standardSeq] asc";
 		}else if(gridType.equals("standardEtc")){
-			sql= "SELECT [contents],[fileName],[fileSeq] FROM [qis_ncr_step1_standard_etc]";
+			sql= "SELECT [contents],[fileName]+'?'+cast([fileSeq] as nvarchar(10)),[fileSeq] FROM [qis_ncr_step1_standard_etc]";
 			sql+=" WHERE ncrNo=? order by [fileSeq] asc";
 		}
 		return jdbc.query(sql, new Object[]{ncrNo}, new RowMapper<Map<String,Object>>(){
@@ -771,4 +774,84 @@ public class QualityIssueDAO {
 	}
 
 
+	public List<Map<String,Object>> getNcrDetail(Locale locale, String ncrNo){
+		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		SqlParameterSource params = new MapSqlParameterSource().addValue("locale",locale.getCountry())
+				.addValue("ncrNo",ncrNo);
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueDAO_getNcrDetail").returningResultSet("ncrDetail",new RowMapper<Map<String,Object>>() {
+
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int rowNum)
+					throws SQLException {
+				Map<String,Object> m  = new HashMap<String,Object>();
+				for(int x = 0;x<rs.getMetaData().getColumnCount();x++){
+					m.put("DATA"+x,(rs.getObject(x+1)==null)?"":rs.getObject(x+1));
+				}
+				list.add(m);
+				return null;
+			}
+		
+		});
+		sp.execute(params);
+		return list;
+	}
+	
+	//NCR대책서파일을 다운한다.
+	public byte[] getNcrMeasureFile(Locale locale, String ncrNo){
+		String sql = "select [measureReport] from dbo.qis_ncr_step1_head_measure_file where ncrNo = ?";
+		
+		return  jdbc.queryForObject(sql,new Object[]{ncrNo},new RowMapper<byte[]>(){
+			@Override
+			public byte[] mapRow(ResultSet rs, int rowNum) throws SQLException {		
+				 return rs.getBytes(1);
+			}
+			 
+		 });
+	}	
+	
+	//NCR임시파일을 다운한다.
+	public byte[] getNcrMeasureReasonFile(Locale locale,String ncrNo,String fileSeq){
+		String sql = "select [file] from dbo.qis_ncr_step1_reason_file where ncrNo = ? and fileSeq = ?";
+		
+		return  jdbc.queryForObject(sql,new Object[]{ncrNo,fileSeq},new RowMapper<byte[]>(){
+			@Override
+			public byte[] mapRow(ResultSet rs, int rowNum) throws SQLException {		
+				 return rs.getBytes(1);
+			}
+			 
+		 });		
+	}
+	
+	//NCR표준반영사항파일을 다운한다
+	public byte[] getNcrMeasureStandardFile(Locale locale, String ncrNo, String fileSeq){
+		String sql = "select [file] from dbo.qis_ncr_step1_standard_file where ncrNo = ? and fileSeq = ?";
+
+		return  jdbc.queryForObject(sql,new Object[]{ncrNo,fileSeq},new RowMapper<byte[]>(){
+			@Override
+			public byte[] mapRow(ResultSet rs, int rowNum) throws SQLException {		
+				 return rs.getBytes(1);
+			}
+			 
+		 });				
+	}
+	
+	//NCR대책서 이미지를 가져온다.
+	public List<Map<String,Object>> getNcrMeasureImg(Locale locale, String ncrNo, String fileSeq){		
+		String sql = "select case(?) when 1 then imgReason1 when 2 then imgReason2 when 3 then imgTempMeasure when 4 then imgMeasure1 else imgMeasure2 end,case(?) when 1 then imgReason1Type when 2 then imgReason2Type when 3 then imgTempMeasureType when 4 then imgMeasure1Type else imgMeasure2Type end   from dbo.qis_ncr_step1_measure_reason_file where ncrNo = ?";
+		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		jdbc.query(sql,new Object[]{fileSeq,fileSeq,ncrNo},new RowMapper<Map<String,Object>>(){
+
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int rowNum)
+					throws SQLException {
+				Map<String,Object> m = new HashMap<String,Object>();
+				m.put("file",rs.getBytes(1));
+				m.put("type",rs.getString(2));
+				list.add(m);
+				return null;
+			}
+			
+		});
+		return list;				
+	}
 }

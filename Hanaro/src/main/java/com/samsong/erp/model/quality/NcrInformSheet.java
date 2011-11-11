@@ -8,7 +8,8 @@ public class NcrInformSheet {
 	String title;
 	String custManager;
 	String custConfirmer;
-	String custAppover;	
+	String custAppover;
+	
 	
 	String measureFileName;
 	

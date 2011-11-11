@@ -33,14 +33,28 @@ public interface QualityIssueService {
 	
 	public void addNcrMeasure(Locale locale, String user, NcrInformSheet sheet, byte[] measureFile, byte[] imgReason1,
 			byte[] imgReason2, byte[] imgTempMeasure, byte[] imgMeasure1, byte[] imgMeasure2,
-			MultipartFile[] inputAddFile, MultipartFile[] inputChangeFile, MultipartFile[] stanFile);
+			MultipartFile[] inputAddFile, MultipartFile[] inputChangeFile, MultipartFile[] stanFile
+			,String imgReasonFile1ContentType,  String imgReasonFile2ContentType, String imgTempNameFileContentType,
+			String imgMeasureName1FileContentType, String imgMeasureName2FileContentType);
 	
 	public void updateNcrMeasure(Locale locale, String user, NcrInformSheet sheet, byte[] measureFile, byte[] imgReason1,
 			byte[] imgReason2, byte[] imgTempMeasure, byte[] imgMeasure1, byte[] imgMeasure2,
-			MultipartFile[] inputAddFile, MultipartFile[] inputChangeFile, MultipartFile[] stanFile);
+			MultipartFile[] inputAddFile, MultipartFile[] inputChangeFile, MultipartFile[] stanFile
+			,String imgReasonFile1ContentType,  String imgReasonFile2ContentType, String imgTempNameFileContentType,
+			String imgMeasureName1FileContentType, String imgMeasureName2FileContentType);
 	
 	public void deleteNcrMeasure(Locale locale, NcrInformSheet sheet);
 	
 	public List<Map<String,Object>> getNcrMeasureDataGrid(Locale locale, String ncrNo, String gridType);
+	
+	public List<Map<String,Object>> getNcrDetail(Locale locale, String ncrNo);
+	
+	public byte[] getNcrMeasureFile(Locale locale,String ncrNo);
+	
+	public byte[] getNcrMeasureReasonFile(Locale locale,String ncrNo,String fileSeq);
+	
+	public byte[] getNcrMeasureStandardFile(Locale locale, String ncrNo, String fileSeq);
+	
+	public List<Map<String,Object>> getNcrMeasureImg(Locale locale, String ncrNo, String fileSeq);
 	
 }

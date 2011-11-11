@@ -327,7 +327,7 @@
 								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.OccurDate"/></span>
 									</th><td>								
-									<form:input class="easyui-datebox"  path="occurDate"  required='true'  style="width:250px;"  id="occurDate"   />
+									<form:input class="easyui-datebox"  path="occurDate"  required='true'  style="width:250px;"  id="occurDate"  editable="false"  />
 								</td>  
 							</tr>
 							<tr>
