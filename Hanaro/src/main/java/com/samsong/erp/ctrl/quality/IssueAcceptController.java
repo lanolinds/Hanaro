@@ -68,6 +68,10 @@ public class IssueAcceptController {
 		
 		return "qualityDivision/qualityIssue/acceptIssues";
 	}
+	@RequestMapping("/issueDetailCallback")
+	public @ResponseBody Map<String,Object> getIssueDetails(@RequestParam("no") String regNo,Locale locale){
+		return service.getIssueDetails(regNo, locale);
+	}
 	
 	
 	private Map<String,String> getHandleMethods(String code,Locale locale){

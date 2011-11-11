@@ -1,19 +1,30 @@
 package com.samsong.erp.service.quality;
 
 
+
 import java.util.ArrayList;
+
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+
 import org.apache.log4j.Logger;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.springframework.web.multipart.MultipartFile;
+
+
 import com.samsong.erp.dao.quality.QualityIssueDAO;
+
 import com.samsong.erp.model.quality.IssueApproval;
+
+import com.samsong.erp.model.quality.NcrInformSheet;
 import com.samsong.erp.model.quality.QualityIssueRegSheet;
 
 @Service
@@ -81,7 +92,7 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 			int workCost, int testCost,
 			String shipType, Locale locale,String user) {
 		//기본값으로 등록.
-		IssueApproval approval = dao.acceptIssue(regNo,method,workCost,testCost,shipType,locale,user);
+		IssueApproval approval = dao.acceptIssue(regNo,method,workCost,testCost,shipType,locale,user); 
 		Map <String,Object> details = dao.getIssueDetails(regNo, locale);
 		String partner =(String)details.get("partnerCode");
 		//예상 귀책업체가 있으면 클래임을 부여한다. 
@@ -196,4 +207,70 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	public void deletePartnerClaim(String approvalNo, String partner) {
 		dao.deletePartnerClaim(approvalNo,partner);
 	}
+	public void addNcrMeasure(Locale locale, String user, NcrInformSheet sheet,
+			byte[] measureFile,  byte[] imgReason1,
+			byte[] imgReason2, byte[] imgTempMeasure, byte[] imgMeasure1, byte[] imgMeasure2,
+			MultipartFile[] inputAddFile, MultipartFile[] inputChangeFile, MultipartFile[] stanFile
+			,String imgReasonFile1ContentType,  String imgReasonFile2ContentType, String imgTempNameFileContentType,
+			String imgMeasureName1FileContentType, String imgMeasureName2FileContentType) {
+		dao.addNcrMeasure(locale, sheet, user, measureFile, imgReason1, imgReason2, imgTempMeasure,
+				imgMeasure1, imgMeasure2,inputAddFile, inputChangeFile, stanFile
+				,imgReasonFile1ContentType,  imgReasonFile2ContentType, imgTempNameFileContentType,
+				imgMeasureName1FileContentType, imgMeasureName2FileContentType);
+		
+	}
+
+	@Override
+	public void deleteNcrMeasure(Locale locale, NcrInformSheet sheet) {
+		dao.deleteNcrMeasure(locale, sheet);
+	}
+
+	@Override
+	public void updateNcrMeasure(Locale locale, String user,
+			NcrInformSheet sheet, byte[] measureFile, byte[] imgReason1,
+			byte[] imgReason2, byte[] imgTempMeasure, byte[] imgMeasure1,
+			byte[] imgMeasure2, MultipartFile[] inputAddFile,
+			MultipartFile[] inputChangeFile, MultipartFile[] stanFile
+			,String imgReasonFile1ContentType,  String imgReasonFile2ContentType, String imgTempNameFileContentType,
+			String imgMeasureName1FileContentType, String imgMeasureName2FileContentType) {
+			dao.updateNcrMeasure(locale, sheet, user, measureFile, imgReason1, imgReason2,
+					imgTempMeasure, imgMeasure1, imgMeasure2, inputAddFile, inputChangeFile, stanFile
+					,imgReasonFile1ContentType,  imgReasonFile2ContentType, imgTempNameFileContentType,
+					imgMeasureName1FileContentType, imgMeasureName2FileContentType);
+		
+	}
+
+	@Override
+	public List<Map<String, Object>> getNcrMeasureDataGrid(Locale locale,
+			String ncrNo, String gridType) {
+			return dao.getNcrMeasureDataGrid(locale, ncrNo, gridType);
+	}
+
+	@Override
+	public List<Map<String, Object>> getNcrDetail(Locale locale, String ncrNo) {
+			return dao.getNcrDetail(locale, ncrNo);
+	}
+
+	@Override
+	public byte[] getNcrMeasureFile(Locale locale, String ncrNo) {
+			return dao.getNcrMeasureFile(locale, ncrNo);
+	}
+
+	@Override
+	public byte[] getNcrMeasureReasonFile(Locale locale, String ncrNo,
+			String fileSeq) {
+			return dao.getNcrMeasureReasonFile(locale, ncrNo, fileSeq);
+	}
+
+	@Override
+	public byte[] getNcrMeasureStandardFile(Locale locale, String ncrNo,
+			String fileSeq) {
+			return dao.getNcrMeasureStandardFile(locale, ncrNo, fileSeq);
+	}
+
+	@Override
+	public List<Map<String,Object>> getNcrMeasureImg(Locale locale, String ncrNo, String fileSeq) {
+			return dao.getNcrMeasureImg(locale, ncrNo, fileSeq);
+	}
+
 }
