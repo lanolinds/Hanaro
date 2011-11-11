@@ -19,7 +19,7 @@
 	
 	$(document).ready(function(){
 		
-		// 그리드 랜더링.
+		// 그리드 랜더링. 1번탭(처리대기)
 		$("#undoneList").datagrid({queryParams:{fromDate:'<fmt:formatDate value="${fromDate}" pattern="yyyy-MM-dd"/>',
 			toDate:'<fmt:formatDate value="${toDate}" pattern="yyyy-MM-dd"/>',item:''},
 			onLoadSuccess:function(data){
@@ -27,6 +27,23 @@
 			},
 			onLoadError:function(error){
 				handleAjaxError(error);
+			},
+			onDblClickRow:function(i,row){
+				acceptSelectedIssue();
+			}
+		});
+		
+		// 그리드 랜더링. 1번탭(처리완료)
+		$("#doneList").datagrid({queryParams:{fromDate:'<fmt:formatDate value="${fromDate}" pattern="yyyy-MM-dd"/>',
+			toDate:'<fmt:formatDate value="${toDate}" pattern="yyyy-MM-dd"/>',item:''},
+			onLoadSuccess:function(data){
+				$("#doneCount").css("color","blue").text("("+data.total+")");
+			},
+			onLoadError:function(error){
+				handleAjaxError(error);
+			},
+			onDblClickRow:function(i,row){
+				editSelectedIssue();
 			}
 		});
 		
@@ -42,6 +59,20 @@
 			          {field:"model",title:'<fmt:message key="ui.label.Model"/>',width:50,align:"center"}
 			          ]]
 		});
+		
+		//검색 필터 아이템에 자동완성 랜더링.
+		$("#item2").combogrid({
+			panelWidth:500,
+			idField:"item",
+			textField:"item",
+			url:"list/itemAssistCallback2",
+			columns:[[{field:"item",title:'<fmt:message key="ui.label.PartNo"/>',width:150},
+			          {field:"name",title:'<fmt:message key="ui.label.PartName"/>',width:200},
+			          {field:"car",title:'<fmt:message key="ui.label.Car"/>',width:50,align:"center"},
+			          {field:"model",title:'<fmt:message key="ui.label.Model"/>',width:50,align:"center"}
+			          ]]
+		});
+		
 	});
 	
 	function validFilter(){
@@ -55,28 +86,39 @@
 		
 	}
 	
-	function acceptSelectedIssues(){
-		var selected =$("#undoneList").datagrid("getSelections");
+	function validFilter2(){
+		var params={};
+		params.fromDate=$("#fromDate2").datebox("getValue");
+		params.toDate=$("#toDate2").datebox("getValue");
+		params.item=$("#item2").combogrid("getValue");
+		
+		$("#doneList").datagrid("clearSelections");
+		$("#doneList").datagrid("load",params);
+		
+	}
+	
+	function acceptSelectedIssue(){
+		var selected =$("#undoneList").datagrid("getSelected");
 		if(!selected || selected.length===0){
 			$.messager.alert("Warnning",'<fmt:message key="warn.notSelectedItem"/>',"warning");
 			return false;
 		}
-		var placeCode = selected[0].placeCode;
-		var c = 0;
-		$.each(selected,function(i,issue){
-			if(placeCode==issue.placeCode)
-				c++;
-			$("form[name='acceptForm']").append("<input type='hidden' name='regNo' value='"+issue.regNo+"'/>");
-		});
-		if(c!==selected.length){
-			$.messager.alert("Warnning",'<fmt:message key="warn.invalidOrigin"/>',"warning");
-			$("form[name='acceptForm'] :hidden").remove();
-		}
-		else{
-			$("form[name='acceptForm']").append("<input type='hidden' name='placeCode' value='"+placeCode+"'/>");
-			$("form[name='acceptForm']").submit();
+		
+		$("form[name='acceptForm'] input[name='regNo']").val(selected.regNo);
+		$("form[name='acceptForm']").submit();
+		
+	}
+	
+	function editSelectedIssue(){
+		var selected =$("#doneList").datagrid("getSelected");
+		if(!selected || selected.length===0){
+			$.messager.alert("Warnning",'<fmt:message key="warn.notSelectedItem"/>',"warning");
+			return false;
 		}
 		
+		$("form[name='approvalForm'] input[name='regNo']").val(selected.regNo);
+		$("form[name='approvalForm'] input[name='action']").val(selected.approvalNo);
+		$("form[name='approvalForm']").submit();
 	}
 	</script>
 </head>
@@ -92,11 +134,10 @@
    
     <div class="easyui-tabs" style="width:1024px;height:720px;">  
         <div title='<fmt:message key="ui.label.qualityIssue.ready" /><span id="readyCount" style="margin-left:.3em;"></span>'  iconCls="icon-document-prepare"  >  
-            <table id="undoneList" iconCls="icon-to-do-list" pagination="true" pageList="[50,100,200,300]"  border="false"
-						fit="true" fitColumns="true" idField="regNo" url="list/gridCallback"  toolbar="#toolbar" >			
+            <table id="undoneList" pagination="true" pageList="[50,100,200,300]"  border="false"
+						fit="true" fitColumns="true" idField="regNo" url="list/gridCallback"  toolbar="#toolbar"  singleSelect="true">			
 				<thead>
-					<tr>
-						<th field="ck" checkbox="true"></th>  
+					<tr> 
 						<th field="regNo" width="250" sortable="true"><fmt:message key="ui.label.RegNo"/></th>
 						<th field="date" width="150" align="center" sortable="true"><fmt:message key="ui.label.OccurHour"/></th>
 						<th field="place" width="100" sortable="true"><fmt:message key="ui.label.RegPlace"/></th>
@@ -108,7 +149,23 @@
 				</thead>
 			</table>
         </div>  
-        <div title='<fmt:message key="ui.label.qualityIssue.done"/>'  iconCls="icon-document-mark-as-final">
+        <div title='<fmt:message key="ui.label.qualityIssue.done"/><span id="doneCount" style="margin-left:.3em;"></span>'  iconCls="icon-document-mark-as-final">
+        	<table id="doneList" pagination="true" pageList="[50,100,200,300]"  border="false"
+						fit="true" fitColumns="true" idField="approvalNo" url="list/gridCallback2"  toolbar="#toolbar2"  singleSelect="true">			
+				<thead>
+					<tr>
+						<th field="approvalNo" width="100" sortable="true" align="center;">처리번호</th>
+						<th field="accepter" width="50" sortable="true">처리자</th> 
+						<th field="regNo" width="250" sortable="true"><fmt:message key="ui.label.RegNo"/></th>
+						<th field="date" width="150" align="center" sortable="true"><fmt:message key="ui.label.OccurHour"/></th>
+						<th field="place" width="100" sortable="true"><fmt:message key="ui.label.RegPlace"/></th>
+						<th field="placeCode" hidden="true"></th>
+						<th field="item" width="150" sortable="true"><fmt:message key="ui.label.PartNo"/></th>
+						<th field="count" width="100" align="right" sortable="true" formatter="numeric"><fmt:message key="ui.label.count"/></th>
+						<th field="comment" width="100" ><fmt:message key="ui.label.remark"/></th>
+					</tr>	
+				</thead>
+			</table>
         </div>  
     </div>
     
@@ -125,9 +182,33 @@
 	    <span style="margin-left:2em;"><a href="javascript:validFilter()" class="easyui-linkbutton" iconCls="icon-search"><fmt:message key="ui.button.Search"/></a></span>
     </div>
     <div style="text-align:right;">
-    	<form name="acceptForm" method="post" action="acceptIssues"></form>
+    	<form name="acceptForm" method="post" action="acceptIssues">
+    		<input type="hidden" name="action" value="new"/>
+    		<input type="hidden" name="regNo"/>
+    	</form>
 
-    	<a href="#" class="easyui-linkbutton" iconCls="icon-document-todo" onclick="acceptSelectedIssues()" plain="true"><fmt:message key="ui.label.doSelected"/></a>
+    	<a href="#" class="easyui-linkbutton" iconCls="icon-document-todo" onclick="acceptSelectedIssue()" plain="true"><fmt:message key="ui.label.doSelected"/></a>
+    </div>
+    </div>
+    
+    <!-- 툴바 -->
+    <div  id="toolbar2" style="padding:5px;height:auto;">
+    <div style="margin-top:.5em;">
+	    <span style="margin-right:.5em"><fmt:message key="ui.label.SearchDate"/></span>
+	    <input id="fromDate2" class="easyui-datebox" editable="false" value='<fmt:formatDate value="${fromDate}" pattern="yyyy-MM-dd"/>' style="width:100px;"></input>
+	    <span style="margin: 0em .3em;">~</span>
+	    <input id="toDate2" class="easyui-datebox" editable="false" value='<fmt:formatDate value="${toDate}" pattern="yyyy-MM-dd"/>' style="width:100px;"></input>
+	     <span style="margin-left:1em;margin-right:.5em;"><fmt:message key="ui.label.PartNo"/></span>
+	    <input id="item2" style="width:200px;"/>
+	    <span style="margin-left:2em;"><a href="javascript:validFilter2()" class="easyui-linkbutton" iconCls="icon-search"><fmt:message key="ui.button.Search"/></a></span>
+    </div>
+    <div style="text-align:right;">
+    	<form name="approvalForm" method="post" action="acceptIssues">
+    		<input type="hidden" name="action" value="edit"/>
+    		<input type="hidden" name="regNo"/>
+    	</form>
+
+    	<a href="#" class="easyui-linkbutton" iconCls="icon-document-todo" onclick="javascript:editSelectedIssue();"  plain="true">수정</a>
     </div>
     </div>
      

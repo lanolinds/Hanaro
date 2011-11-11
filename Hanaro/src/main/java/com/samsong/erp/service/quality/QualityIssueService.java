@@ -1,11 +1,11 @@
 package com.samsong.erp.service.quality;
 
-import java.io.FileOutputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import com.samsong.erp.model.quality.IssueApproval;
 import com.samsong.erp.model.quality.QualityIssueRegSheet;
 
 public interface QualityIssueService {
@@ -28,5 +28,25 @@ public interface QualityIssueService {
 	public Map<String, Object> getIssueDetails(String regNo, Locale locale);
 
 	public List<Map<String, Object>> getDefectTreeData(Locale locale);
+
+	public IssueApproval acceptIssue(String regNo, String method,
+			int workCost, int testCost,
+			String shipType, Locale locale, String user);
+
+	public List<Map<String, Object>> getClaimList(String approvalNo,
+			Locale locale);
+
+	public List<Map<String, Object>> get4mTreeData(Locale locale);
+
+	public List<Map<String, Object>> getClaimItemAssistantList(Locale locale);
+
+	public List<Map<String, Object>> getDoneIssueList(Date fromDate,
+			Date toDate, String item, Locale locale);
+
+	public IssueApproval getApproval(String approvalNo, Locale locale);
+
+	public void updateApproval(String regNo, IssueApproval approval,Locale locale);
+
+	public void deletePartnerClaim(String approvalNo, String partner);
 	
 }

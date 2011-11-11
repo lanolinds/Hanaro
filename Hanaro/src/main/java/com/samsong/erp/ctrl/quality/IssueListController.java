@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.samsong.erp.service.cust.CustManagementService;
 import com.samsong.erp.service.quality.QualityIssueService;
 import com.samsong.erp.util.HashMapComparator;
 
@@ -35,9 +36,7 @@ public class IssueListController {
 	@Autowired
 	private QualityIssueService service;
 	
-	@Autowired
-	private MessageSource message;
-	
+
 	@RequestMapping(value="/list",method=RequestMethod.GET)
 	public String list(Model model){
 		Calendar cal = Calendar.getInstance();
@@ -86,6 +85,45 @@ public class IssueListController {
 		return json;
 	}
 	
+	@RequestMapping(value="/list/gridCallback2", method=RequestMethod.POST)
+	public @ResponseBody Map<String,Object> getUndoneIssueList2(@RequestParam("page") int page,
+			@RequestParam("rows") int rows,
+			@RequestParam(value="sort",required=false) String sortKey,
+			@RequestParam(value="order",required=false) String order,
+			@RequestParam(value="fromDate",required=false) String fromDateStr,
+			@RequestParam(value="toDate",required=false) String toDateStr,
+			@RequestParam(value="item",required=false) String item,
+			Locale locale){
+		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
+		Date fromDate=null;
+		Date toDate = null;
+		try {
+			fromDate = fmt.parse(fromDateStr);
+			toDate = fmt.parse(toDateStr);
+		} catch (Exception ex) {
+			logger.info("검색기간을 java.util.Date 타입으로 파싱하던 중 에러가 났습니다:"+ex.getMessage());
+		}
+		
+		Map<String,Object> json = new HashMap<String, Object>();
+		List<Map<String,Object>> list =service.getDoneIssueList(fromDate,toDate,item,locale);	
+		if(sortKey!=null){
+			Collections.sort(list,new HashMapComparator(sortKey, order.equalsIgnoreCase("asc")));
+		}
+		
+		if(list!=null){
+			json.put("total",list.size());
+			int from = (page-1)*rows;
+			int to = from + rows;
+			to = list.size()<to?list.size():to;
+			json.put("rows", list.subList(from,to));
+		}
+		else{
+			json.put("total", Integer.valueOf(0));
+			json.put("rows", Integer.valueOf(0));
+		}
+		return json;
+	}
+	
 	@RequestMapping(value="/list/itemAssistCallback", method=RequestMethod.POST)
 	public @ResponseBody Map<String,Object> getAssistItemList(Locale locale){
 		List<Map<String,Object>> list = service.getAssistItemList(locale,"ready");	
@@ -100,26 +138,19 @@ public class IssueListController {
 		}
 		return json;
 	}
-	@RequestMapping(value="/acceptIssues", method=RequestMethod.POST)
-	public String accept(@RequestParam("regNo") String[] regNums,@RequestParam("placeCode") String placeCode
-			,Model model, Locale locale){
-		List<String> issues = Arrays.asList(regNums);
-		Map<String,String> m = getHandleMethods(placeCode,locale);
-		model.addAttribute("issues",issues);
-		model.addAttribute("methods",m);
-		model.addAttribute("place",placeCode);
-		return "qualityDivision/qualityIssue/acceptIssues";
-	}
-	private Map<String,String> getHandleMethods(String code,Locale locale){
-		Map<String,String> m = new LinkedHashMap<String,String>();
-		if(code.equalsIgnoreCase("CD")){
-			m.put("resend", message.getMessage("system.resend",null,locale));
+	
+	@RequestMapping(value="/list/itemAssistCallback2", method=RequestMethod.POST)
+	public @ResponseBody Map<String,Object> getAssistItemList2(Locale locale){
+		List<Map<String,Object>> list = service.getAssistItemList(locale,"done");	
+		Map<String,Object> json = new HashMap<String, Object>();
+		if(list!=null){
+			json.put("total",list.size());
+			json.put("rows", list);
 		}
 		else{
-			m.put("reuse", message.getMessage("system.option.reuse",null,locale));
-			m.put("rework", message.getMessage("system.option.rework",null,locale));
-			m.put("abandon", message.getMessage("system.option.abandon",null,locale));
+			json.put("total", Integer.valueOf(0));
+			json.put("rows", Integer.valueOf(0));
 		}
-		return m;
+		return json;
 	}
 }

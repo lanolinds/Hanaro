@@ -1,5 +1,6 @@
 package com.samsong.erp.dao.quality;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -13,9 +14,10 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -23,6 +25,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
 
+import com.samsong.erp.model.quality.IssueApproval;
 import com.samsong.erp.model.quality.QualityIssueRegSheet;
 
 @Repository
@@ -37,6 +40,7 @@ public class QualityIssueDAO {
 	}
 	
 	public Map<String,Object> getCodeDefectSource(Locale locale, String parentCode){
+		
 		
 		final Map<String,Object> defects = new LinkedHashMap<String,Object>();
 		SqlParameterSource params = new MapSqlParameterSource()
@@ -281,6 +285,212 @@ public class QualityIssueDAO {
 			}
 		}
 		return level0;
+	}
+
+	public Map<String,Object> getPartnerClaimBaseInfo(String regNo, String claimPartnerCode,Locale locale) {
+		
+		//먼저 등록된 품질 문제로 부터, 원인 품번,수량,출처,단위가격을 파악해야 한다. 
+		String sql = "exec QualityIssueDAO_getPartnerClaimBaseInfo ?,?,?; ";
+		return  jdbc.queryForMap(sql, regNo,claimPartnerCode,locale.getCountry());
+	}
+
+	public IssueApproval acceptIssue(String regNo, String method, double workCost,
+			int testCost, String shipType, Locale locale,String user) {	
+		String sql = "exec QualityIssueDAO_acceptIssue ?,?,?,?,?,?,?;";
+		return jdbc.queryForObject(sql, new Object[] {regNo,method,workCost,testCost,shipType,locale.getCountry(),user},
+				new RowMapper<IssueApproval>(){
+
+					@Override
+					public IssueApproval mapRow(ResultSet rs, int i)
+							throws SQLException {
+						IssueApproval approval = new IssueApproval();
+						
+						approval.setApprovalNo(rs.getString(1));
+						approval.setDefect1(rs.getString(2));
+						approval.setDefect2(rs.getString(3));
+						approval.setDefect3(rs.getString(4));
+						approval.setRemark(rs.getString(5));
+						approval.setMethod(rs.getString(6));
+						approval.setWorkCost(rs.getInt(7));
+						approval.setTestCost(rs.getInt(8));
+						approval.setShipType(rs.getString(9));
+						return approval;
+					}
+			
+		});
+		
+	}
+
+	public void addClaimPartner(String approvalNo, String partner,
+			String item, String lot, String reason1, String reason2,
+			String reason3, double rate, double claim, String comment,
+			String ref1, String ref2, String ref3, String ncr,Locale locale) {
+		
+		String sql = "insert qis_claims(approvalNo, partner, item, lot, reason1, reason2, reason3, rate, claim, remark, ref1, ref2, ref3, ncr, locale, inputTime) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,getdate());";
+		jdbc.update(sql,approvalNo,partner,item,lot,reason1,reason2,reason3,rate,claim,comment,ref1,ref2,ref3,ncr,locale.getCountry());
+		
+	}
+
+	public List<Map<String, Object>> getClaimList(String approvalNo,
+			Locale locale) {
+		
+		String sql = "exec QualityIssueDAO_getClaimList ?,?;";
+		return jdbc.queryForList(sql, approvalNo,locale.getCountry());
+	}
+
+	public List<Map<String, Object>> get4mTreeData(Locale locale) {
+		// 테이블 구성이 tree에 적합하지 않음. 재귀함수 적용 포기.
+		
+				String country=locale.getCountry();
+				//1단계
+				String sql = "select code, name from code_4m where locale=? and (len(code) - len(replace(code,'-','')))=?;";
+				List<Map<String,Object>> level0=jdbc.query(sql,new Object[]{country,0}, new RowMapper<Map<String,Object>>(){
+
+					@Override
+					public Map<String, Object> mapRow(ResultSet rs, int i)
+							throws SQLException {
+						Map<String,Object> node = new HashMap<String,Object>();
+						List<Map<String,Object>> children = new ArrayList<Map<String,Object>>();
+						node.put("id", rs.getString(1));
+						node.put("text", rs.getString(2));
+						node.put("state","closed");
+						node.put("iconCls", "icon-brick-add");
+						node.put("children", children);
+						return node;
+					}
+				});
+				//2단계
+					List<Map<String,Object>> level1=jdbc.query(sql,new Object[]{country,1}, new RowMapper<Map<String,Object>>(){
+
+						@Override
+						public Map<String, Object> mapRow(ResultSet rs, int i)
+								throws SQLException {
+							Map<String,Object> node = new HashMap<String,Object>();
+							List<Map<String,Object>> children = new ArrayList<Map<String,Object>>();
+							node.put("id", rs.getString(1));
+							node.put("text", rs.getString(2));
+							node.put("state","closed");
+							node.put("iconCls", "icon-error-add");
+							node.put("children", children);
+							return node;
+						}
+					});
+				//3단계
+				List<Map<String,Object>> level2=jdbc.query(sql,new Object[]{country,2}, new RowMapper<Map<String,Object>>(){
+
+					@Override
+					public Map<String, Object> mapRow(ResultSet rs, int i)
+							throws SQLException {
+						Map<String,Object> node = new HashMap<String,Object>();
+						node.put("id", rs.getString(1));
+						node.put("text", rs.getString(2));
+						node.put("iconCls", "icon-bullet-error");
+						node.put("checked", true);
+						return node;
+					}
+				});
+				
+				//3단계를 2단계에 넣기.
+				for(Map<String,Object> node: level2){
+					String parent =(String)node.get("id");
+					parent = parent.substring(0,parent.lastIndexOf("-"));
+					for(Map<String,Object> n: level1){
+						if(n.get("id").equals(parent)){
+							((List<Map<String,Object>>)n.get("children")).add(node);
+							break;
+						}
+					}
+				}
+				
+				//2단계를 1단계에 넣기.
+				for(Map<String,Object> node: level1){
+					String parent =(String)node.get("id");
+					parent = parent.substring(0,parent.lastIndexOf("-"));
+					for(Map<String,Object> n: level0){
+						if(n.get("id").equals(parent)){
+							((List<Map<String,Object>>)n.get("children")).add(node);
+							break;
+						}
+					}
+				}
+				return level0;
+	}
+
+	public List<Map<String, Object>> getClaimItemAssistantList(Locale locale) {
+		String sql = "select part_no as [item],part_name as [name], car_type as [car], machine_type as [model] from part_master where part_type='1002' and  cust_code <>'' and supplier1<>'';";
+		return jdbc.queryForList(sql);
+	}
+
+	public List<Map<String, Object>> getDoneIssueList(Date fromDate,
+			Date toDate, String item, Locale locale) {
+		String sql = "exec QualityIssueDAO_getDoneIssueList ?,?,?,?;";
+		return jdbc.queryForList(sql, fromDate,toDate,item,locale.getCountry());
+	}
+
+	public IssueApproval getApproval(String approvalNo, Locale locale) {
+		String sql = "exec QualityIssueDAO_getApproval ?,?;";
+		return jdbc.queryForObject(sql, new Object[] {approvalNo,locale.getCountry()},
+				new RowMapper<IssueApproval>(){
+
+					@Override
+					public IssueApproval mapRow(ResultSet rs, int i)
+							throws SQLException {
+						IssueApproval approval = new IssueApproval();
+						
+						approval.setApprovalNo(rs.getString(1));
+						approval.setDefect1(rs.getString(2));
+						approval.setDefect2(rs.getString(3));
+						approval.setDefect3(rs.getString(4));
+						approval.setRemark(rs.getString(5));
+						approval.setMethod(rs.getString(6));
+						approval.setWorkCost(rs.getInt(7));
+						approval.setTestCost(rs.getInt(8));
+						approval.setShipType(rs.getString(9));
+						return approval;
+					}
+			
+		});
+	}
+
+	public void updateApproval(IssueApproval approval) {
+		String sql = "update qis_issue_approvals set reason1=?,reason2=?, reason3=?,remark=?,method=?,workCost=?,testCost=?,shipType=? where approvalNo =?;";
+		jdbc.update(sql,
+				approval.getDefect1(),
+				approval.getDefect2(),
+				approval.getDefect3(),
+				approval.getRemark(),
+				approval.getMethod(),
+				approval.getWorkCost(),
+				approval.getTestCost(),
+				approval.getShipType(),
+				approval.getApprovalNo());
+	}
+
+	public void batchUpdatePartnerClaimValue(final String approvalNo,
+			final List<Map<String, Object>> newClaimInfoList, Locale locale) {
+		String sql = "update qis_claims set claim = ? where approvalNo=? and partner=?;";
+		
+		jdbc.batchUpdate(sql, new BatchPreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement st, int i) throws SQLException {
+				st.setDouble(1,Double.parseDouble(newClaimInfoList.get(i).get("claim").toString()));
+				st.setString(2,approvalNo);
+				st.setString(3,(String)newClaimInfoList.get(i).get("code"));
+			}
+			
+			@Override
+			public int getBatchSize() {
+				return newClaimInfoList.size();
+			}
+		});
+		
+	}
+
+	public void deletePartnerClaim(String approvalNo, String partner) {
+		String sql = "delete from qis_claims where approvalNo =? and partner=?;";
+		jdbc.update(sql, approvalNo,partner);
+		
 	}
 
 }

@@ -17,6 +17,10 @@ public class HashMapComparator implements Comparator<Map<String, Object>> {
 		Object val1 = m1.get(sortKey);
 		Object val2 = m2.get(sortKey);
 		
+		if(val1==null || val2 ==null){
+			return 0;
+		}
+		
 		if(val1 instanceof Number){
 			return (int) ((ascendant?1:-1)*(((Number) val1).doubleValue()-((Number) val2).doubleValue()));
 		}

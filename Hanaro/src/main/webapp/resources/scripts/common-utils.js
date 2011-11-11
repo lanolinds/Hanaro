@@ -4,8 +4,8 @@ function numeric(val){val += '';x = val.split('.');x1 = x[0];	x2 = x.length > 1 
 function handleAjaxError(err){
 	var status = err.status;
 	if(status===401){//http spec : 401 Unauthorized (Session timeout에 걸리면...)
-		var res=$.messager.alert("Session Timeout",$.messager.http401,"warning");
-		window.location.replace('<c:url value="/j_spring_security_logout" />');
+		$.messager.alert("Session Timeout",$.messager.http401,"warning");
+		//window.location.replace('<c:url value="/j_spring_security_logout" />');
 	} 
 	else if(status===403){//http sepc: 403 Forbidden (권한이 없을때...)
 		$.messager.alert("Un Authorized Access",$.messager.http403,"warning");
