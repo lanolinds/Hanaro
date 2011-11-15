@@ -79,4 +79,11 @@ public interface QualityIssueService {
 	
 	public List<Map<String,Object>> getNcrMeasureImg(Locale locale, String ncrNo, String fileSeq);
 	
+	public void updateNCRMeasureProcedure(Locale locale, String ncrNo, String updateType,String comment,
+			String date1, String date2, String date3, String date4, String date5, String manager,
+			String confirmer, String approver, String fileName, byte[] file, String resultEvaluation,
+			String user);	
+	public byte[] getNCREvaluationFile(Locale locale, String ncrNo);
+
+	
 }

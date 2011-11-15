@@ -32,6 +32,14 @@
 		#form2 td {border:1px dotted #CBC7C4	r;width:170px;}
 		#form2 input{border:0px;width:100%;}
 		#form2 .group{background-color: #E1E8F3;}
+		
+		
+		
+		#displayValuation th {background-color: #FAFAFA;height:22px; font-weight:normal; text-align: left; white-space:nowrap;width: 120px; }
+		#displayValuation td {border:1px dotted #CBC7C4	r;width:170px;}
+		#displayValuation input{border:0px;width:100%;}		
+		
+		
 		.fileDown{cursor:pointer;color:blue;font-weight:bold;}
 		.fileDelete{cursor:pointer;}								
 		
@@ -249,7 +257,8 @@
 	
 	//대책서를 등록한다.
 	function insertData(){
-		if($("#form1").form("validate")){			
+		if($("#form1").form("validate")){	
+			document.form1.action="procNcrMeasure";
 			$("#form1").submit();			
 		}else{
 			return false;
@@ -259,10 +268,26 @@
 	function updateData(){
 		if($("#form1").form("validate")){
 			document.form1.measureProcType.value = "UPDATE";
+			document.form1.action="procNcrMeasure";
 			$("#form1").submit();			
 		}else{
 			return false;
 		}		
+	}
+	
+	//대책서를 재수정 및 통보한다.
+	function reUpdateData(){
+		if($("#form1").form("validate")){
+			$.messager.confirm("<fmt:message key='info.confirm' />","<fmt:message key='warn.reEditAndDirectInform' />",function(r){  
+			    if (r){  
+					document.form1.measureProcType.value = "do_plan";
+					document.form1.action="procNcrMeasure";
+					$("#form1").submit();	  
+			    }  
+			});	
+		}else{
+			return false;
+		}				
 	}
 	
 	//대책서를 삭제한다.
@@ -270,10 +295,66 @@
 		$.messager.confirm("<fmt:message key='info.confirm' />","<fmt:message key='warn.wannaDelete' />",function(r){  
 		    if (r){  
 				document.form1.measureProcType.value = "DELETE";
+				document.form1.action="procNcrMeasure";
 				$("#form1").submit();	  
 		    }  
 		});			
 
+	}
+	
+	//대책서를 통보한다.
+	function informData(){
+		$.messager.confirm("<fmt:message key='info.confirm' />","<fmt:message key='warn.ncrInformWarn' />",function(r){  
+		    if (r){  
+				document.form1.measureProcType.value = "do_plan";
+				document.form1.action="updateNCRMeasureProcedure";
+				$("#form1").submit();	  
+		    }  
+		});			
+	}
+	
+	//대책서를 반려한다.
+	function reject(){
+		
+		document.form1.comment.value = $("textarea[name='commentDialog']").val();
+		document.form1.measureProcType.value = "do_reject";
+		document.form1.action="updateNCRMeasureProcedure";
+		$("#form1").submit();		
+	}
+	//대책서 반려내용을 확인한다.
+	function checkComment(){
+		$.messager.alert("<fmt:message key='ui.button.checkComment' />","${sheetMap.rejectComment}");	
+	}
+	//대책서를 승인한다.
+	function doAgree(){
+		if($("#insideIncomeDate").datebox("getValue")==""){
+			$.messager.alert("<fmt:message key='warn.infoWarn' />","<fmt:message key='ui.label.qualityIssue.insideIncomeDate' /><fmt:message key='warn.required' />");
+			return;
+		}
+		document.form1.measureProcType.value = "do_agree";
+		document.form1.action="updateNCRMeasureProcedure";
+		$("#form1").submit();
+	}
+	
+	//대책서를 평가한다.
+	function doEvaluation(){
+		if($("#insideIncomeDate").datebox("getValue")==""){
+			$.messager.alert("<fmt:message key='warn.infoWarn' />","<fmt:message key='ui.label.qualityIssue.insideIncomeDate' /><fmt:message key='warn.required' />");
+			return;
+		}		
+		if($("#form1").form("validate")){
+			$.messager.confirm("<fmt:message key='info.confirm' />","<fmt:message key='warn.cannotEditAfterEvaluation' />",function(r){  
+			    if (r){  
+					document.form1.measureProcType.value = "do_evaluation";
+					document.form1.action="updateNCRMeasureProcedure";
+					document.form1.comment.value=$("textarea[name='inputEvaluation']").val();
+			    }  
+			});				
+			
+			$("#form1").submit();			
+		}else{
+			return false;
+		}	
 	}
 	
 	$(document).ready(function(){
@@ -315,6 +396,7 @@
 								<td>
 									<form:input path="ncrNo" readonly="true" id="ncrNo" />
 									<input type="hidden" name="measureProcType" value="INSERT" >
+									<input type="hidden" name="comment" value="" >
 								</td>
 							</tr>
 							<tr>
@@ -356,7 +438,14 @@
 							</tr>
 							<tr>
 								<th colspan="2" rowspan="7">
-									<img src=<c:url value="/resources/images/no_image.jpg" /> width="300px" height="170px"/>								
+									<c:choose>
+										<c:when test="${sheetMap.ref1!=''}">
+											<img src=<c:url value="getNcrMeasureImg?ncrNo=${ncrInForm.ncrNo}&fileSeq=3" /> width="300px" height="170px" />
+										</c:when>
+										<c:otherwise>
+											<img src=<c:url value="/resources/images/no_image.jpg" /> width="300px" height="170px"/>
+										</c:otherwise>
+									</c:choose>								
 								</th>								
 								<th><label><fmt:message key="ui.label.qualityIssue.reasonPartNo" /></label></th>
 								<td><input type="text"   readonly="true"  value="${sheetMap.rPartNo}"  /></td>
@@ -407,7 +496,7 @@
 							</tr>		
 							<tr>								
 								<th><label><fmt:message key="ui.label.qualityIssue.insideIncomeDate" /></label></th>
-								<td><form:input  path="insideIncomeDate" class="easyui-datebox"   editable="false" style="color:blue;" /></td>
+								<td><form:input  path="insideIncomeDate" class="easyui-datebox"   editable="false" style="color:blue;" id="insideIncomeDate" /></td>
 							</tr>
 							<tr>								
 								<th><label><fmt:message key="ui.label.qualityIssue.procApplyDate" /></label></th>
@@ -710,9 +799,8 @@
 								</tr>													
 							</table>												
 					  </div>  			
-					  <c:if test="${ncrInForm.status=='AGREE'}">
-					  <div title='<fmt:message key="ui.label.evaluation"/>'  id="displayValuation">  
-						<form id="form2" enctype="multipart/form-data" action="addNcrMeasureEvaluation">
+					  <c:if test="${ncrInForm.status=='AGREE' || ncrInForm.status=='GOOD' || ncrInForm.status=='BAD' }">
+					  <div title='<fmt:message key="ui.label.evaluation"/>'  id="displayValuation">
 							<table style="padding:10px;" class="groupTable" width="100%">
 								<tr>
 									<th colspan='3' class="group"><label class="label-Leader-blue"><fmt:message key="ui.label.ncrEvaluation" /></label></th>								
@@ -720,9 +808,7 @@
 								<tr>
 									<th><fmt:message key="ui.label.evaluation"/><fmt:message key="ui.label.contents" /></th>
 									<td>
-										<textarea name="inputEvaluation" cols=35 rows=5 ></textarea>
-										<input type="hidden" name="validateProcType" value="INSERT" >
-										<input type="hidden" name="validateNcrNo">
+										<textarea name="inputEvaluation" cols=35 rows=5 >${sheetMap.evaluationContent}</textarea>
 									</td>
 									<th><img src='<c:url value="/resources/images/samsong_logo.gif" />'  width="100px" height="80px" /></th>
 								</tr>
@@ -731,29 +817,37 @@
 									<td colspan="2">
 										<select name="selectEvaluationResult"   class="easyui-validatebox"  required="true">
 											<option value=""><fmt:message key="ui.element.Select" /></option>
-											<option value="GOOD">GOOD</option>
-											<option value="BAD">BAD</option>
+											<option value="GOOD" <c:if test="${sheetMap.evaluationResult=='GOOD'}">selected</c:if>>GOOD</option>
+											<option value="BAD" <c:if test="${sheetMap.evaluationResult=='BAD'}">selected</c:if> >BAD</option>
 										</select>
 									</td>
 								</tr>
 								<tr>
 									<th><fmt:message key="ui.label.File" /></th>
-									<td colspan="2"><input type="file" name="inputEvaluationFile" /></td>
+									<td><input type="file" name="inputEvaluationFile" size="1" /></td>
+									<td style="width:150px;">
+									<c:if test="${sheetMap.evaluationFileName!=''}">
+										<a  href="getNCREvaluationFile?ncrNo=${ncrInForm.ncrNo}&fileName=${sheetMap.evaluationFileName}" title="${sheetMap.evaluationFileName}" class="fileDown">
+											<span class="icon-attach" style="width:16px;" >&nbsp;</span>
+											[<fmt:message key="ui.label.File" />]
+										</a>
+									</c:if>	
+									</td>
 								</tr>
 								<tr>
 									<th><fmt:message key="ui.label.manager" /></th>
-									<td colspan="2"><input class="easyui-validatebox" name="evalManager" required="true" /></td>
+									<td colspan="2"><input class="easyui-validatebox"  type="text" name="evalManager" required="true" value="${sheetMap.evaluationManager}" /></td>
 								</tr>
 								<tr>
 									<th><fmt:message key="ui.label.confirmer" /></th>
-									<td colspan="2"><input class="easyui-validatebox" name="evalConfirmer" required="true" /></td>
+									<td colspan="2"><input class="easyui-validatebox"  type="text" name="evalConfirmer" required="true" value="${sheetMap.evaluationConfirmer}"  /></td>
 								</tr>
 								<tr>
 									<th><fmt:message key="ui.label.approver" /></th>
-									<td colspan="2"><input class="easyui-validatebox" name="evalApprover" required="true" /></td>
+									<td colspan="2"><input class="easyui-validatebox"  type="text" name="evalApprover" required="true" value="${sheetMap.evaluationApprover}"  /></td>
 								</tr>																											
 							</table>		
-							</form>		
+							
 					  </div>
 					  </c:if>
 					    				
@@ -763,14 +857,36 @@
 		</tr>
 		<tr>
 			<td colspan="2" align="center">
-				<a href="#" iconCls="icon-disk" class="easyui-linkbutton" onclick="javascript:insertData();"><fmt:message key="ui.button.Reg" /></a>
-				<a href="#" iconCls="icon-pencil" class="easyui-linkbutton" onclick="javascript:updateData();" ><fmt:message key="ui.button.Edit" /></a>
+<!-- 			등록된 대책서가 없고 귀책처와 현재 접속자의 부서혹은 업체코드가 같으면 등록버튼을 연다 -->
+			<c:if test="${ncrInForm.status=='' && sheetMap.reasonOrgan==sheetMap.userDept}">
+				<a href="#" iconCls="icon-disk" class="easyui-linkbutton" onclick="javascript:insertData();"><fmt:message key="ui.button.Reg" /></a>			
+			</c:if>
+			
+<!-- 			반려건수가 0이고 진행상태가 등록이고 귀책처와 현재 접속자의 부서혹은 업체코드가 같으면 수정,삭제, 통보 버튼을 연다 -->
+			<c:if test="${ncrInForm.rejectCount==0 && ncrInForm.status=='REG' && sheetMap.reasonOrgan==sheetMap.userDept}">
+				<a href="#" iconCls="icon-pencil" class="easyui-linkbutton" onclick="javascript:updateData();" ><fmt:message key="ui.button.Edit" /></a>			
 				<a href="#" iconCls="icon-delete" class="easyui-linkbutton" onclick="javascript:deleteData();" ><fmt:message key="ui.button.Delete" /></a>
-				<a href="#" iconCls="icon-information" class="easyui-linkbutton"><fmt:message key="ui.button.inform" /></a>
-				<a href="#" iconCls="icon-comment-delete" class="easyui-linkbutton"><fmt:message key="ui.button.reject" /></a>
-				<a href="#" iconCls="icon-accept" class="easyui-linkbutton"><fmt:message key="ui.button.agree" /></a>
-				<a href="#" iconCls="icon-table-edit" class="easyui-linkbutton"><fmt:message key="ui.button.evaluation" /></a>
-				<a href="#" iconCls="icon-arrow-redo" class="easyui-linkbutton"><fmt:message key="ui.button.Cancel" /></a>
+				<a href="#" iconCls="icon-information" class="easyui-linkbutton" onclick="javascript:informData();"><fmt:message key="ui.button.inform" /></a>
+			</c:if>
+			
+<!-- 			반려건수가 0이상이고 진행상태가 등록이고 귀책처와 현재 접속자의 부서혹은 업체코드가 같으면 재통보 버튼을 연다 -->
+			<c:if test="${ncrInForm.rejectCount>0 && ncrInForm.status=='REG' && sheetMap.reasonOrgan==sheetMap.userDept}">
+			    <a href="#" iconCls="icon-viewstack" class="easyui-linkbutton" onclick="javascript:checkComment();" ><fmt:message key="ui.button.checkComment" /></a>
+				<a href="#" iconCls="icon-pencil-go" class="easyui-linkbutton" onclick="javascript:reUpdateData();" ><fmt:message key="ui.button.editAndReInform" /></a>
+			</c:if>
+
+<!-- 			진행상태가 통보이고, 사내일경우는 승인 버튼을 연다			 -->
+			<c:if test="${ncrInForm.status=='PLAN' &&sheetMap.isEmp}">
+				<a href="#" iconCls="icon-comment-delete" class="easyui-linkbutton" onclick="javascript:$('#rejectDialog').dialog({modal:true});"><fmt:message key="ui.button.reject" /></a>
+				<a href="#" iconCls="icon-accept" class="easyui-linkbutton" onclick="javascript:doAgree();"><fmt:message key="ui.button.agree" /></a>
+			</c:if>
+			
+<!-- 			진행상태가 승인이고 사내일경우는 평가 버튼을 연다 -->
+			<c:if test="${sheetMap.isEmp && ncrInForm.status=='AGREE'}">
+				<a href="#" iconCls="icon-accept" class="easyui-linkbutton" onclick="javascript:doAgree();"><fmt:message key="ui.button.changeApplyDate" /></a>	
+				<a href="#" iconCls="icon-table-edit" class="easyui-linkbutton" onclick="javascript:doEvaluation();"><fmt:message key="ui.button.evaluation" /></a>
+			</c:if>
+			<a href="#" iconCls="icon-arrow-redo" class="easyui-linkbutton" onclick="javascript:self.close();"><fmt:message key="ui.button.close" /></a>
 			</td>
 		</tr>
 	</table>
@@ -830,6 +946,18 @@
 			<a  class="easyui-linkbutton" href="#" iconCls="icon-delete" onclick="javascript:deleteStandard();"><fmt:message key="ui.button.Delete" /></a>
 			</td>
 		</tr>
+	</table>
+</div>
+
+<div id="rejectDialog" title ="<fmt:message key='ui.button.reject' />" >
+	<table width="200px">
+	<tr>
+	<td  align=center'>
+		<textarea rows=7 cols=50 name="commentDialog"></textarea>
+		<a href="#" iconCls="icon-accept" class="easyui-linkbutton" onclick="javascript:reject();"><fmt:message key="ui.button.apply" /></a>	
+	</td>
+	</tr>
+
 	</table>
 </div>
 

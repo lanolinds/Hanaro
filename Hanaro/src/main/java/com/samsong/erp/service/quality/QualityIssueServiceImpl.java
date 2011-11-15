@@ -273,4 +273,21 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 			return dao.getNcrMeasureImg(locale, ncrNo, fileSeq);
 	}
 
+	@Override
+	public void updateNCRMeasureProcedure(Locale locale, String ncrNo,
+			String updateType, String comment, String date1, String date2,
+			String date3, String date4, String date5, String manager,
+			String confirmer, String approver, String fileName, byte[] file,
+			String resultEvaluation, String user) {
+		dao.updateNCRMeasureProcedure(locale, ncrNo, updateType, comment, date1, date2, date3, date4, date5, manager, confirmer, approver, fileName, file, resultEvaluation, user);
+		
+	}
+
+	@Override
+	public byte[] getNCREvaluationFile(Locale locale, String ncrNo) {
+		return dao.getNCREvaluationFile(locale, ncrNo);
+	}
+
+
+
 }
