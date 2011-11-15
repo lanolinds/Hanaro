@@ -143,55 +143,6 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 		return claim;
 	}
 	
-	private double calculatePartnerClaim(String partner,double rate,Map<String,Object> meta,IssueApproval approval) {
-		double claim = 0d;
-			
-		Map<String,Double> manageRates = new HashMap<String,Double>();
-		manageRates.put("AA",1.5d);
-		manageRates.put("AB",1.5d);
-		manageRates.put("AC",1.5d);
-		manageRates.put("AD",2d);
-		manageRates.put("CA",1.3d);
-		manageRates.put("CB",1.5d);
-		manageRates.put("CC",1.2d);
-		manageRates.put("CD",0.1d);
-		manageRates.put("DA",1.3d);
-		manageRates.put("DB",1.3d);	
-		
-		String method = approval.getMethod();
-		double workCost = approval.getWorkCost();
-		int testCost = approval.getTestCost();
-		String shipType = approval.getShipType();
-		
-		String origin = (String)meta.get("origin");
-		int count = (Integer)meta.get("count");
-		double unitPrice = Double.parseDouble(meta.get("price").toString());
-		
-		if(method.equals("abandon")){
-			claim = count*unitPrice*manageRates.get(origin)*0.9d;
-			if(origin.equals("CA")){
-				claim *=2000;  // 초기유동이면 개당 2000원 검사비용.
-			}
-			if(origin.startsWith("D")){
-				claim +=testCost;  // 출처가 시험실이면 검사비 추가
-			}
-		}
-		else if(method.equals("resend")){
-			claim= count*unitPrice*manageRates.get(origin);
-		}
-		else if(method.equals("rework")){
-			claim=count*unitPrice*manageRates.get(origin)*0.9*workCost;
-			if(origin.startsWith("A")){
-				claim += 100000;  //출처가 고객이면 기회비용 십만원 추가.
-			}
-		}
-		else{
-			claim = 0d;
-		}
-		
-		return claim*(rate/100d);
-	}
-
 	@Override
 	public List<Map<String, Object>> getClaimList(String approvalNo,
 			Locale locale) {
@@ -220,28 +171,30 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	}
 
 	@Override
-	public void updateApproval(String regNo,IssueApproval approval,Locale locale) {
+	public IssueApproval updateApproval(IssueApproval approval) {
+		
+		//변경사항 저장.
 		dao.updateApproval(approval);
-		List<Map<String,Object>> claimPartners = dao.getClaimList(approval.getApprovalNo(), locale);
-		List<Map<String,Object>> newClaimInfoList = new ArrayList<Map<String,Object>>();
-		for(Map<String,Object> partner : claimPartners){
-			String partnerCode = (String)partner.get("code");
-			double rate = Double.parseDouble(partner.get("rate").toString());
-			Map<String,Object> meta = dao.getPartnerClaimBaseInfo(regNo, partnerCode, locale);
-			double newClaim = this.calculatePartnerClaim(partnerCode, rate, meta, approval);
-			logger.info("newClaim:"+newClaim);
-			logger.info("code:"+partnerCode);
-			Map<String,Object> claimInfo = new HashMap<String,Object>();
-			claimInfo.put("code",partnerCode);
-			claimInfo.put("claim",newClaim);
-			newClaimInfoList.add(claimInfo);
-		}
-		dao.batchUpdatePartnerClaimValue(approval.getApprovalNo(),newClaimInfoList,locale);
+		
+		//변경사항에 맞게 클래임을 다시 계산한다.
+		Map<String,Object> params = dao.getClaimParams(approval.getApprovalNo());
+		double claim = this.calculateClaim(params);
+		approval.setClaim(claim);
+		//클레임 가격 저장.
+		dao.updateTotalClaim(approval.getApprovalNo(), claim);
+		
+		// 배분한 귀책처들 배분값 다시 계산.
+		dao.updateAllSharedClaim(approval.getApprovalNo());
+		
+		return approval;
 	}
 
 	@Override
-	public void deletePartnerClaim(String approvalNo, String partner) {
-		dao.deletePartnerClaim(approvalNo,partner);
+	public void deletePartnerClaim(String approvalNo, String partner,Locale locale) {
+		String ncrNo = dao.deletePartnerClaim(approvalNo,partner);
+		NcrInformSheet sheet =new NcrInformSheet();
+		sheet.setNcrNo(ncrNo);
+		dao.deleteNcrMeasure(locale,sheet);
 	}
 	
 	public void addNcrMeasure(Locale locale, String user, NcrInformSheet sheet,
@@ -311,7 +264,7 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	}
 
 	@Override
-	public void updateClaim(String regNo,IssueApproval approval, String partner, double rate,
+	public void updateClaim(String approvalNo, String partner, double rate,
 			String item,String lot, String reason1, String reason2, String reason3,
 			String remark, MultipartFile pic1,String pic1id, MultipartFile pic2,String pic2id,
 			MultipartFile ref,String refid,Locale locale) {
@@ -326,10 +279,11 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 			refid = dao.updateClaimAttach(refid,ref);
 		}
 		
-		//변경된 요율에 맞게 클래임 다시 계산.
-		Map<String,Object> meta = dao.getPartnerClaimBaseInfo(regNo,partner, locale);
-		double newClaim = this.calculatePartnerClaim(partner, rate, meta, approval);
-		dao.updateClaim(approval.getApprovalNo(), partner, rate,newClaim,item, lot, reason1, reason2, reason3, remark, pic1id, pic2id, refid);
+		//변경된 요율을 적용한다.
+		IssueApproval issue = dao.getApproval(approvalNo, locale);
+		double share = issue.getClaim()*(rate/100d);
+		
+		dao.updateClaim(approvalNo, partner, rate,share,item, lot, reason1, reason2, reason3, remark, pic1id, pic2id, refid);
 	}
 
 	@Override
@@ -338,7 +292,7 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	}
 
 	@Override
-	public void addClaim(String regNo, IssueApproval approval, String partner,
+	public void addClaim(String approvalNo, String partner,
 			double rate, String item, String lot, String reason1,
 			String reason2, String reason3, String remark, MultipartFile pic1,
 			MultipartFile pic2, MultipartFile ref, String ncr, String reqDate,
@@ -367,14 +321,23 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 		
 		
 		//업체 클래임 금액 계산.
-		Map<String,Object> meta = dao.getPartnerClaimBaseInfo(regNo,partner, locale);
-		double claim = this.calculatePartnerClaim(partner, rate, meta, approval);
-		dao.addClaimPartner(approval.getApprovalNo(), partner, item, lot, reason1, reason2, reason3, rate, claim, remark, pic1id, pic2id,refid, ncrNo, locale);
+		IssueApproval approval = dao.getApproval(approvalNo, locale);
+		double share = approval.getClaim()*(rate/100d);
+		dao.addClaimPartner(approvalNo, partner, item, lot, reason1, reason2, reason3, rate, share, remark, pic1id, pic2id,refid, ncrNo, locale);
 	}
 
 	@Override
 	public Map<String, String> getClaimItemSuppliers(String item, Locale locale) {
 		return dao.getClaimItemSuppliers(item,locale);
+	}
+
+	@Override
+	public void cancelApproval(String approvalNo, Locale locale) {
+		List<String> partners =dao.getClaimSharedPartnerList(approvalNo);
+		for(String partner : partners){
+			this.deletePartnerClaim(approvalNo, partner, locale);
+		}
+		dao.rollbackIssue(approvalNo);
 	}
 
 }
