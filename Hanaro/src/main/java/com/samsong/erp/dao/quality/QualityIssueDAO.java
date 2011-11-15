@@ -312,15 +312,6 @@ public class QualityIssueDAO {
 		return level0;
 	}
 
-	public Map<String, Object> getPartnerClaimBaseInfo(String regNo,
-			String claimPartnerCode, Locale locale) {
-
-		// 먼저 등록된 품질 문제로 부터, 원인 품번,수량,출처,단위가격을 파악해야 한다.
-		String sql = "exec QualityIssueDAO_getPartnerClaimBaseInfo ?,?,?; ";
-		return jdbc.queryForMap(sql, regNo, claimPartnerCode,
-				locale.getCountry());
-	}
-
 	public String acceptIssue(String regNo, Locale locale,String user) {
 		String sql = "exec QualityIssueDAO_acceptIssue ?,?,?;";
 		return jdbc.queryForObject(sql, new Object[] { regNo,locale.getCountry(), user },
@@ -477,42 +468,23 @@ public class QualityIssueDAO {
 	}
 
 	public void updateApproval(IssueApproval approval) {
-		String sql = "update qis_issue_approvals set reason1=?,reason2=?, reason3=?,remark=?,method=?,workCost=?,testCost=?,shipType=? where approvalNo =?;";
-		jdbc.update(sql, approval.getDefect1(), approval.getDefect2(),
+		String sql = "update qis_issue_approvals set causePartner=?, reason1=?,reason2=?, reason3=?,remark=?,method=?,workCost=?,testCost=?,shipType=? where approvalNo =?;";
+		jdbc.update(sql,approval.getCausePartner(), approval.getDefect1(), approval.getDefect2(),
 				approval.getDefect3(), approval.getRemark(),
 				approval.getMethod(), approval.getWorkCost(),
 				approval.getTestCost(), approval.getShipType(),
 				approval.getApprovalNo());
 	}
 
-	public void batchUpdatePartnerClaimValue(final String approvalNo,
-			final List<Map<String, Object>> newClaimInfoList, Locale locale) {
-		String sql = "update qis_claims set claim = ? where approvalNo=? and partner=?;";
-
-		jdbc.batchUpdate(sql, new BatchPreparedStatementSetter() {
-
+	public String deletePartnerClaim(String approvalNo, String partner) {
+		String sql = "exec QualityIssueDAO_deletePartnerClaim ?,?";
+		return jdbc.queryForObject(sql,new Object[] {approvalNo,partner}, new RowMapper<String>(){
 			@Override
-			public void setValues(PreparedStatement st, int i)
-					throws SQLException {
-				st.setDouble(
-						1,
-						Double.parseDouble(newClaimInfoList.get(i).get("claim")
-								.toString()));
-				st.setString(2, approvalNo);
-				st.setString(3, (String) newClaimInfoList.get(i).get("code"));
+			public String mapRow(ResultSet rs, int i) throws SQLException {
+				return rs.getString(1);
 			}
-
-			@Override
-			public int getBatchSize() {
-				return newClaimInfoList.size();
-			}
+			
 		});
-
-	}
-
-	public void deletePartnerClaim(String approvalNo, String partner) {
-		String sql = "delete from qis_claims where approvalNo =? and partner=?;";
-		jdbc.update(sql, approvalNo, partner);
 
 	}
 
@@ -1263,17 +1235,6 @@ public class QualityIssueDAO {
 		});
 	}
 
-	public void updateClaim(String approvalNo, String partner, double rate,double claim,
-			String lot, String reason1, String reason2, String reason3,
-			String remark, MultipartFile pic1, MultipartFile pic2,
-			MultipartFile ref) {
-//		String sql = "exec QualityIssueDAO_updateClaim ?,?,?,?,?,?,?,?,?,?,?,?;";
-//		Map<String,Object> attaches = jdbc.queryForMap(sql,approvalNo,partner,rate,claim,lot,reason1,reason2,reason3,remark);
-//		
-//		int ncrNo = (Integer)attaches.get("ncrNo");
-//		String pic1Id =(String)attaches.get("pic1"); 
-//		String pic1Id =(String)attaches.get("pic1");
-	}
 
 	public String updateClaimAttach(String id, MultipartFile f) {
 		String sql = "exec QualityIssueDAO_updateClaimAttach ?,?,?,?;";
@@ -1369,6 +1330,18 @@ public class QualityIssueDAO {
 		});
 		sp.execute(params);
 		return list;
+	}
+
+	public List<String> getClaimSharedPartnerList(String approvalNo) {
+		List<String> list = null;
+		String sql = "select partner from qis_claims where approvalNo=?";
+		list = jdbc.queryForList(sql, String.class,approvalNo);
+		return list;
+	}
+
+	public void rollbackIssue(String approvalNo) {
+		String sql = "update qis_quality_defect set action_ref = null where action_ref =?";
+		jdbc.update(sql,approvalNo);
 	}
 
 }

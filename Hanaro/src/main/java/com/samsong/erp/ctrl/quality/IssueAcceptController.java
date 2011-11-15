@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.security.Principal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -42,6 +43,15 @@ public class IssueAcceptController {
 	@Autowired
 	private MessageSource message;
 	
+	@RequestMapping(value="/cancelAccept", method=RequestMethod.POST)
+	public String cancelAccept(@RequestParam("regNo") String regNo,@RequestParam(value="no",required=false) String approvalNo,Model model,Locale locale){
+		
+		service.cancelApproval(approvalNo,locale);
+		
+		return "redirect:/qualityDivision/qualityIssue/list";
+	}
+	
+	
 	@RequestMapping(value="/acceptIssues", method=RequestMethod.POST)
 	public String accept(@RequestParam("regNo") String regNo,@RequestParam(value="no",required=false) String approvalNo,Model model, Locale locale,Principal p){
 		
@@ -56,7 +66,7 @@ public class IssueAcceptController {
 		if(approvalNo==null)
 			approvalNo=service.acceptIssue(regNo,locale, p.getName());
 		IssueApproval approval = service.getApproval(approvalNo, locale);
-		logger.info(approval.toString());
+		
 		//원인품번 납품처 리스트
 		String item = (String)details.get("item");
 		Map<String,String> suppliers = service.getClaimItemSuppliers(item,locale);
@@ -158,15 +168,19 @@ public class IssueAcceptController {
 	public String updateApproval(
 			@RequestParam("regNo") String regNo,
 			@RequestParam("approvalNo") String approvalNo,
+			@RequestParam("finalCausePartner") String causePartner,
 			@RequestParam("reason1") String reason1,
 			@RequestParam("reason2") String reason2,
 			@RequestParam("reason3") String reason3,
 			@RequestParam("approvalRemark") String remark,
 			@RequestParam("method") String method,
-			@RequestParam("workCost") int workCost,
-			@RequestParam("testCost") int testCost,
+			@RequestParam(value="workCost",required=false) Integer workCost,
+			@RequestParam(value="testCost",required=false) Integer testCost,
 			Model model,Locale locale){
-				
+		
+		int workCostVal = workCost==null?0:workCost.intValue();
+		int testCostVal = testCost==null?0:testCost.intValue();
+		
 		IssueApproval approval =new IssueApproval();
 		approval.setApprovalNo(approvalNo);
 		approval.setDefect1(reason1);
@@ -174,23 +188,26 @@ public class IssueAcceptController {
 		approval.setDefect3(reason3);
 		approval.setRemark(remark);
 		approval.setMethod(method);
-		approval.setWorkCost(workCost);
-		approval.setTestCost(testCost);
+		approval.setWorkCost(workCostVal);
+		approval.setTestCost(testCostVal);
 		approval.setShipType("unit");
+		approval.setCausePartner(causePartner);
 		
 		//처리내역 변경 사항을 업데이트한다.
-		service.updateApproval(regNo,approval,locale); 
-		
+		approval =service.updateApproval(approval); 
+		logger.info(approval);
 		
 		Map<String,Object> details = service.getIssueDetails(regNo, locale);
 		String originCode =(String)details.get("originCode");
 		Map<String,String> methods = getHandleMethods(originCode,locale);
+		String item = (String)details.get("item");
+		Map<String,String> suppliers = service.getClaimItemSuppliers(item,locale);
 		
 		model.addAttribute("issue",details);
 		model.addAttribute("methods",methods);
 		model.addAttribute("approval",approval);
 		model.addAttribute("partners",partnerService.getCustOption(locale, "qisall", ""));
-		
+		model.addAttribute("suppliers",suppliers);
 		return "qualityDivision/qualityIssue/acceptIssues";
 	}
 	
@@ -222,30 +239,32 @@ public class IssueAcceptController {
 		pic2id = pic2id.trim().length()==0?null:pic2id;
 		refid = refid.trim().length()==0?null:refid;
 		
-		IssueApproval approval =service.getApproval(approvalNo,locale);
-		Map<String,Object> details = service.getIssueDetails(regNo, locale);
-		String originCode =(String)details.get("originCode");
-		Map<String,String> methods = getHandleMethods(originCode,locale);
-		
 		if(action.equals("add")){
-			service.addClaim(regNo,approval,partner,rate,item,lot,reason1,reason2,reason3,remark,pic1,pic2,ref,ncr,reqDate,request,locale);
+			service.addClaim(approvalNo,partner,rate,item,lot,reason1,reason2,reason3,remark,pic1,pic2,ref,ncr,reqDate,request,locale);
 		}
 		else if (action.equals("edit")){
-			service.updateClaim(regNo,approval,partner,rate,item,lot,reason1,reason2,reason3,remark,pic1,pic1id,pic2,pic2id,ref,refid,locale);
+			//service.updateClaim(approvalNo,partner,rate,item,lot,reason1,reason2,reason3,remark,pic1,pic1id,pic2,pic2id,ref,refid,locale);
+			service.updateClaim(approvalNo, partner, rate, item, lot, reason1, reason2, reason3, remark, pic1, pic1id, pic2, pic2id, ref, refid, locale);
 		}
 		else if(action.equals("delete")){
-			service.deletePartnerClaim(approvalNo,partner); 
+			service.deletePartnerClaim(approvalNo,partner,locale); 
 		}
 		else
 		{
 			; //do nothing.
 		}
-
+		IssueApproval approval = service.getApproval(approvalNo, locale);
+		Map<String,Object> details = service.getIssueDetails(regNo, locale);
+		String originCode =(String)details.get("originCode");
+		Map<String,String> methods = getHandleMethods(originCode,locale);
+		String claimItem = (String)details.get("item");
+		Map<String,String> suppliers = service.getClaimItemSuppliers(claimItem,locale);
+		
 		model.addAttribute("issue",details);
 		model.addAttribute("methods",methods);
 		model.addAttribute("approval",approval);
 		model.addAttribute("partners",partnerService.getCustOption(locale, "qisall", ""));
-		
+		model.addAttribute("suppliers",suppliers);
 		return "qualityDivision/qualityIssue/acceptIssues";
 	}
 	 

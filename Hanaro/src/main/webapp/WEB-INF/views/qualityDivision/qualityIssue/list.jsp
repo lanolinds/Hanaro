@@ -118,7 +118,24 @@
 		
 		$("form[name='approvalForm'] input[name='regNo']").val(selected.regNo);
 		$("form[name='approvalForm'] input[name='no']").val(selected.approvalNo);
-		$("form[name='approvalForm']").submit();
+		$("form[name='approvalForm']").attr("action","acceptIssues").submit();
+	}
+	
+	function cancelApproval(){
+		var selected =$("#doneList").datagrid("getSelected");
+		if(!selected || selected.length===0){
+			$.messager.alert("Warnning",'<fmt:message key="warn.notSelectedItem"/>',"warning");
+			return false;
+		}
+		var title='<fmt:message key="ui.label.cancelAction"/>';
+		var question='<fmt:message key="question.cancelQualityIssueAction"/>';
+		$.messager.confirm(title,question,function(yes){
+			if(yes){
+				$("form[name='approvalForm'] input[name='regNo']").val(selected.regNo);
+				$("form[name='approvalForm'] input[name='no']").val(selected.approvalNo);
+				$("form[name='approvalForm']").attr("action","cancelAccept").submit();
+			}
+		});
 	}
 	</script>
 </head>
@@ -154,8 +171,8 @@
 						fit="true" fitColumns="true" idField="approvalNo" url="list/gridCallback2"  toolbar="#toolbar2"  singleSelect="true">			
 				<thead>
 					<tr>
-						<th field="approvalNo" width="100" sortable="true" align="center;">처리번호</th>
-						<th field="accepter" width="50" sortable="true">처리자</th> 
+						<th field="approvalNo" width="100" sortable="true" align="center;"><fmt:message key="ui.label.actionNo"/></th>
+						<th field="accepter" width="50" sortable="true"><fmt:message key="ui.label.actor"/></th> 
 						<th field="regNo" width="250" sortable="true"><fmt:message key="ui.label.RegNo"/></th>
 						<th field="date" width="150" align="center" sortable="true"><fmt:message key="ui.label.OccurHour"/></th>
 						<th field="place" width="100" sortable="true"><fmt:message key="ui.label.RegPlace"/></th>
@@ -186,7 +203,7 @@
     		<input type="hidden" name="regNo"/>
     	</form>
 
-    	<a href="#" class="easyui-linkbutton" iconCls="icon-document-todo" onclick="acceptSelectedIssue()" plain="true"><fmt:message key="ui.label.doSelected"/></a>
+    	<a href="#" class="easyui-linkbutton" iconCls="icon-document-next" onclick="acceptSelectedIssue()" plain="true"><fmt:message key="ui.label.doSelected"/></a>
     </div>
     </div>
     
@@ -206,8 +223,8 @@
     		<input type="hidden" name="no" />
     		<input type="hidden" name="regNo"/>
     	</form>
-
-    	<a href="#" class="easyui-linkbutton" iconCls="icon-document-todo" onclick="javascript:editSelectedIssue();"  plain="true">수정</a>
+		<a href="#" class="easyui-linkbutton" iconCls="icon-page-delete" onclick="javascript:cancelApproval();"  plain="true"><fmt:message key="ui.label.cancelAction"/></a>
+    	<a href="#" class="easyui-linkbutton" iconCls="icon-pencil" onclick="javascript:editSelectedIssue();"  plain="true"><fmt:message key="ui.label.editAction"/></a>
     </div>
     </div>
      

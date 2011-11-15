@@ -7,7 +7,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-	<title>품질문제 처리</title>
+	<title><fmt:message key="menu.qualityIssueProduce"/></title>
 	<link rel="stylesheet" href='<c:url value="/resources/scripts/easyui/themes/gray/easyui.css"/>'/>
 	<link rel="stylesheet" href='<c:url value="/resources/scripts/easyui/themes/icon.css"/>'/>
 	<link rel="stylesheet" href='<c:url value="/resources/styles/app.default.css"/>'/>
@@ -28,9 +28,9 @@
 		$("#claimList").datagrid({queryParams:{approvalNo:"${approval.approvalNo}"}});
 		
 		//다이얼로드 랜더링.
-		$("#claimPartnerDlg").dialog({buttons:[{text:"저장",iconCls:"icon-disk",handler:function(){
+		$("#claimPartnerDlg").dialog({buttons:[{text:'<fmt:message key="ui.button.Save"/>',iconCls:"icon-disk",handler:function(){
 			validateClaimForm();
-		}},{text:"취소",iconCls:"icon-cancel",handler:function(){
+		}},{text:'<fmt:message key="ui.button.Cancel"/>',iconCls:"icon-cancel",handler:function(){
 			$("#claimPartnerDlg").dialog("close");
 		}}]});
 		
@@ -169,12 +169,30 @@
 			$.messager.alert("Warnning",'<fmt:message key="warn.notSelectedItem"/>',"warning");
 			return false;
 		}
-		$("form[name='claimForm'] input[name='action']").val("delete");
-		$("#claimPartner").combobox("setValue",selected.code); //업체바인딩.
-		$("form[name='claimForm']").submit();
+		var title = '<fmt:message key="ui.label.qualityIssue.deleteClaim"/>';
+		var question = '<fmt:message key="question.deleteClaim"/>';
+		$.messager.confirm(title,question,function(yes){
+			if(yes){
+				$("form[name='claimForm'] input[name='action']").val("delete");
+				$("#claimPartner").combobox("setValue",selected.code); //업체바인딩.
+				$("form[name='claimForm']").submit();
+			}
+		});
+		
 	}
 	
 	function validateApprovalForm(){
+		//최종 납품처는 claim 계산에 반영된다.
+		//납품처를 선택하지 않으면 claim이 부여되지 않을 수 있음을 경고한다.
+		var finalCausePartner = $("#finalCausePartner").combobox("getValue");
+		if(finalCausePartner==""){
+			var title = '<fmt:message key="ui.label.editAction"/>';
+			var message = '<fmt:message key="question.noCausePartnerExist"/>';
+			$.messager.confirm(title,message,function(b){
+				if(!b)
+					return false;
+			});
+		}
 		$("form[name='approvalForm']").submit();
 	}
 	
@@ -186,7 +204,7 @@
 		if(action=="add"){  // 신규 추가일 경우 귀책처 누락 없게...
 			var partner =  $("#claimPartner").combobox("getValue");
 			if(partner==""){
-				$.messager.alert("Warnning",'귀책처를 선택하세요',"warning");
+				$.messager.alert("Warnning",'<fmt:message key="warn.enterFaultPartner"/>',"warning");
 				return false;
 			}
 		}
@@ -196,7 +214,7 @@
 		var ncr = $("form[name='claimForm'] :radio:checked").val();
 		var date = $("#reqDate").datebox("getValue");
 		if(ncr=="Y" && date.length==0){
-			$.messager.alert("Warnning",'NCR 대책 회신일을 입력하세요',"warning");
+			$.messager.alert("Warnning",'<fmt:message key="ui.label.qualityIssue.measureReplyDate"/>'+'<fmt:message key="warn.enterSomething"/>',"warning");
 			return false;
 		}
 		
@@ -204,7 +222,7 @@
 		var rate = Number($("form[name='claimForm'] input[name='claimRate']").numberspinner("getValue"));//요율바인딩.
 		var rateSum = getClaimRateSum(action)+rate;
 		if(rateSum>100){
-			$.messager.alert("Warnning",'요율은 100%를 넘을 수 없습니다.',"warning");
+			$.messager.alert("Warnning",'<fmt:message key="warn.percentError"/>',"warning");
 			return false;
 		}
 		
@@ -222,55 +240,59 @@
 </div>
 <div region="center" style="padding:10px;">
 
-<div id="issueDetails" class="easyui-panel" title="등록정보" iconCls="icon-document-info" style="width:1000px;height:auto;padding:2px;">
+
+<div style="width:1000px;text-align:right; padding:6px 0px;">
+<a href='<c:url value="/qualityDivision/qualityIssue/list"/>' class="easyui-linkbutton"  iconCls="icon-application-view-detail"><fmt:message key="ui.label.toList"/></a>
+</div>
+<div id="issueDetails" class="easyui-panel" title='<fmt:message key="ui.label.regInfo"/>' iconCls="icon-document-info" style="width:1000px;height:auto;padding:2px;">
 
 <table class="simple-table" style="width:100%;">
 <tr>
-<th>등록번호</th>
+<th><fmt:message key="ui.label.RegNo"/></th>
 <td style="width:200px;"><span id="regNo">${issue.regNo }</span></td>
-<th>출처</th>
+<th><fmt:message key="ui.label.QualityIssue.OccurSite"/></th>
 <td><span id="origin">${issue.origin}</span></td>
 </tr>
 <tr>
-<th>발생일시</th>
+<th><fmt:message key="ui.label.OccurDate"/></th>
 <td><span id="when">${issue.when}</span></td>
-<th>발생처</th>
+<th><fmt:message key="ui.label.QualityIssue.OccurPlace"/></th>
 <td><span id="place">${issue.place}</span></td>
 </tr>
 <tr>
-<th>조립라인</th>
+<th><fmt:message key="ui.label.QualityIssue.OccurLine"/></th>
 <td><span id="line">${issue.line}</span></td>
-<th>공정</th>
+<th><fmt:message key="ui.label.QualityIssue.OccurProc"/></th>
 <td><span id="proc">${issue.proc }</span></td>
 </tr>
 <tr>
-<th>품번(차종/기종)</th>
+<th><fmt:message key="ui.label.PartNo"/>(<fmt:message key="ui.label.CarModel"/>)</th>
 <td><span id="item">${issue.item }&nbsp;&nbsp;(${issue.car }/${issue.model})</span></td>
-<th>품명</th>
+<th><fmt:message key="ui.label.PartName"/></th>
 <td><span id="name">${issue.name }</span></td>
 </tr>
 <tr>
-<th>로트</th>
+<th>LOT</th>
 <td><span id="lot">${issue.lot}</span></td>
-<th>예상납품처</th>
+<th><fmt:message key="ui.label.qualityIssue.tempSupplier"/></th>
 <td><span id="causePartner">${issue.causePartner}</span></td>
 </tr>
 <tr>
-<th>수량</th>
+<th><fmt:message key="ui.label.count"/></th>
 <td><span id="count">${issue.count}</span></td>
-<th>단가</th>
+<th><fmt:message key="ui.label.unitPrice"/></th>
 <td><span id="price">${issue.price}</span></td>
 </tr>
 <tr>
-<th>현상</th>
+<th><fmt:message key="ui.label.phenomenon"/></th>
 <td colspan="3"><span id="reasons">${issue.defects}</span></td>
 </tr>
 <tr>
-<th>설명</th>
+<th><fmt:message key="ui.label.description"/></th>
 <td colspan="3"><span id="comment">${issue.comment}</span></td>
 </tr>
 <tr>
-<th>첨부</th>
+<th><fmt:message key="ui.label.File"/></th>
 <td colspan="3" >
 <span id="attached">
 <c:if test="${issue.ref1 != null and issue.ref1 ne '' }">
@@ -285,19 +307,19 @@
 </table>	
 </div>
 <br/>
-<div id="actionPanel" class="easyui-panel" style="width:1000px;height:auto;" title="최종처리내역" iconCls="icon-page-lightning">
+<div id="actionPanel" class="easyui-panel" style="width:1000px;height:auto;" title='<fmt:message key="ui.label.finalActionDescription"/>' iconCls="icon-page-lightning">
 <form name="approvalForm" action="approval" method="post">
 <input type="hidden" name="regNo" value="${issue.regNo}"></input>
 <table class="simple-table" style="width:100%;">
 <tr>
-<th>처리번호</th>
+<th><fmt:message key="ui.label.actionNo"/></th>
 <td style="padding:4px;"><input type="text"  name="approvalNo"  readonly="readonly" value="${approval.approvalNo }" style="border: none;" /></td>
 </tr>
 <tr>
-<th>최종납품처</th>
+<th><fmt:message key="ui.label.qualityIssue.fixedSupplier"/></th>
 <td style="padding:4px;">
 <select name="finalCausePartner" id="finalCausePartner" class="easyui-combobox" style="width:200px;">
-<option value="" ${approval.causePartner eq '' or approval.causePartner eq null ?'selected':''}>없음</option>
+<option value="" ${approval.causePartner eq '' or approval.causePartner eq null ?'selected':''}><fmt:message key="ui.label.noExist"/></option>
 <c:forEach var="supplier" items="${suppliers}">
 <option value="${supplier.key}" ${supplier.key eq approval.causePartner ?'selected':''}>${supplier.value }</option>
 </c:forEach>
@@ -305,7 +327,7 @@
 </td>
 </tr>
 <tr>
-<th>최종현상</th>
+<th><fmt:message key="ui.label.fixedPhenomenon"/></th>
 <td style="padding:4px;">
 <input name="reason1"  type='hidden'/>
 <input name="reason2"  type='hidden'/>
@@ -314,13 +336,13 @@
 </td>
 </tr>
 <tr>
-<th>비고</th>
+<th><fmt:message key="ui.label.remark"/></th>
 <td style="padding:4px;">
 <textarea id="finalComment" name="approvalRemark" rows="3" cols="100" style="width:99%;">${approval.remark }</textarea>
 </td>
 </tr>
 <tr>
-<th>처리방법</th>
+<th><fmt:message key="ui.label.actionType"/></th>
 <td style="padding 4px;">
 <c:forEach var="method" items="${methods}">
 <c:choose>
@@ -333,101 +355,101 @@
 </c:choose>
 </c:forEach>
 <span id="workCost" style="margin-left:2em; display:${approval.method eq 'rework'?'inline':'none' };">
-재작업요율
+<fmt:message key="ui.label.qualityIssue.reworkRate"/>
 <select name="workCost"   class="easyui-combobox" >
-<option value=30 ${approval.workCost == 30 ?'selected':''}>즉재작업</option>
-<option value=40 ${approval.workCost == 40 ?'selected':''}>부분해체</option>
-<option value=50 ${approval.workCost == 50 ?'selected':''}>완전해체</option>
+<option value=30 ${approval.workCost == 30 ?'selected':''}><fmt:message key="ui.label.qualityIssue.recompose"/></option>
+<option value=40 ${approval.workCost == 40 ?'selected':''}><fmt:message key="ui.label.qualityIssue.partialDecompose"/></option>
+<option value=50 ${approval.workCost == 50 ?'selected':''}><fmt:message key="ui.label.qualityIssue.fullDecompose"/></option>
 </select>
 </span>
 <c:if test="${issue.originCode eq 'DA' or issue.originCode eq 'DB' }">
 <span id="testCost"  style="margin-left:2em;">
-시험(검사)비용 
+<fmt:message key="ui.label.qualityIssue.testCost"/>
 <select name="testCost"  class="easyui-combobox">
-<option value=10000 ${approval.testCost == 10000 ?'selected':''}>일반신뢰성</option>
-<option value=100000 ${approval.testCost == 100000 ?'selected':''}>동하중</option>
+<option value=10000 ${approval.testCost == 10000 ?'selected':''}><fmt:message key="ui.label.qualityIssue.reliableTestCost"/></option>
+<option value=100000 ${approval.testCost == 100000 ?'selected':''}><fmt:message key="ui.label.qualityIssue.loadTestCost"/></option>
 </select>
 </span>
 </c:if>
 </td>
 </tr>
 <tr>
-<th>최종클래임</th>
+<th><fmt:message key="ui.label.qualityIssue.fixedClaim"/></th>
 <td >
 <span id="totalClaim" style="width:800px;display:inline-table;"><fmt:formatNumber maxFractionDigits="2" value="${approval.claim }"/></span>
-<a href="#" iconCls="icon-accept" class="easyui-linkbutton" onclick="javascript:validateApprovalForm()">적용</a>
+<a href="#" iconCls="icon-accept" class="easyui-linkbutton" onclick="javascript:validateApprovalForm()"><fmt:message key="ui.label.apply"/></a>
 </td>
 </tr>
 </table>
 </form>
 </div>
 <br/>
-<table id="claimList" title="귀책처 리스트" iconCls="icon-table-money" rownumbers="true" fitColumns="true"
+<table id="claimList" title='<fmt:message key="ui.label.faultList"/>' iconCls="icon-table-money" rownumbers="true" fitColumns="true"
 url="acceptIssues/claimListGridCallback" showFooter="true" toolbar="#claimToolbar" style="width:1000px;height:200px;" singleSelect="true" >
 <thead>
 <tr>
-<th field="code" width="50">코드</th>
-<th field="name" width="150">귀책처</th>
-<th field="item" width="150">원인품번</th>
-<th field="car" width="50" align="center">차종</th>
-<th field="model" width="50" align="center">기종</th>
-<th field="lot" width="100"  align="center">로트</th>
-<th field="reason1" width="100" hidden="true">4M1차</th>
-<th field="reason2" width="100" hidden="true">4M2차</th>
-<th field="reason3" width="100" hidden="true">4M3차</th>
-<th field="rate" width="50" align="right;">분담율</th>
-<th field="claim" width="100" align="right;">금액</th>
-<th field="remark" width="150" hidden="true" >원인</th>
-<th field="pic1" width="100" hidden="true">사진1</th>
-<th field="pic2" width="100" hidden="true">사진2</th>
-<th field="ref" width="100" hidden="true">참조</th>
+<th field="code" width="50"><fmt:message key="ui.label.code"/></th>
+<th field="name" width="150"><fmt:message key="ui.label.qualityIssue.reasonOrgan"/></th>
+<th field="item" width="150"><fmt:message key="ui.label.qualityIssue.reasonPartNo"/></th>
+<th field="car" width="50" align="center"><fmt:message key="ui.label.Car"/></th>
+<th field="model" width="50" align="center"><fmt:message key="ui.label.Model"/></th>
+<th field="lot" width="100"  align="center">LOT</th>
+<th field="reason1" width="100" hidden="true"><fmt:message key="ui.label.qualityIssue.4m1"/></th>
+<th field="reason2" width="100" hidden="true"><fmt:message key="ui.label.qualityIssue.4m2"/></th>
+<th field="reason3" width="100" hidden="true"><fmt:message key="ui.label.qualityIssue.analysisName"/></th>
+<th field="rate" width="50" align="right;"><fmt:message key="ui.label.shareRate"/></th>
+<th field="claim" width="100" align="right;"><fmt:message key="ui.label.money"/></th>
+<th field="remark" width="150" hidden="true" ><fmt:message key="ui.label.reason"/></th>
+<th field="pic1" width="100" hidden="true"><fmt:message key="ui.label.picture"/>1</th>
+<th field="pic2" width="100" hidden="true"><fmt:message key="ui.label.picture"/>2</th>
+<th field="ref" width="100" hidden="true"><fmt:message key="ui.label.reference"/></th>
 <th field="ncr" width="100" align="center;" hidden="true">NCR</th>
-<th field="reqDate" width="100" align="center;" hidden="true">대책회신일</th>
-<th field="request" width="150" hidden="true">요청사항</th>
+<th field="reqDate" width="100" align="center;" hidden="true"><fmt:message key="ui.label.qualityIssue.measureReplyDate"/></th>
+<th field="request" width="150" hidden="true"><fmt:message key="ui.label.requestContents"/></th>
 </tr>
 </thead>
 </table>
 
 </div>
 <div id="claimToolbar" style="text-align:right;">
-<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="javascript:addNewClaimPartner();">추가</a>
-<a href="#" class="easyui-linkbutton" iconCls="icon-page-edit" plain="true" onclick="javascript:editClaim();">수정</a>
-<a href="#" class="easyui-linkbutton" iconCls="icon-bin-closed" plain="true" onclick="javascript:deleteClaim();">삭제</a>
+<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="javascript:addNewClaimPartner();"><fmt:message key="ui.button.Add"/></a>
+<a href="#" class="easyui-linkbutton" iconCls="icon-pencil" plain="true" onclick="javascript:editClaim();"><fmt:message key="ui.button.Edit"/></a>
+<a href="#" class="easyui-linkbutton" iconCls="icon-delete" plain="true" onclick="javascript:deleteClaim();"><fmt:message key="ui.button.Delete"/></a>
 </div>
 
-<div id="claimPartnerDlg" closed="true" title="귀책처 변경" iconCls="icon-page-edit" style="width:610px;height:490px;" modal="true">
+<div id="claimPartnerDlg" closed="true" title='<fmt:message key="ui.label.qualityIssue.changeFaultPartner"/>' iconCls="icon-page-edit" style="width:610px;height:490px;" modal="true">
 <form name="claimForm" action="updateClaim" method="post" enctype="multipart/form-data">
 <input type="hidden" name="action"></input>
 <input type="hidden" name="regNo" value="${issue.regNo}"></input>
 <input type="hidden" name="approvalNo" value="${approval.approvalNo }"></input>
 <table class="simple-table" style="margin-top:6px; width:100%;">
 <tr>
-<th>귀책처</th>
+<th><fmt:message key="ui.label.qualityIssue.reasonOrgan"/></th>
 <td style="width:300px;">
 <select name="claimPartner" id="claimPartner" class="easyui-combobox" style="width:200px;">
-<option value='' selected="selected">선택</option>
+<option value='' selected="selected"><fmt:message key="ui.element.Select"/></option>
 <c:forEach var="partner" items="${partners}">
 <option value="${partner.custCode}">${partner.custName }</option>
 </c:forEach>
 </select>
 </td>
-<th>요율</th>
+<th><fmt:message key="ui.label.applyRate"/></th>
 <td>
 <input name="claimRate"  min="10" max="100" increment="5" value="10" class="easyui-numberspinner" style="width:200px;text-align:right;"></input>
 </td>
 </tr>
 <tr>
-<th>원인품번</th>
+<th><fmt:message key="ui.label.qualityIssue.reasonPartNo"/></th>
 <td>
 <input name="claimItem" id="claimItem"  style="width:200px;" ></input>
 </td>
-<th>로트</th>
+<th>LOT</th>
 <td>
 <input name="claimLot"  style="width:200px;" ></input>
 </td>
 </tr>
 <tr>
-<th>4M분석</th>
+<th><fmt:message key="ui.label.qualityIssue.4mAnalysis"/></th>
 <td colspan="3">
 <input name="reason1"  type="hidden"></input>
 <input name="reason2"  type="hidden"></input>
@@ -436,50 +458,50 @@ url="acceptIssues/claimListGridCallback" showFooter="true" toolbar="#claimToolba
 </td>
 </tr>
 <tr>
-<th>설명</th>
+<th><fmt:message key="ui.label.description"/></th>
 <td colspan="3">
 <textarea name="claimRemark" style="width:99%;" rows="3"></textarea>
 </td>
 </tr>
 <tr>
-<th>사진1</th>
+<th><fmt:message key="ui.label.picture"/>1</th>
 <td colspan="3">
 <input type="file" name="pic1"></input><input type="hidden" name="pic1id"></input>  
-<a href="#" id="pic1Link"  class='icon-page-attach' style="margin-left:1em;padding-left16px;display:none;">다운로드</a>
+<a href="#" id="pic1Link"  class='icon-page-attach' style="margin-left:1em;padding-left16px;display:none;"><fmt:message key="ui.label.download"/></a>
 </td>
 </tr>
 <tr>
-<th>사진2</th>
+<th><fmt:message key="ui.label.picture"/>2</th>
 <td colspan="3">
 <input type="file" name="pic2"></input><input type="hidden" name="pic2id"></input>  
-<a href="#" id="pic2Link"  class='icon-page-attach' style="margin-left:1em;padding-left16px;display:none;">다운로드</a>
+<a href="#" id="pic2Link"  class='icon-page-attach' style="margin-left:1em;padding-left16px;display:none;"><fmt:message key="ui.label.download"/></a>
 </td>
 </tr>
 <tr>
-<th>참조</th>
+<th><fmt:message key="ui.label.reference"/></th>
 <td colspan="3">
 <input type="file" name="ref"></input><input type="hidden" name="refid"></input>  
-<a href="#" id="refLink"  class='icon-page-attach' style="margin-left:1em;padding-left16px;display:none;">다운로드</a>
+<a href="#" id="refLink"  class='icon-page-attach' style="margin-left:1em;padding-left16px;display:none;"><fmt:message key="ui.label.download"/></a>
 </td>
 </tr>
 <tr>
 <td colspan="4" style="background-color:#9BD200; color:white; padding:4px;">
-<p><span class="icon-information" style="padding: 1px 2px 1px 16px;"></span>한 번 발행된 NCR은 수정이 불가합니다. 불가피하게, 발행된 NCR을 회수해야 하는 경우 Claim을 삭제한 후 다시 등록하세요.</p>
+<p><span class="icon-information" style="padding: 1px 2px 1px 16px;">&nbsp;</span><fmt:message key="info.ncrCausion"/></p>
 </td>
 </tr>
 <tr>
 <th>NCR</th>
 <td>
-<input type="radio" name="ncr" value="N" checked="checked"/>미발행
-<input type="radio" name="ncr" value="Y" />발행<span id="ncrNo" style="margin-left:1em;color:blue;"></span>
+<input type="radio" name="ncr" value="N" checked="checked"/><fmt:message key="ui.label.unpublished"/>
+<input type="radio" name="ncr" value="Y" /><fmt:message key="ui.label.publish"/><span id="ncrNo" style="margin-left:1em;color:blue;"></span>
 </td>
-<th>회신일</th>
+<th><fmt:message key="ui.label.replyDate"/></th>
 <td>
 <input name = "reqDate" id="reqDate"  type="text"  class="easyui-datebox" style="width:100px;" editable="false"></input>
 </td>
 </tr>
 <tr>
-<th>요청사항</th>
+<th><fmt:message key="ui.label.requestContents"/></th>
 <td colspan="3">
 <textarea name="request"  rows="3" style="width:99%;"></textarea>
 </td>

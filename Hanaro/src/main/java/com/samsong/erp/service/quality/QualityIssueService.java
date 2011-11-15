@@ -46,9 +46,9 @@ public interface QualityIssueService {
 
 	public IssueApproval getApproval(String approvalNo, Locale locale);
 
-	public void updateApproval(String regNo, IssueApproval approval,Locale locale);
+	public IssueApproval updateApproval( IssueApproval approval);
 
-	public void deletePartnerClaim(String approvalNo, String partner);
+	public void deletePartnerClaim(String approvalNo, String partner,Locale locale);
 	public Map<String, Object> getIssueDetails(String regNo, Locale locale);
 	
 	public void addNcrMeasure(Locale locale, String user, NcrInformSheet sheet, byte[] measureFile, byte[] imgReason1,
@@ -86,23 +86,28 @@ public interface QualityIssueService {
 
 
 
-	public void updateClaim(String regNo, IssueApproval approval, String partner, double rate,
+	public void updateClaim(String approvalNo, String partner, double rate,
 			String item,String lot, String reason1, String reason2, String reason3,
 			String remark, MultipartFile pic1, String pic1id, MultipartFile pic2,
 			String pic2id, MultipartFile ref,String refid, Locale locale);
 
 	public Map<String, Object> getClaimAttachment(String id);
 
-	public void addClaim(String regNo, IssueApproval approval, String partner,
+	public void addClaim(String approvalNo, String partner,
 			double rate, String item, String lot, String reason1,
 			String reason2, String reason3, String remark, MultipartFile pic1,
 			MultipartFile pic2, MultipartFile ref, String ncr, String reqDate,
 			String request, Locale locale);
 
 	public Map<String, String> getClaimItemSuppliers(String item, Locale locale);
+
 	
 	public List<Map<String,Object>> getNCRList(Locale locale,String division, String occurSite,
 			String stdDt, String endDt, String reasonCust, String publishCust);	
+
+
+
+	public void cancelApproval(String approvalNo, Locale locale);
 
 	
 }
