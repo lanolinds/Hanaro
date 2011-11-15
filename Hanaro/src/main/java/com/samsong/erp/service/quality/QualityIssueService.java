@@ -32,9 +32,7 @@ public interface QualityIssueService {
 
 	public List<Map<String, Object>> getDefectTreeData(Locale locale);
 
-	public IssueApproval acceptIssue(String regNo, String method,
-			int workCost, int testCost,
-			String shipType, Locale locale, String user);
+	public String acceptIssue(String regNo, Locale locale, String user);
 
 	public List<Map<String, Object>> getClaimList(String approvalNo,
 			Locale locale);
@@ -78,12 +76,30 @@ public interface QualityIssueService {
 	public byte[] getNcrMeasureStandardFile(Locale locale, String ncrNo, String fileSeq);
 	
 	public List<Map<String,Object>> getNcrMeasureImg(Locale locale, String ncrNo, String fileSeq);
+
 	
 	public void updateNCRMeasureProcedure(Locale locale, String ncrNo, String updateType,String comment,
 			String date1, String date2, String date3, String date4, String date5, String manager,
 			String confirmer, String approver, String fileName, byte[] file, String resultEvaluation,
 			String user);	
 	public byte[] getNCREvaluationFile(Locale locale, String ncrNo);
+
+
+
+	public void updateClaim(String regNo, IssueApproval approval, String partner, double rate,
+			String item,String lot, String reason1, String reason2, String reason3,
+			String remark, MultipartFile pic1, String pic1id, MultipartFile pic2,
+			String pic2id, MultipartFile ref,String refid, Locale locale);
+
+	public Map<String, Object> getClaimAttachment(String id);
+
+	public void addClaim(String regNo, IssueApproval approval, String partner,
+			double rate, String item, String lot, String reason1,
+			String reason2, String reason3, String remark, MultipartFile pic1,
+			MultipartFile pic2, MultipartFile ref, String ncr, String reqDate,
+			String request, Locale locale);
+
+	public Map<String, String> getClaimItemSuppliers(String item, Locale locale);
 
 	
 }
