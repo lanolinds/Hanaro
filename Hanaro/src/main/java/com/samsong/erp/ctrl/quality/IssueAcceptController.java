@@ -43,29 +43,31 @@ public class IssueAcceptController {
 	private MessageSource message;
 	
 	@RequestMapping(value="/acceptIssues", method=RequestMethod.POST)
-	public String accept(@RequestParam("regNo") String regNo,@RequestParam("action") String action,Model model, Locale locale,Principal p){
+	public String accept(@RequestParam("regNo") String regNo,@RequestParam(value="no",required=false) String approvalNo,Model model, Locale locale,Principal p){
 		
+		//등록된 품질문제 상세 내역을 얻는다.
 		Map<String,Object> details = service.getIssueDetails(regNo, locale);
+		
+		//출처별 처리 방법을 얻는다.
 		String originCode =(String)details.get("originCode");
 		Map<String,String> methods = getHandleMethods(originCode,locale);
 		
-		IssueApproval approval =null;
-		if(action.equals("new")){
-			String defaultMethod = originCode.equals("CD")?"resend":"abandon";
-			int defaultWorkCost = 100;
-			int defaultTestCost = 10000;
-			String defaultShipType = "unit";
-			approval =service.acceptIssue(regNo,defaultMethod,defaultWorkCost,defaultTestCost,defaultShipType,locale,p.getName());
-		}
-		else{
-			approval =service.getApproval(action,locale);
-		}
+		//기본 처리 내역을 얻는다.
+		if(approvalNo==null)
+			approvalNo=service.acceptIssue(regNo,locale, p.getName());
+		IssueApproval approval = service.getApproval(approvalNo, locale);
+		logger.info(approval.toString());
+		//원인품번 납품처 리스트
+		String item = (String)details.get("item");
+		Map<String,String> suppliers = service.getClaimItemSuppliers(item,locale);
+		
+		
 		
 		model.addAttribute("issue",details);
 		model.addAttribute("methods",methods);
 		model.addAttribute("approval",approval);
 		model.addAttribute("partners",partnerService.getCustOption(locale, "qisall", ""));
-		
+		model.addAttribute("suppliers",suppliers);
 		return "qualityDivision/qualityIssue/acceptIssues";
 	}
 	@RequestMapping("/issueDetailCallback")
@@ -206,45 +208,64 @@ public class IssueAcceptController {
 			@RequestParam("claim4m") String reason3,
 			@RequestParam("claimRemark") String remark,
 			@RequestParam("pic1") MultipartFile pic1,
+			@RequestParam("pic1id") String pic1id,
 			@RequestParam("pic2") MultipartFile pic2,
+			@RequestParam("pic2id") String pic2id,
 			@RequestParam("ref") MultipartFile ref,
+			@RequestParam("refid") String refid,
 			@RequestParam("ncr") String ncr,
 			@RequestParam("reqDate") String reqDate,
 			@RequestParam("request") String request,
 			Model model,Locale locale){
 		
-		if(action.equals("delete")){
-			service.deletePartnerClaim(approvalNo,partner); 
-		}
-		
-		logger.info("action:"+action);
-		logger.info("claimPartner:"+partner);
-		logger.info("claimRate:"+rate);
-		logger.info("claimItem:"+item);
-		logger.info("claimLot:"+lot);
-		logger.info("reason1:"+reason1);
-		logger.info("reason2:"+reason2);
-		logger.info("reason3:"+reason3);
-		logger.info("claimRemark:"+remark);
-		logger.info("pic1:"+pic1.getSize());
-		logger.info("pic2:"+pic2.getSize());
-		logger.info("pic3:"+ref.getSize());
-		logger.info("ncr:"+ncr);
-		logger.info("reqDate:"+reqDate);
-		logger.info("request:"+request);
+		pic1id = pic1id.trim().length()==0?null:pic1id;
+		pic2id = pic2id.trim().length()==0?null:pic2id;
+		refid = refid.trim().length()==0?null:refid;
 		
 		IssueApproval approval =service.getApproval(approvalNo,locale);
-		
 		Map<String,Object> details = service.getIssueDetails(regNo, locale);
 		String originCode =(String)details.get("originCode");
 		Map<String,String> methods = getHandleMethods(originCode,locale);
 		
+		if(action.equals("add")){
+			service.addClaim(regNo,approval,partner,rate,item,lot,reason1,reason2,reason3,remark,pic1,pic2,ref,ncr,reqDate,request,locale);
+		}
+		else if (action.equals("edit")){
+			service.updateClaim(regNo,approval,partner,rate,item,lot,reason1,reason2,reason3,remark,pic1,pic1id,pic2,pic2id,ref,refid,locale);
+		}
+		else if(action.equals("delete")){
+			service.deletePartnerClaim(approvalNo,partner); 
+		}
+		else
+		{
+			; //do nothing.
+		}
+
 		model.addAttribute("issue",details);
 		model.addAttribute("methods",methods);
 		model.addAttribute("approval",approval);
 		model.addAttribute("partners",partnerService.getCustOption(locale, "qisall", ""));
 		
 		return "qualityDivision/qualityIssue/acceptIssues";
+	}
+	 
+	@RequestMapping("/acceptIssues/downloadClaimRef")
+	public void downloadClaimRef(@RequestParam("id") String id,HttpServletRequest req,HttpServletResponse res){
+		Map<String,Object> attach = service.getClaimAttachment(id);
+		String name = (String)attach.get("fileName");
+		String contentType=(String)attach.get("contentType");
+		byte[] binary = (byte[])attach.get("binary");
+		try{
+			name = ClientFileNameEncoder.encodeFileName(name, req.getHeader("User-Agent"));
+			res.setHeader("Content-Disposition", "inline;filename=" + name);
+			res.setContentType(contentType);
+			res.setContentLength(binary.length);
+			OutputStream out = res.getOutputStream();
+			out.write(binary);
+			out.flush();
+		}catch(IOException ex){
+			logger.error("파일 다운로드 중 다음 에러 발생:"+ex.getMessage());
+		}
 	}
 
 }

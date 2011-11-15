@@ -110,18 +110,21 @@
 			$("#claim4m").combotree("setValue",data.reason3);//4m바인딩.
 			$("textarea[name='claimRemark']",$form).val(data.remark);//귀책 원인 바인딩.
 			if(data.pic1){
+				$("input[name='pic1id']",$form).val(data.pic1); 
 				$("#pic1Link",$form).attr("href","acceptIssues/downloadClaimRef?id="+data.pic1).show();
 			}
 			else{
 				$("#pic1Link",$form).hide();
 			}
 			if(data.pic2){
+				$("input[name='pic2id']",$form).val(data.pic2);
 				$("#pic2Link",$form).attr("href","acceptIssues/downloadClaimRef?id="+data.pic2).show();
 			}
 			else{
 				$("#pic2Link",$form).hide();
 			}
 			if(data.ref){
+				$("input[name='refid']",$form).val(data.ref);
 				$("#refLink",$form).attr("href","acceptIssues/downloadClaimRef?id="+data.ref).show();
 			}
 			else{
@@ -136,6 +139,7 @@
 		}
 		else{
 			$(" input[name='action']",$form).val("add");
+			$(".icon-page-attach",$form).hide();
 			$("#claim4mLabels").text("");
 			$("#ncrNo").text("");
 			$("#claimPartner").combobox("enable").combobox("clear"); 
@@ -248,7 +252,7 @@
 <tr>
 <th>로트</th>
 <td><span id="lot">${issue.lot}</span></td>
-<th>예상귀책처</th>
+<th>예상납품처</th>
 <td><span id="causePartner">${issue.causePartner}</span></td>
 </tr>
 <tr>
@@ -288,6 +292,17 @@
 <tr>
 <th>처리번호</th>
 <td style="padding:4px;"><input type="text"  name="approvalNo"  readonly="readonly" value="${approval.approvalNo }" style="border: none;" /></td>
+</tr>
+<tr>
+<th>최종납품처</th>
+<td style="padding:4px;">
+<select name="finalCausePartner" id="finalCausePartner" class="easyui-combobox" style="width:200px;">
+<option value="" ${approval.causePartner eq '' or approval.causePartner eq null ?'selected':''}>없음</option>
+<c:forEach var="supplier" items="${suppliers}">
+<option value="${supplier.key}" ${supplier.key eq approval.causePartner ?'selected':''}>${supplier.value }</option>
+</c:forEach>
+</select>
+</td>
 </tr>
 <tr>
 <th>최종현상</th>
@@ -337,8 +352,10 @@
 </td>
 </tr>
 <tr>
-<td colspan="2" style="text-align:right;border:none;">
-<a href="#" iconCls="icon-accept" class="easyui-linkbutton"  onclick="javascript:validateApprovalForm()">적용</a>
+<th>최종클래임</th>
+<td >
+<span id="totalClaim" style="width:800px;display:inline-table;"><fmt:formatNumber maxFractionDigits="2" value="${approval.claim }"/></span>
+<a href="#" iconCls="icon-accept" class="easyui-linkbutton" onclick="javascript:validateApprovalForm()">적용</a>
 </td>
 </tr>
 </table>
@@ -378,14 +395,14 @@ url="acceptIssues/claimListGridCallback" showFooter="true" toolbar="#claimToolba
 <a href="#" class="easyui-linkbutton" iconCls="icon-bin-closed" plain="true" onclick="javascript:deleteClaim();">삭제</a>
 </div>
 
-<div id="claimPartnerDlg" closed="true" title="귀책처 변경" iconCls="icon-page-edit" style="width:610px;height:440px;" modal="true">
+<div id="claimPartnerDlg" closed="true" title="귀책처 변경" iconCls="icon-page-edit" style="width:610px;height:490px;" modal="true">
 <form name="claimForm" action="updateClaim" method="post" enctype="multipart/form-data">
 <input type="hidden" name="action"></input>
 <input type="hidden" name="regNo" value="${issue.regNo}"></input>
 <input type="hidden" name="approvalNo" value="${approval.approvalNo }"></input>
 <table class="simple-table" style="margin-top:6px; width:100%;">
 <tr>
-<th>업체</th>
+<th>귀책처</th>
 <td style="width:300px;">
 <select name="claimPartner" id="claimPartner" class="easyui-combobox" style="width:200px;">
 <option value='' selected="selected">선택</option>
@@ -427,22 +444,27 @@ url="acceptIssues/claimListGridCallback" showFooter="true" toolbar="#claimToolba
 <tr>
 <th>사진1</th>
 <td colspan="3">
-<input type="file" name="pic1"></input> 
+<input type="file" name="pic1"></input><input type="hidden" name="pic1id"></input>  
 <a href="#" id="pic1Link"  class='icon-page-attach' style="margin-left:1em;padding-left16px;display:none;">다운로드</a>
 </td>
 </tr>
 <tr>
 <th>사진2</th>
 <td colspan="3">
-<input type="file" name="pic2"></input>
+<input type="file" name="pic2"></input><input type="hidden" name="pic2id"></input>  
 <a href="#" id="pic2Link"  class='icon-page-attach' style="margin-left:1em;padding-left16px;display:none;">다운로드</a>
 </td>
 </tr>
 <tr>
 <th>참조</th>
 <td colspan="3">
-<input type="file" name="ref"></input>
+<input type="file" name="ref"></input><input type="hidden" name="refid"></input>  
 <a href="#" id="refLink"  class='icon-page-attach' style="margin-left:1em;padding-left16px;display:none;">다운로드</a>
+</td>
+</tr>
+<tr>
+<td colspan="4" style="background-color:#9BD200; color:white; padding:4px;">
+<p><span class="icon-information" style="padding: 1px 2px 1px 16px;"></span>한 번 발행된 NCR은 수정이 불가합니다. 불가피하게, 발행된 NCR을 회수해야 하는 경우 Claim을 삭제한 후 다시 등록하세요.</p>
 </td>
 </tr>
 <tr>

@@ -2,28 +2,21 @@ package com.samsong.erp.service.quality;
 
 
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
-
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-
 import org.apache.log4j.Logger;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import org.springframework.web.multipart.MultipartFile;
 
-
 import com.samsong.erp.dao.quality.QualityIssueDAO;
-
 import com.samsong.erp.model.quality.IssueApproval;
-
 import com.samsong.erp.model.quality.NcrInformSheet;
 import com.samsong.erp.model.quality.QualityIssueRegSheet;
 
@@ -88,24 +81,67 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	}
 
 	@Override
-	public IssueApproval acceptIssue(String regNo, String method,
-			int workCost, int testCost,
-			String shipType, Locale locale,String user) {
+	public String acceptIssue(String regNo, Locale locale,String user) {
 		//기본값으로 등록.
-		IssueApproval approval = dao.acceptIssue(regNo,method,workCost,testCost,shipType,locale,user); 
-		Map <String,Object> details = dao.getIssueDetails(regNo, locale);
-		String partner =(String)details.get("partnerCode");
-		//예상 귀책업체가 있으면 클래임을 부여한다. 
-		if(partner!=null && !partner.equals("")){
-			String item=(String)details.get("item");
-			String lot = (String)details.get("lot");
-			Map<String,Object> m = dao.getPartnerClaimBaseInfo(regNo, partner, locale);
-			double claim = this.calculatePartnerClaim(partner, 100d, m, approval);
-			dao.addClaimPartner(approval.getApprovalNo(),partner,item,lot,null,null,null,100d,claim,null,null,null,null,null,locale);
-		}
-		return approval;
+		String approvalNo = dao.acceptIssue(regNo,locale,user); 
+		
+		Map<String,Object> claimParams = dao.getClaimParams(approvalNo);
+		double claim = this.calculateClaim(claimParams);
+		
+		dao.updateTotalClaim(approvalNo,claim);
+		
+		dao.updateAllSharedClaim(approvalNo);
+		
+		return approvalNo;
 	}
 	
+	private double calculateClaim(Map<String,Object> params){
+		double claim = 0d;
+		Map<String,Double> manageRates = new HashMap<String,Double>();
+		manageRates.put("AA",1.5d);
+		manageRates.put("AB",1.5d);
+		manageRates.put("AC",1.5d);
+		manageRates.put("AD",2d);
+		manageRates.put("CA",1.3d);
+		manageRates.put("CB",1.5d);
+		manageRates.put("CC",1.2d);
+		manageRates.put("CD",0.1d);
+		manageRates.put("DA",1.3d);
+		manageRates.put("DB",1.3d);	
+		
+		String method = (String)params.get("method");
+		double workCost = (Integer)params.get("workCost");
+		int testCost = (Integer)params.get("testCost");
+		String shipType = (String)params.get("shipType");
+		
+		String origin = (String)params.get("origin");
+		int count = (Integer)params.get("count");
+		double unitPrice =  ((BigDecimal)params.get("price")).doubleValue();
+		
+		if(method.equals("abandon")){
+			claim = count*unitPrice*manageRates.get(origin)*0.9d;
+			if(origin.equals("CA")){
+				claim *=2000;  // 초기유동이면 개당 2000원 검사비용.
+			}
+			if(origin.startsWith("D")){
+				claim +=testCost;  // 출처가 시험실이면 검사비 추가
+			}
+		}
+		else if(method.equals("resend")){
+			claim= count*unitPrice*manageRates.get(origin);
+		}
+		else if(method.equals("rework")){
+			claim=count*unitPrice*manageRates.get(origin)*0.9*workCost;
+			if(origin.startsWith("A")){
+				claim += 100000;  //출처가 고객이면 기회비용 십만원 추가.
+			}
+		}
+		else{
+			claim = 0d;
+		}
+		
+		return claim;
+	}
 	
 	private double calculatePartnerClaim(String partner,double rate,Map<String,Object> meta,IssueApproval approval) {
 		double claim = 0d;
@@ -207,6 +243,7 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	public void deletePartnerClaim(String approvalNo, String partner) {
 		dao.deletePartnerClaim(approvalNo,partner);
 	}
+	
 	public void addNcrMeasure(Locale locale, String user, NcrInformSheet sheet,
 			byte[] measureFile,  byte[] imgReason1,
 			byte[] imgReason2, byte[] imgTempMeasure, byte[] imgMeasure1, byte[] imgMeasure2,
@@ -271,6 +308,73 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	@Override
 	public List<Map<String,Object>> getNcrMeasureImg(Locale locale, String ncrNo, String fileSeq) {
 			return dao.getNcrMeasureImg(locale, ncrNo, fileSeq);
+	}
+
+	@Override
+	public void updateClaim(String regNo,IssueApproval approval, String partner, double rate,
+			String item,String lot, String reason1, String reason2, String reason3,
+			String remark, MultipartFile pic1,String pic1id, MultipartFile pic2,String pic2id,
+			MultipartFile ref,String refid,Locale locale) {
+		
+		if(pic1.getSize()>0){
+			pic1id = dao.updateClaimAttach(pic1id,pic1);
+		}
+		if(pic2.getSize()>0){
+			pic2id = dao.updateClaimAttach(pic2id,pic2);
+		}
+		if(ref.getSize()>0){
+			refid = dao.updateClaimAttach(refid,ref);
+		}
+		
+		//변경된 요율에 맞게 클래임 다시 계산.
+		Map<String,Object> meta = dao.getPartnerClaimBaseInfo(regNo,partner, locale);
+		double newClaim = this.calculatePartnerClaim(partner, rate, meta, approval);
+		dao.updateClaim(approval.getApprovalNo(), partner, rate,newClaim,item, lot, reason1, reason2, reason3, remark, pic1id, pic2id, refid);
+	}
+
+	@Override
+	public Map<String, Object> getClaimAttachment(String id) {
+		return dao.getClaimAttachment(id);
+	}
+
+	@Override
+	public void addClaim(String regNo, IssueApproval approval, String partner,
+			double rate, String item, String lot, String reason1,
+			String reason2, String reason3, String remark, MultipartFile pic1,
+			MultipartFile pic2, MultipartFile ref, String ncr, String reqDate,
+			String request, Locale locale) {
+		
+		
+		//첨부파일 있으면 외래키 확보.
+		String pic1id = null;
+		String pic2id = null;
+		String refid = null;
+		if(pic1.getSize()>0){
+			pic1id = dao.updateClaimAttach(pic1id,pic1);
+		}
+		if(pic2.getSize()>0){
+			pic2id = dao.updateClaimAttach(pic2id,pic2);
+		}
+		if(ref.getSize()>0){
+			refid = dao.updateClaimAttach(refid,ref);
+		}
+		
+		//NCR 발행하면 외래키 확보
+		String ncrNo = null;
+		if(ncr!=null && ncr.equalsIgnoreCase("Y")){
+			ncrNo =dao.publishNcr(reqDate,request);
+		}
+		
+		
+		//업체 클래임 금액 계산.
+		Map<String,Object> meta = dao.getPartnerClaimBaseInfo(regNo,partner, locale);
+		double claim = this.calculatePartnerClaim(partner, rate, meta, approval);
+		dao.addClaimPartner(approval.getApprovalNo(), partner, item, lot, reason1, reason2, reason3, rate, claim, remark, pic1id, pic2id,refid, ncrNo, locale);
+	}
+
+	@Override
+	public Map<String, String> getClaimItemSuppliers(String item, Locale locale) {
+		return dao.getClaimItemSuppliers(item,locale);
 	}
 
 }

@@ -6,6 +6,7 @@ import java.util.Map;
 public class IssueApproval {
 	
 	private String approvalNo;
+	private String causePartner;
 	private String defect1;
 	private String defect2;
 	private String defect3;
@@ -15,7 +16,14 @@ public class IssueApproval {
 	private int workCost;
 	private int testCost;
 	private String shipType;
+	private double claim;
 	
+	public double getClaim() {
+		return claim;
+	}
+	public void setClaim(double claim) {
+		this.claim = claim;
+	}
 	private List<Map<String,Object>> claims;
 	
 	public String getApprovalNo() {
@@ -85,14 +93,20 @@ public class IssueApproval {
 	public void setClaims(List<Map<String, Object>> claims) {
 		this.claims = claims;
 	}
+	public String getCausePartner() {
+		return causePartner;
+	}
+	public void setCausePartner(String causePartner) {
+		this.causePartner = causePartner;
+	}
 	@Override
 	public String toString() {
-		return "IssueApproval [approvalNo=" + approvalNo + ", defect1="
-				+ defect1 + ", defect2=" + defect2 + ", defect3=" + defect3
-				+ ", remark=" + remark + ", adHocs=" + adHocs + ", method="
-				+ method + ", workCost=" + workCost + ", testCost=" + testCost
-				+ ", shipType=" + shipType + ", claims=" + claims + "]";
+		return "IssueApproval [approvalNo=" + approvalNo + ", causePartner="
+				+ causePartner + ", defect1=" + defect1 + ", defect2="
+				+ defect2 + ", defect3=" + defect3 + ", remark=" + remark
+				+ ", adHocs=" + adHocs + ", method=" + method + ", workCost="
+				+ workCost + ", testCost=" + testCost + ", shipType="
+				+ shipType + ", claim=" + claim + ", claims=" + claims + "]";
 	}
 	
-
 }

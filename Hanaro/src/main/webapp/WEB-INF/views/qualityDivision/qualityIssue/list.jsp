@@ -117,7 +117,7 @@
 		}
 		
 		$("form[name='approvalForm'] input[name='regNo']").val(selected.regNo);
-		$("form[name='approvalForm'] input[name='action']").val(selected.approvalNo);
+		$("form[name='approvalForm'] input[name='no']").val(selected.approvalNo);
 		$("form[name='approvalForm']").submit();
 	}
 	</script>
@@ -183,7 +183,6 @@
     </div>
     <div style="text-align:right;">
     	<form name="acceptForm" method="post" action="acceptIssues">
-    		<input type="hidden" name="action" value="new"/>
     		<input type="hidden" name="regNo"/>
     	</form>
 
@@ -204,7 +203,7 @@
     </div>
     <div style="text-align:right;">
     	<form name="approvalForm" method="post" action="acceptIssues">
-    		<input type="hidden" name="action" value="edit"/>
+    		<input type="hidden" name="no" />
     		<input type="hidden" name="regNo"/>
     	</form>
 

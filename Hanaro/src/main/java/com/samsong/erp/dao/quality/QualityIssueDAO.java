@@ -321,29 +321,15 @@ public class QualityIssueDAO {
 				locale.getCountry());
 	}
 
-	public IssueApproval acceptIssue(String regNo, String method,
-			double workCost, int testCost, String shipType, Locale locale,
-			String user) {
-		String sql = "exec QualityIssueDAO_acceptIssue ?,?,?,?,?,?,?;";
-		return jdbc.queryForObject(sql, new Object[] { regNo, method, workCost,
-				testCost, shipType, locale.getCountry(), user },
-				new RowMapper<IssueApproval>() {
+	public String acceptIssue(String regNo, Locale locale,String user) {
+		String sql = "exec QualityIssueDAO_acceptIssue ?,?,?;";
+		return jdbc.queryForObject(sql, new Object[] { regNo,locale.getCountry(), user },
+				new RowMapper<String>() {
 
 					@Override
-					public IssueApproval mapRow(ResultSet rs, int i)
+					public String mapRow(ResultSet rs, int i)
 							throws SQLException {
-						IssueApproval approval = new IssueApproval();
-
-						approval.setApprovalNo(rs.getString(1));
-						approval.setDefect1(rs.getString(2));
-						approval.setDefect2(rs.getString(3));
-						approval.setDefect3(rs.getString(4));
-						approval.setRemark(rs.getString(5));
-						approval.setMethod(rs.getString(6));
-						approval.setWorkCost(rs.getInt(7));
-						approval.setTestCost(rs.getInt(8));
-						approval.setShipType(rs.getString(9));
-						return approval;
+						return rs.getString(1);
 					}
 
 				});
@@ -482,6 +468,8 @@ public class QualityIssueDAO {
 						approval.setWorkCost(rs.getInt(7));
 						approval.setTestCost(rs.getInt(8));
 						approval.setShipType(rs.getString(9));
+						approval.setCausePartner(rs.getString(10));
+						approval.setClaim(rs.getDouble(11));
 						return approval;
 					}
 
@@ -1236,6 +1224,86 @@ public class QualityIssueDAO {
 
 		}
 
+	}
+
+	public void updateClaim(String approvalNo, String partner, double rate,double claim,
+			String lot, String reason1, String reason2, String reason3,
+			String remark, MultipartFile pic1, MultipartFile pic2,
+			MultipartFile ref) {
+//		String sql = "exec QualityIssueDAO_updateClaim ?,?,?,?,?,?,?,?,?,?,?,?;";
+//		Map<String,Object> attaches = jdbc.queryForMap(sql,approvalNo,partner,rate,claim,lot,reason1,reason2,reason3,remark);
+//		
+//		int ncrNo = (Integer)attaches.get("ncrNo");
+//		String pic1Id =(String)attaches.get("pic1"); 
+//		String pic1Id =(String)attaches.get("pic1");
+	}
+
+	public String updateClaimAttach(String id, MultipartFile f) {
+		String sql = "exec QualityIssueDAO_updateClaimAttach ?,?,?,?;";
+		try{
+		id = jdbc.queryForObject(sql,new Object[]{id,f.getContentType(),f.getOriginalFilename(),f.getBytes()},new RowMapper<String>(){
+
+			@Override
+			public String mapRow(ResultSet rs, int i) throws SQLException {
+				return rs.getString(1);
+			}
+			
+		});
+		}catch(Exception ex){}
+		return id;
+	}
+
+	public void updateClaim(String approvalNo, String partner, double rate,
+			double claim,String item, String lot, String reason1, String reason2,
+			String reason3, String remark, String pic1id, String pic2id,
+			String refid) {
+		String sql = "update qis_claims set item=?, lot=?, reason1=?, reason2 =?, reason3=?, rate=?, claim=?, remark=?, ref1=?, ref2=?, ref3=?" +
+				" where approvalNo=? and partner=?";
+		jdbc.update(sql, item,lot,reason1,reason2,reason3,rate,claim,remark,pic1id,pic2id,refid,approvalNo,partner);
+	}
+
+	public Map<String, Object> getClaimAttachment(String id) {
+		return jdbc.queryForMap("select fileName,contentType,binary from qis_claims_attaches where uid=?",id);
+	}
+
+	public String publishNcr(String reqDate, String request) {
+		String sql = "exec QualityIssueDAO_publishNcr ?,?;";
+		return jdbc.queryForObject(sql,new Object[]{reqDate,request},new RowMapper<String>(){
+
+			@Override
+			public String mapRow(ResultSet rs, int i) throws SQLException {
+				return rs.getString(1);
+			}
+			
+		});
+		
+	}
+
+	public Map<String, Object> getClaimParams(String approvalNo) {
+		String sql = "exec QualityIssueDAO_getClaimParams ?;";
+		return jdbc.queryForMap(sql,approvalNo);
+	}
+
+	public void updateTotalClaim(String approvalNo, double claim) {
+		String sql = "update qis_issue_approvals set claim=? where approvalNo=?;";
+		jdbc.update(sql, claim,approvalNo);
+	}
+
+	public void updateAllSharedClaim(String approvalNo) {
+		jdbc.update("exec QualityIssueDAO_updateAllSharedClaim ?; ",approvalNo);
+	}
+
+	public Map<String, String> getClaimItemSuppliers(String item, Locale locale) {
+		String sql = "exec QualityIssueDAO_getClaimItemSupplier ?, ?;";
+		final Map<String,String> suppliers = new HashMap<String,String>();
+		jdbc.query(sql, new Object[]{item,locale.getCountry()},new RowCallbackHandler() {
+			
+			@Override
+			public void processRow(ResultSet rs) throws SQLException {
+				suppliers.put(rs.getString(1),rs.getString(2));
+			}
+		});
+		return suppliers;
 	}
 
 }
