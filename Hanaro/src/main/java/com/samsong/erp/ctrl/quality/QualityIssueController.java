@@ -18,6 +18,7 @@ import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -91,9 +92,8 @@ public class QualityIssueController {
 	public @ResponseBody List<Map<String,Object>> codePartListForIssueRegCallbak(Locale locale,
 	@RequestParam(value="partType", required=false) String partType , @RequestParam(value="q", required=false) String q, Authentication auth){		
 		String uid = auth.getName();
-		String role = auth.getAuthorities().toString();
 		List<Map<String ,Object>> resultList = new ArrayList<Map<String,Object>>();		
-		if(role.equals("[ROLE_CUST]"))
+		if(auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_CUST")))
 			resultList =  service.getOccurPartListForReg(locale, uid, partType, q);
 		else
 			resultList =  service.getOccurPartListForReg(locale, "", partType, q);

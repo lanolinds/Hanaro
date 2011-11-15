@@ -542,7 +542,7 @@
 				</c:forEach>
 		</select>
 		 <fmt:message key="ui.label.QualityIssue.OccurSite"/>         
-		<select  id='searchOccurSite' >
+		<select  id='searchOccurSite' style="width:100px;">
 				<option value=''><fmt:message key="ui.element.All"/></option>
 		</select>
 		 <fmt:message key="ui.label.SearchDate"/>

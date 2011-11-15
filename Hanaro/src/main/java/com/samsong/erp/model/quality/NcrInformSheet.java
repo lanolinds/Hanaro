@@ -52,8 +52,25 @@ public class NcrInformSheet {
 	String applyCustDate;
 	
 	String status;
+	int rejectCount;
 	
 	
+
+
+	public int getRejectCount() {
+		return rejectCount;
+	}
+
+
+
+
+
+	public void setRejectCount(int rejectCount) {
+		this.rejectCount = rejectCount;
+	}
+
+
+
 
 
 	public String[] getStandardState() {
