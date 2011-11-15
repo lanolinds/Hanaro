@@ -6,7 +6,7 @@
 		<td style="text-align:left;">
 			<div style="white-space: nowrap;"><!-- 좌측상단 메인 메뉴 -->
 				<a href="#" class="easyui-menubutton" menu="#qualityDivision" iconCls="icon-candlestickchart"><fmt:message key="menu.qualityDivision"/></a>
-			    
+			    <a href="#" class="easyui-menubutton" menu="#humanMgmt" iconCls="icon-candlestickchart"><fmt:message key="menu.employeeDivision"/></a>
 			</div>
 		</td>
 		<td style="text-align:right;">
@@ -40,6 +40,15 @@
 			<div href='<c:url value="/qualityDivision/qualityIssue/ncrManageList"/>'><fmt:message key="menu.qualityNcrManagement"/></div>
 			<div ><fmt:message key="menu.qualityNcrStatus"/></div>			
 			<div ><fmt:message key="menu.qualityClaimSearch"/></div>
+	</div>
+	</div>
+</div>
+<!-- 인사부문 서브메뉴 -->
+<div id="humanMgmt" style="width:150px;">
+	<div style="white-space: nowrap;"><fmt:message key="menu.employeeMgmt"/>      	
+	<div style="width:150px;">			
+			<div href='<c:url value="/humanDivision/employeeInfo/createForm"/>'><fmt:message key="menu.employeeForm"/></div>
+			<div href='<c:url value="/humanDivision/employeeInfo/list"/>'><fmt:message key="menu.employeeList"/></div>
 	</div>
 	</div>
 </div>

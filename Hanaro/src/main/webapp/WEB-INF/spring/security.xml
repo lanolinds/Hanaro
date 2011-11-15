@@ -14,6 +14,7 @@
 <!-- 		<intercept-url pattern="/dataAccessFailure.jsp" access="isAuthenticated()"/>DB error  페이지. 로그인한 사용자면 누구나 -->
  		<intercept-url pattern="/home" access="hasAnyRole('ROLE_USER','ROLE_CUST')"/><!-- 기본 사용자 역할 --> 		
  		<intercept-url pattern="/qualityDivision/**" access="hasAnyRole('ROLE_USER','ROLE_CUST')"/><!-- 기본 사용자 역할 -->
+ 		<intercept-url pattern="/humanDivision/**" access="hasAnyRole('ROLE_USER','ROLE_CUST')"/><!-- 기본 사용자 역할 -->
 		<intercept-url pattern="/**"  access="denyAll"/>  <!-- 기본 원칙은 아무도 접근 못한다!!!  -->
 		<custom-filter ref="hanaroLoginFilter" position="FORM_LOGIN_FILTER"/> <!--  시스템 로그인 기록을 log로 남기기위해 custom UsernamePasswordAuthenticationFilter를 구현하여 사용함. -->
 		<logout/> 
