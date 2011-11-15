@@ -100,6 +100,9 @@ public interface QualityIssueService {
 			String request, Locale locale);
 
 	public Map<String, String> getClaimItemSuppliers(String item, Locale locale);
+	
+	public List<Map<String,Object>> getNCRList(Locale locale,String division, String occurSite,
+			String stdDt, String endDt, String reasonCust, String publishCust);	
 
 	
 }

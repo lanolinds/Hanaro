@@ -348,10 +348,11 @@
 					document.form1.measureProcType.value = "do_evaluation";
 					document.form1.action="updateNCRMeasureProcedure";
 					document.form1.comment.value=$("textarea[name='inputEvaluation']").val();
+					$("#form1").submit();	
 			    }  
 			});				
 			
-			$("#form1").submit();			
+					
 		}else{
 			return false;
 		}	
@@ -440,7 +441,7 @@
 								<th colspan="2" rowspan="7">
 									<c:choose>
 										<c:when test="${sheetMap.ref1!=''}">
-											<img src=<c:url value="getNcrMeasureImg?ncrNo=${ncrInForm.ncrNo}&fileSeq=3" /> width="300px" height="170px" />
+											<img src=<c:url value="acceptIssues/downloadClaimRef?id=${sheetMap.ref1}" /> width="300px" height="170px" />
 										</c:when>
 										<c:otherwise>
 											<img src=<c:url value="/resources/images/no_image.jpg" /> width="300px" height="170px"/>
@@ -476,7 +477,14 @@
 							</tr>		
 							<tr>
 								<th colspan="2" rowspan="7">
-									<img src=<c:url value="/resources/images/no_image.jpg" /> width="300px" height="180px" />
+									<c:choose>
+										<c:when test="${sheetMap.ref2!=''}">
+											<img src=<c:url value="acceptIssues/downloadClaimRef?id=${sheetMap.ref2}" /> width="300px" height="170px" />
+										</c:when>
+										<c:otherwise>
+											<img src=<c:url value="/resources/images/no_image.jpg" /> width="300px" height="170px"/>
+										</c:otherwise>
+									</c:choose>
 								</th>
 								<th><label><fmt:message key="ui.label.qualityIssue.reasonExplanation" /></label></th>
 								<td><input type="text"   readonly="true"   value="${sheetMap.remark}" /></td>														
@@ -508,7 +516,14 @@
 							</tr>																													
 							<tr>
 								<th><label><fmt:message key="ui.label.refDoc" /></label></th>
-								<th></th>
+								<th>
+									<c:if test="${sheetMap.ref3!=''}">
+										<a href=<c:url value="acceptIssues/downloadClaimRef?id=${sheetMap.ref3}" /> width="300px" height="170px">
+											<span class="icon-attach" style="width:16px;" >&nbsp;</span>
+											[<fmt:message key="ui.label.refDoc" />]										
+										</a>
+									</c:if>
+								</th>
 								<th><label><fmt:message key="ui.label.qualityIssue.measureLimitDate" /></label></th>
 								<td><input type="text"   readonly="true"   value="${sheetMap.measureRequestDt}" /></td>
 							</tr>

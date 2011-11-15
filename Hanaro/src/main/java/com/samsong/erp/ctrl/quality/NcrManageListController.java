@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.log4j.Logger;
+import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
@@ -30,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.samsong.erp.model.quality.NcrInformSheet;
 import com.samsong.erp.service.employee.EmployeeManagementService;
 import com.samsong.erp.service.quality.QualityIssueService;
+import com.samsong.erp.util.HashMapComparator;
 
 
  
@@ -46,7 +49,22 @@ public class NcrManageListController {
 	EmployeeManagementService serviceEmployee;
 	
 	@RequestMapping(value="/ncrManageList", method=RequestMethod.GET)
-	public String menuNcrManageList(){		
+	public String menuNcrManageList(Model model,Locale locale, LocalDate date, Authentication auth){
+		String deptCd ="";
+        List<Map<String,Object>> userInfoList = serviceEmployee.getUserInfo(locale, auth.getName());
+        if(userInfoList !=null){
+        	deptCd = String.valueOf(((HashMap)userInfoList.get(0)).get("DATA1"));
+        }
+
+        if(auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_USER")))
+        	model.addAttribute("isEMP",true);
+        else
+        	model.addAttribute("isEMP",false);
+		model.addAttribute("deptCd",deptCd);
+		
+		Map<String,Object> defects = service.getCodeDefectSource(locale, "");		
+	    model.addAttribute("defectSource",defects);
+	    model.addAttribute("today",date);
 		return prefix+"/ncrManageList"; 
 	}
 	@RequestMapping(value="/ncrManageDetail", method=RequestMethod.GET)
@@ -59,7 +77,7 @@ public class NcrManageListController {
 		NcrInformSheet sheet = new NcrInformSheet();
 		Map<String,Object> sheetMap = new HashMap<String,Object>(); 
 		List<Map<String,Object>> sheetList = service.getNcrDetail(locale, ncrNo);
-		if(sheetList !=null){
+		if(sheetList !=null && sheetList.size()>0){
 			sheet.setStatus(String.valueOf(((HashMap)sheetList.get(0)).get("DATA0"))); //상태
 			sheet.setTitle(String.valueOf(((HashMap)sheetList.get(0)).get("DATA1")));//제목
 			sheetMap.put("occurPartNo",String.valueOf(((HashMap)sheetList.get(0)).get("DATA3"))); //발생품번
@@ -122,7 +140,7 @@ public class NcrManageListController {
 		
         List<Map<String,Object>> userInfoList = serviceEmployee.getUserInfo(locale, auth.getName());
         
-        if(auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_EMP")))
+        if(auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_USER")))
         	sheetMap.put("isEmp",true);
         else
         	sheetMap.put("isEmp",false);
@@ -354,6 +372,37 @@ public class NcrManageListController {
 			e.printStackTrace();
 		}
 	}
+	
+	
+	//NCR대책서 리스트 조회
+	//품질불량등록 메뉴의 등록된 목록조회
+	@RequestMapping(value="/getNCRList", method=RequestMethod.POST)
+	public @ResponseBody Map<String,Object> getNCRList(Locale locale, @RequestParam(value="division",required=false) String division, @RequestParam(value="occurSite",required=false) String occurSite,
+			@RequestParam(value="stdDt",required=false) String stdDt, @RequestParam(value="endDt",required=false) String endDt,
+			@RequestParam(value="reasonCust",required=false) String reasonCust, @RequestParam(value="publishCust",required=false) String publishCust,
+			@RequestParam("page") int page,@RequestParam("rows") int rows,
+			@RequestParam(value="sort",required=false) String sortKey,@RequestParam(value="order",required=false) String order){
+		
+		Map<String,Object> table = new LinkedHashMap<String,Object>();
+		List<Map<String,Object>> resultList = service.getNCRList(locale, division, occurSite, stdDt, endDt,
+				(reasonCust==null)?"":reasonCust,
+				(publishCust==null)?"":publishCust);
+				
+		if(resultList!=null){			
+			if(sortKey!=null){
+				Collections.sort(resultList,new HashMapComparator(sortKey, order.equalsIgnoreCase("asc")));
+			}
+			
+			table.put("total",resultList.size());
+			int start =  (page-1)*rows;
+			int end  = start +rows;
+			if(end>resultList.size())end = resultList.size();
+			table.put("rows",resultList.subList(start,end));
+		}else{
+			table.put("total",0);
+		}
+		return table;
+	}		
 			
 			
 			

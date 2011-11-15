@@ -1342,5 +1342,33 @@ public class QualityIssueDAO {
 		});
 		return suppliers;
 	}
+	
+	public List<Map<String,Object>> getNCRList(Locale locale,String division, String occurSite,
+			String stdDt, String endDt, String reasonCust, String publishCust){
+		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		SqlParameterSource params = new MapSqlParameterSource()
+		.addValue("locale",locale.getCountry())
+		.addValue("occurDivision",division)
+		.addValue("occustSite",occurSite)
+		.addValue("stdDt",stdDt)
+		.addValue("endDt",endDt)
+		.addValue("reasonCust",reasonCust)
+		.addValue("publishCust",publishCust);
+		
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueDAO_getNcrList").returningResultSet("ncrList",new RowMapper<Map<String,Object>>() {
+
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int rowNum)
+					throws SQLException {
+				Map<String,Object> m = new HashMap<String, Object>();
+				for(int x = 0; x<rs.getMetaData().getColumnCount();x++)
+					m.put("DATA"+x,rs.getObject(x+1));
+				list.add(m);
+				return null;
+			}
+		});
+		sp.execute(params);
+		return list;
+	}
 
 }

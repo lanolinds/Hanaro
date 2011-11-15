@@ -394,5 +394,12 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 		return dao.getClaimItemSuppliers(item,locale);
 	}
 
+	@Override
+	public List<Map<String, Object>> getNCRList(Locale locale, String division,
+			String occurSite, String stdDt, String endDt, String reasonCust,
+			String publishCust) {
+		return dao.getNCRList(locale, division, occurSite, stdDt, endDt, reasonCust, publishCust);
+	}
+
 
 }
