@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.samsong.erp.model.quality.NcrInformSheet;
-import com.samsong.erp.service.employee.EmployeeManagementService;
+import com.samsong.erp.service.empInfo.EmployeeInfoService;
 import com.samsong.erp.service.quality.QualityIssueService;
 import com.samsong.erp.util.HashMapComparator;
 
@@ -46,7 +46,7 @@ public class NcrManageListController {
 	QualityIssueService service;
 	
 	@Autowired
-	EmployeeManagementService serviceEmployee;
+	EmployeeInfoService serviceEmployee;
 	
 	@RequestMapping(value="/ncrManageList", method=RequestMethod.GET)
 	public String menuNcrManageList(Model model,Locale locale, LocalDate date, Authentication auth){

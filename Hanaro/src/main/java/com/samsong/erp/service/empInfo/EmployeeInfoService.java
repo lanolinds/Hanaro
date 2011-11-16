@@ -16,4 +16,5 @@ public interface EmployeeInfoService {
 	public Map<String, Object> getCodePosition(Locale locale);
 	public Map<String, Object> getCodeRole(Locale locale);
 	public void setEmployeeInfo(String setType, Locale locale,EmployeeInfo info, String user, byte[] photo);
+	public List<Map<String,Object>> getUserInfo(Locale locale,String user);	
 }
