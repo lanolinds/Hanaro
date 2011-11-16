@@ -18,4 +18,6 @@ public interface EmployeeInfoService {
 	public void setEmployeeInfo(String setType, Locale locale,EmployeeInfo info, String user, byte[] photo);
 	public List<Map<String, Object>> getEmployeeRegList(Locale locale,String keyword, String keyfield);
 	public byte[] getEmployeeFile(Locale locale, String empNo);
+	public List<Map<String,Object>> getUserInfo(Locale locale,String user);	
+
 }

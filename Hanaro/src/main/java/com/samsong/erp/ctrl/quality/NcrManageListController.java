@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.samsong.erp.model.quality.NcrInformSheet;
-import com.samsong.erp.service.employee.EmployeeManagementService;
+import com.samsong.erp.service.empInfo.EmployeeInfoService;
 import com.samsong.erp.service.quality.QualityIssueService;
 import com.samsong.erp.util.HashMapComparator;
 
@@ -46,7 +46,7 @@ public class NcrManageListController {
 	QualityIssueService service;
 	
 	@Autowired
-	EmployeeManagementService serviceEmployee;
+	EmployeeInfoService serviceEmployee;
 	
 	@RequestMapping(value="/ncrManageList", method=RequestMethod.GET)
 	public String menuNcrManageList(Model model,Locale locale, LocalDate date, Authentication auth){
@@ -402,7 +402,13 @@ public class NcrManageListController {
 			table.put("total",0);
 		}
 		return table;
-	}		
+	}	
+	
+	//NCR 동일 품번 동일 불량건으로 발생된 최근 추이차트
+	@RequestMapping(value="/getNcrDetailChart",method=RequestMethod.GET)
+	public @ResponseBody Map<String,Object> getNcrDetailChart(@RequestParam("ncrNo")String ncrNo){
+		return  service.getNcrDetailChart(ncrNo);
+	}
 			
 			
 			

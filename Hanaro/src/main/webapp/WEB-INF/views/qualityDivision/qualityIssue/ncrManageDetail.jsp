@@ -49,8 +49,9 @@
 	<script type="text/javascript" src='<c:url value="/resources/scripts/easyui/jquery.easyui.min.js"/>'></script>
 	<script type="text/javascript" src='<c:url value="/resources/scripts/easyui/locale/easyui-lang-${pageContext.response.locale.language}.js"/>'></script>
 	<script type="text/javascript" src='<c:url value="/resources/scripts/common-utils.js" />' ></script>
+	<script type="text/javascript" src='<c:url value="/resources/scripts/highcharts/highcharts.js" />' ></script>
 	<script type="text/javascript">
-	
+	var datas;
 
 	//임시파일 등록처리
 	function insertReasonFile(){		
@@ -358,15 +359,78 @@
 		}	
 	}
 	
+	function chart(){
+		$("#chart").empty();
+		  chart = new Highcharts.Chart({
+		      chart: {
+		         renderTo: 'chart',
+		         defaultSeriesType: 'column',
+		         width:470,
+		         hegiht:170
+		         
+		         
+		         
+		         
+		      },
+		      title: {
+		         text: '<span class="label-Leader-red"><fmt:message key="ui.label.ncrLastedGraph" /></span>',
+		         style:{
+		        	 fontSize: '8px'
+		         },
+		         margin:40,
+		         align:'left'
+		         
+		         
+		      },
+		      subtitle: {
+		         text: null
+		      },
+		      xAxis: {
+		         categories: ['<span><fmt:message key="ui.label.ncrDate4" /></span>',
+		                      '<span><fmt:message key="ui.label.ncrDate3" /></span>',
+		                      '<span><fmt:message key="ui.label.ncrDate2" /></span>',
+		                      '<span><fmt:message key="ui.label.ncrDate1" /></span>'],
+		         title: {
+		            text: null
+		         }
+		      },
+		      yAxis: {
+		         min: 0,
+		         title :null,
+		         tickInterval: 1
+		      },		      
+		      legend: {
+		    	  enabled:false
+		      },
+		      credits: {
+		         enabled: false
+		      },
+		           series: [{
+		         name: null,
+		         data: datas
+		      }]
+		   });
+		   		
+	}
+	
 	$(document).ready(function(){
 		$("#datagridReasonFile").datagrid({queryParams:{ncrNo:$("#ncrNo").val(),gridType:"reasonFile"}});
 		$("#datagridTempMeasure").datagrid({queryParams:{ncrNo:$("#ncrNo").val(),gridType:"tempMeasure"}});
 		$("#datagridMeasure").datagrid({queryParams:{ncrNo:$("#ncrNo").val(),gridType:"measure"}});
 		$("#datagridLotConfirm").datagrid({queryParams:{ncrNo:$("#ncrNo").val(),gridType:"lotConfirm"}});
 		$("#datagridStandard").datagrid({queryParams:{ncrNo:$("#ncrNo").val(),gridType:"standardEtc"}});
-		
 		$(".fileDelete").live("click",function(){
 			modifyFile('d',$(this));
+		});
+		
+		//차트 그리디
+		$.get("getNcrDetailChart",{ncrNo:$("#ncrNo").val(),t:new Date().getTime()},function(map){
+			datas =[];
+			datas.push(Number(map.chartList[0].date1));
+			datas.push(Number(map.chartList[0].date2));
+			datas.push(Number(map.chartList[0].date3));
+			datas.push(Number(map.chartList[0].date4));
+			chart();
 		});
 		
 	});
@@ -863,6 +927,7 @@
 								</tr>																											
 							</table>		
 							
+							<div style="padding:10px;" style="width:460px;height:200px;" id="chart"></div>									
 					  </div>
 					  </c:if>
 					    				

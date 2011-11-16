@@ -8,7 +8,8 @@
 	<link rel="stylesheet" href='<c:url value="/resources/scripts/easyui/themes/gray/easyui.css"/>'/>
 	<link rel="stylesheet" href='<c:url value="/resources/scripts/easyui/themes/icon.css"/>'/>
 	<link rel="stylesheet" href='<c:url value="/resources/styles/app.default.css"/>'/>
-		
+ 	<link rel="shortcut icon" href='<c:url value="/resources/images/favi.ico"/>' />
+ 	<link rel="icon" href='<c:url value="/resources/images/favi.ico"/>' type="image/x-icon" />		
 	
 	<script type="text/javascript" src='<c:url value="/resources/scripts/jquery/jquery.latest.js"/>'></script>
 	<script type="text/javascript" src='<c:url value="/resources/scripts/easyui/jquery.easyui.min.js"/>'></script>
@@ -23,5 +24,5 @@
 <div region="center" style="padding:10px;">
 <p>게시판 구현</p>
  </div>
-</body>
-</html>
+</body> 
+</html> 
