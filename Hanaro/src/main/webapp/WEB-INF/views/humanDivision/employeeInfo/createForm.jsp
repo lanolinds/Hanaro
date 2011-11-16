@@ -40,6 +40,52 @@
 			$("#resultDataGrid").datagrid("load",params);
 			
 		}
+		
+		function resetForm(){
+			$('form')[0].reset();
+			$('#setType').val('INSERT');
+			$('b',$('#photoImg').parent()).empty();
+		}
+		
+		function fileDownImg1(value,rowData){
+			var empNo = rowData.DATA1;				
+			var format = "";		
+			if(value !="")
+				format = "<a  href='getEmployeeFile?empNo="+empNo+"&fileName="+encodeURIComponent(value)+"  class='icon-disk' style='padding:2px 12px;cursor:pointer;'>&nbsp;</a>";
+			
+			return format;
+			
+		}
+		
+		//품질문제등록 내용을 폼에 넣는다.
+		function insertForm(){
+			var record = $("#resultDataGrid").datagrid("getSelected");
+			if(record ==null){
+				$.messager.alert("<fmt:message key='warn.infoWarn' />","<fmt:message key='warn.notSelectedItem' />");
+				return;
+			}
+
+			$("#empNo").val(record.DATA1);
+			$("input[name='setType']").val("UPDATE");
+			$("#empNm").val(record.DATA2);
+			$("#ssn").val(record.DATA3);		
+			$("#gender").val(record.DATA4);
+			$("#birthday").datebox('setValue',record.DATA5);
+			$("#employDt").datebox('setValue',record.DATA6);
+			$("#deptCd").val(record.DATA7);
+			$("#positionCd").val(record.DATA9);
+			$("#roleCd").val(record.DATA14);
+			$("#marry").val(record.DATA16);
+			$("#marryDt").datebox('setValue',record.DATA17);
+			$("#phone").val(record.DATA11);
+			$("#cellPhone").val(record.DATA12);
+			$("#email").val(record.DATA13);
+			$("#retireDt").datebox('setValue',record.DATA18);
+			$("b",$("#photoImg").parent()).empty();
+					
+			if(record.DATA0 !="")
+				$("b",$("#photoImg").parent()).append("<img src='getEmployeeFile?empNo="+record.DATA1+"&fileName="+encodeURIComponent(record.DATA0)+"'' width='45' height='45'><br><a  href='getEmployeeFile?empNo="+record.DATA1+"&fileName="+encodeURIComponent(record.DATA0)+"' >"+record.DATA0+"</a>");
+		}
 	</script> 
 
 </head> 
@@ -53,7 +99,7 @@
 	<table>
 		<tr>
 			<td>
-				<div iconCls="icon-chart-bar-delete" class="easyui-panel" style="width:400px;height:725px;" title='<fmt:message key="menu.employeeForm"/>'>
+				<div iconCls="icon-chart-bar-delete" class="easyui-panel" style="width:370px;height:725px;" title='<fmt:message key="menu.employeeForm"/>'>
 					<form:form action="addEmployeeInfo" method="POST"  modelAttribute="employeeInfo"  id="form" name="frm"  enctype="multipart/form-data">
 						<table class="groupTable"  >
 							<tr>
@@ -61,13 +107,13 @@
 									<span  class="label-Leader-black"  ><fmt:message key="ui.label.employee.photo" /></span>
 								</th>
 								<td>	
-									<input type = "file"  id="photoImg"  name = "photoImg"  />							
-									<input type="hidden" name="setType" value="INSERT" >
+									<input type = "file"  id="photoImg"  name = "photoImg"  /><br><b></b>						
 								</td>  
 							</tr>
 							<tr>
 								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.employee.empNo"  /></span>
+									<input type="hidden" name="setType" value="INSERT" >
 								</th>
 								<td>						
 									<form:input class="easyui-validatebox" readonly="true"  path="empNo"  id="empNo"  />		
@@ -106,7 +152,7 @@
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.employee.birthday"/></span>
 								</th>
 								<td>						
-									<form:input class="easyui-datebox"  path="birthday"  required='true'  style="width:100px;"  id="bithday"  editable="false"  />
+									<form:input class="easyui-datebox"  path="birthday"  required='true'  style="width:100px;"  id="birthday"  editable="false"  />
 								</td>  
 							</tr>
 							<tr>
@@ -183,7 +229,7 @@
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.employee.cellPhone"/></span>
 								</th>
 								<td>								
-									<form:input path="cellPhone"  id='cellPhone'   style="width:120px;"  />
+									<form:input path="cellPhone"  id='cellPhone'   style="width:150px;"  />
 								</td>  
 							</tr>						
 							<tr>
@@ -191,7 +237,7 @@
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.employee.email"/></span>
 								</th>
 								<td>								
-									<form:input path="email"  id='email'   style="width:100px;"  />
+									<form:input path="email"  id='email'   style="width:200px;"  />
 								</td> 
 							</tr>
 							<tr>
@@ -213,17 +259,17 @@
 				</div>
 			</td>
 			<td>
-				<table class="easyui-datagrid" iconCls="icon-application-view-list" style="width:800px;height:725px;" 
+				<table class="easyui-datagrid" iconCls="icon-application-view-list" style="width:830px;height:725px;" 
 				title='<fmt:message key="ui.label.employee.empList"/>' toolbar="#divSearch" pagination="true"  id="resultDataGrid" pageSize="30"   singleSelect="true" striped="true"   url="getEmployeeList" >
 					<thead frozen="true">
 						        <tr> 
-						        	<th field="DATA0" width="100" sortable="true" align="center"><fmt:message key="ui.label.employee.photo" /></th>  
-						            <th field="DATA1" width="100" sortable="true" align="center"><fmt:message key="ui.label.employee.deptNm" /></th>  
+						            <th field="DATA8" width="130" sortable="true" align="center"><fmt:message key="ui.label.employee.deptNm" /></th>  
+						            <th field="DATA10" width="100" sortable="true" align="center"><fmt:message key="ui.label.employee.position" /></th>   		
 						            <th field="DATA2" width="100" sortable="true" align="center"><fmt:message key="ui.label.employee.empNm" /></th>   				      
-						            <th field="DATA3" width="100" sortable="true" align="center"><fmt:message key="ui.label.employee.employDt" /></th>  
-						            <th field="DATA4" width="100" sortable="true" align="center"><fmt:message key="ui.label.employee.phone" /></th>
-						            <th field="DATA5" width="100" sortable="true" align="center"><fmt:message key="ui.label.employee.cellPhone" /></th>  
-						            <th field="DATA6" width="200" sortable="true" align="center"><fmt:message key="ui.label.employee.email" /></th>       
+						            <th field="DATA6" width="100" sortable="true" align="center" ><fmt:message key="ui.label.employee.employDt" /></th>  
+						            <th field="DATA11" width="100" sortable="true" align="center"><fmt:message key="ui.label.employee.phone" /></th>
+						            <th field="DATA12" width="100" sortable="true" align="center"><fmt:message key="ui.label.employee.cellPhone" /></th>  
+						            <th field="DATA13" width="200" sortable="true" align="center"><fmt:message key="ui.label.employee.email" /></th>   
       						  </tr>
 					</thead>
 				</table>
@@ -246,7 +292,6 @@
      <div style="margin-bottom:5px" align="right"'>  
          <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true"  onclick="javascript:resetForm();"><fmt:message key="ui.button.Reg"/></a>  
          <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="javascript:insertForm();"><fmt:message key="ui.button.Edit"/></a>           
-         <a href="#" class="easyui-linkbutton" iconCls="icon-delete" plain="true" onclick="javascript:deleteList();"><fmt:message key="ui.button.Delete"/></a>
       </div>
 
  

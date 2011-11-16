@@ -125,7 +125,7 @@ public class NcrManageListController {
 			sheetMap.put("reasonOrgan",String.valueOf(((HashMap)sheetList.get(0)).get("DATA45")));
 			sheet.setRejectCount(Integer.parseInt(((HashMap)sheetList.get(0)).get("DATA46").toString()));
 			sheetMap.put("rejectComment", String.valueOf(((HashMap)sheetList.get(0)).get("DATA47")));
-			sheetMap.put("evaluationContent", String.valueOf(((HashMap)sheetList.get(0)).get("DATA48")));
+			sheetMap.put("evaluationContent", String.valueOf(((HashMap)sheetList.get(0)).get("DATA48"))); 
 			sheetMap.put("evaluationManager", String.valueOf(((HashMap)sheetList.get(0)).get("DATA49")));
 			sheetMap.put("evaluationConfirmer", String.valueOf(((HashMap)sheetList.get(0)).get("DATA50")));
 			sheetMap.put("evaluationApprover", String.valueOf(((HashMap)sheetList.get(0)).get("DATA51")));

@@ -55,4 +55,9 @@ public class EmployeeInfoServiceImpl implements EmployeeInfoService {
 	public List<Map<String, Object>> getEmployeeRegList(Locale locale,String keyword, String keyfield) {
 		return dao.getEmployeeRegList(locale, keyword, keyfield);
 	}
+	
+	@Override
+	public byte[] getEmployeeFile(Locale locale, String empNo){
+		return dao.getEmployeeFile(locale, empNo);
+	}
 }

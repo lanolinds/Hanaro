@@ -169,7 +169,7 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	public IssueApproval getApproval(String approvalNo, Locale locale) {
 		return dao.getApproval(approvalNo,locale);
 	}
-
+ 
 	@Override
 	public IssueApproval updateApproval(IssueApproval approval) {
 		
@@ -360,7 +360,7 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 		return dao.getNCRList(locale, division, occurSite, stdDt, endDt, reasonCust, publishCust);
 	}
 
-
+	@Override
 	public void cancelApproval(String approvalNo, Locale locale) {
 		List<String> partners =dao.getClaimSharedPartnerList(approvalNo);
 		for(String partner : partners){

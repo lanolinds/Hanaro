@@ -66,6 +66,7 @@ public class EmployeeInfoController {
 	public String addEmployeeInfo(String setType,Locale locale, EmployeeInfo info,Principal prin,Model model, @RequestParam("photoImg") MultipartFile photoImg){
 	   String user =prin.getName();
 	  try {
+		  System.out.println(photoImg.getOriginalFilename());
 	   //선택된 파일이름은 모델에 담는다.		  
 	   info.setPhoto(photoImg.getOriginalFilename());
 
@@ -78,7 +79,7 @@ public class EmployeeInfoController {
 	   return "redirect:"+prefix+"/createForm";
 	}	
 	
-	//품질불량등록 메뉴의 등록된 목록조회
+	//사원정보등록 메뉴의 등록된 목록조회
 	@RequestMapping(value="/getEmployeeList", method=RequestMethod.POST)
 	public @ResponseBody Map<String,Object> getQualityIssueRegList(Locale locale, 
 			@RequestParam(value="keyword",required=false) String keyword,
@@ -90,7 +91,7 @@ public class EmployeeInfoController {
 		
 		Map<String,Object> table = new LinkedHashMap<String,Object>();
 		List<Map<String,Object>> resultList = service.getEmployeeRegList(locale,keyword,keyfield);
-				
+	
 		if(resultList!=null){			
 			if(sortKey!=null){
 				Collections.sort(resultList,new HashMapComparator(sortKey, order.equalsIgnoreCase("asc")));
@@ -105,5 +106,25 @@ public class EmployeeInfoController {
 			table.put("total",0);
 		}
 		return table;
+	}
+	
+	//품질 파일 다운
+	@RequestMapping(value="/getEmployeeFile", method=RequestMethod.GET)
+	public  void  getEmployeeFile(Locale locale, @RequestParam("empNo") String empNo, @RequestParam("fileName") String fileName, HttpServletResponse response){		
+	
+		byte[] file = null;
+		BufferedOutputStream out = null;
+		file = service.getEmployeeFile(locale, empNo);	    
+
+		try {
+		    response.setHeader("Content-Disposition","attachment;filename=\""+URLEncoder.encode(fileName, "UTF-8")+"\"");	    
+
+			out = new BufferedOutputStream(response.getOutputStream());
+			out.write(file);
+			out.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

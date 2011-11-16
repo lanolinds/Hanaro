@@ -124,6 +124,7 @@ public class EmployeeInfoDAO {
 					public Map<String, Object> mapRow(ResultSet rs, int i)
 							throws SQLException {
 						Map<String, Object> m = new HashMap<String, Object>();
+					
 						for (int x = 0; x < rs.getMetaData().getColumnCount(); x++) {
 							m.put("DATA" + x, rs.getObject((x + 1)));
 						}
@@ -133,5 +134,16 @@ public class EmployeeInfoDAO {
 				});
 		sp.execute(params);
 		return resultList;
+	}
+	
+	//사원사진 다운받는거
+	public byte[] getEmployeeFile(Locale locale, String empNo){
+		String sql  = "select PHOTO_IMG from MASTER_EMPLOYEE where LOCALE=? and EMP_NO =?";
+		return jdbc.queryForObject(sql,new Object[]{locale.getCountry(),empNo},new RowMapper<byte[]>(){
+			@Override
+			public byte[] mapRow(ResultSet rs, int rowNum) throws SQLException {
+				return rs.getBytes(1);
+			}
+		});
 	}
 }
