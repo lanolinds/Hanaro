@@ -109,4 +109,29 @@ public class EmployeeInfoDAO {
 		sp = new SimpleJdbcCall(jdbc).withProcedureName("EmployeeInfoDAO_setEmployeeInfo");
 		sp.execute(params);
 	}
+	
+	// 품질등록리스트를 조회한다.
+	public List<Map<String, Object>> getEmployeeRegList(Locale locale,String keyword, String keyfield) {
+		final List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+		SqlParameterSource params = new MapSqlParameterSource()
+				.addValue("locale", locale.getCountry())
+				.addValue("keyword", keyword)
+				.addValue("keyfield", keyfield);
+		sp = new SimpleJdbcCall(jdbc).withProcedureName(
+				"EmployeeInfoDAO_getEmployeeRegList").returningResultSet(
+				"issueRegList", new RowMapper<Map<String, Object>>() {
+					@Override
+					public Map<String, Object> mapRow(ResultSet rs, int i)
+							throws SQLException {
+						Map<String, Object> m = new HashMap<String, Object>();
+						for (int x = 0; x < rs.getMetaData().getColumnCount(); x++) {
+							m.put("DATA" + x, rs.getObject((x + 1)));
+						}
+						resultList.add(m);
+						return null;
+					}
+				});
+		sp.execute(params);
+		return resultList;
+	}
 }

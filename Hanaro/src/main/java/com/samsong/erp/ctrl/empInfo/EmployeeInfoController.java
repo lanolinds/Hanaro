@@ -77,4 +77,33 @@ public class EmployeeInfoController {
 	   model.addAttribute("status","success");
 	   return "redirect:"+prefix+"/createForm";
 	}	
+	
+	//품질불량등록 메뉴의 등록된 목록조회
+	@RequestMapping(value="/getEmployeeList", method=RequestMethod.POST)
+	public @ResponseBody Map<String,Object> getQualityIssueRegList(Locale locale, 
+			@RequestParam(value="keyword",required=false) String keyword,
+			@RequestParam(value="keyfield",required=false) String keyfield,
+			@RequestParam("page") int page,
+			@RequestParam("rows") int rows,
+			@RequestParam(value="sort",required=false) String sortKey,
+			@RequestParam(value="order",required=false) String order){
+		
+		Map<String,Object> table = new LinkedHashMap<String,Object>();
+		List<Map<String,Object>> resultList = service.getEmployeeRegList(locale,keyword,keyfield);
+				
+		if(resultList!=null){			
+			if(sortKey!=null){
+				Collections.sort(resultList,new HashMapComparator(sortKey, order.equalsIgnoreCase("asc")));
+			}
+			
+			table.put("total",resultList.size());
+			int start =  (page-1)*rows;
+			int end  = start +rows;
+			if(end>resultList.size())end = resultList.size();
+			table.put("rows",resultList.subList(start,end));
+		}else{
+			table.put("total",0);
+		}
+		return table;
+	}
 }

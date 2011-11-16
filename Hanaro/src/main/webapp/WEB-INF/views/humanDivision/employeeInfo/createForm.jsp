@@ -31,6 +31,15 @@
 				return false;
 			}
 		}
+		
+		//사원정보 등록 리스트 조회하기
+		function searchList(){
+			var params = {};
+			params.keyword = $("#keyword").val();
+			params.keyfield = $("#keyfield").val(); 
+			$("#resultDataGrid").datagrid("load",params);
+			
+		}
 	</script> 
 
 </head> 
@@ -205,17 +214,16 @@
 			</td>
 			<td>
 				<table class="easyui-datagrid" iconCls="icon-application-view-list" style="width:800px;height:725px;" 
-				title='<fmt:message key="ui.label.RegList"/>' toolbar="#divSearch" pagination="true"  id="resultDataGrid" pageSize="30"   singleSelect="true" striped="true"   url="getEmployeeList" >
+				title='<fmt:message key="ui.label.employee.empList"/>' toolbar="#divSearch" pagination="true"  id="resultDataGrid" pageSize="30"   singleSelect="true" striped="true"   url="getEmployeeList" >
 					<thead frozen="true">
 						        <tr> 
 						        	<th field="DATA0" width="100" sortable="true" align="center"><fmt:message key="ui.label.employee.photo" /></th>  
-						            <th field="DATA0" width="100" sortable="true" align="center"><fmt:message key="ui.label.employee.deptNm" /></th>  
-						            <th field="DATA1" width="100" sortable="true" align="center"><fmt:message key="ui.label.employee.empNm" /></th>   				      
+						            <th field="DATA1" width="100" sortable="true" align="center"><fmt:message key="ui.label.employee.deptNm" /></th>  
+						            <th field="DATA2" width="100" sortable="true" align="center"><fmt:message key="ui.label.employee.empNm" /></th>   				      
 						            <th field="DATA3" width="100" sortable="true" align="center"><fmt:message key="ui.label.employee.employDt" /></th>  
 						            <th field="DATA4" width="100" sortable="true" align="center"><fmt:message key="ui.label.employee.phone" /></th>
-						            <th field="DATA6" width="100" sortable="true" align="center"><fmt:message key="ui.label.employee.cellPhone" /></th>  
-						            <th field="DATA8" width="200" sortable="true" align="center"><fmt:message key="ui.label.employee.email" /></th>       
-						            
+						            <th field="DATA5" width="100" sortable="true" align="center"><fmt:message key="ui.label.employee.cellPhone" /></th>  
+						            <th field="DATA6" width="200" sortable="true" align="center"><fmt:message key="ui.label.employee.email" /></th>       
       						  </tr>
 					</thead>
 				</table>
@@ -226,20 +234,13 @@
 
  <div id="divSearch" style="padding:5px;height:auto">
        <div>        
-         <fmt:message key="ui.label.QualityIssue.Division"/>
-		<select  id='searchDivision' >
-		<option value=""><fmt:message key="ui.element.All"/></option>									
-				
+		<select  id='keyword' >
+				<option value="1"><fmt:message key="ui.element.All"/></option>
+				<option value="DEPT"><fmt:message key="ui.label.employee.deptNm"/></option>
+				<option value="EMP"><fmt:message key="ui.label.employee.empNm"/></option>
 		</select>
-		 <fmt:message key="ui.label.QualityIssue.OccurSite"/>         
-		<select  id='searchOccurSite' >
-				<option value=''><fmt:message key="ui.element.All"/></option>
-		</select>
-		 <fmt:message key="ui.label.SearchDate"/>
-		<input id="searchStdDt" class="easyui-datebox" style="width:90px;"  value=""  />~
-		<input id="searchEndDt" class="easyui-datebox" style="width:90px;"  value=""  />
+		<input id="keyfield" style="width:120px;"  value=""  />
 		<a  href="#" class="easyui-linkbutton" iconCls="icon-search" onclick="javascript:searchList();"><fmt:message key="ui.button.Search"/></a>		
-		  
      </div>
       
      <div style="margin-bottom:5px" align="right"'>  

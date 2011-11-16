@@ -51,4 +51,8 @@ public class EmployeeInfoServiceImpl implements EmployeeInfoService {
 		dao.setEmployeeInfo( setType ,locale, info, user, photo);
 	}
 
+	@Override
+	public List<Map<String, Object>> getEmployeeRegList(Locale locale,String keyword, String keyfield) {
+		return dao.getEmployeeRegList(locale, keyword, keyfield);
+	}
 }

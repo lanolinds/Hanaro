@@ -312,6 +312,15 @@ public class QualityIssueDAO {
 		return level0;
 	}
 
+	public Map<String, Object> getPartnerClaimBaseInfo(String regNo,
+			String claimPartnerCode, Locale locale) {
+
+		// 먼저 등록된 품질 문제로 부터, 원인 품번,수량,출처,단위가격을 파악해야 한다.
+		String sql = "exec QualityIssueDAO_getPartnerClaimBaseInfo ?,?,?; ";
+		return jdbc.queryForMap(sql, regNo, claimPartnerCode,
+				locale.getCountry());
+	}
+
 	public String acceptIssue(String regNo, Locale locale,String user) {
 		String sql = "exec QualityIssueDAO_acceptIssue ?,?,?;";
 		return jdbc.queryForObject(sql, new Object[] { regNo,locale.getCountry(), user },
@@ -468,23 +477,42 @@ public class QualityIssueDAO {
 	}
 
 	public void updateApproval(IssueApproval approval) {
-		String sql = "update qis_issue_approvals set causePartner=?, reason1=?,reason2=?, reason3=?,remark=?,method=?,workCost=?,testCost=?,shipType=? where approvalNo =?;";
-		jdbc.update(sql,approval.getCausePartner(), approval.getDefect1(), approval.getDefect2(),
+		String sql = "update qis_issue_approvals set reason1=?,reason2=?, reason3=?,remark=?,method=?,workCost=?,testCost=?,shipType=? where approvalNo =?;";
+		jdbc.update(sql, approval.getDefect1(), approval.getDefect2(),
 				approval.getDefect3(), approval.getRemark(),
 				approval.getMethod(), approval.getWorkCost(),
 				approval.getTestCost(), approval.getShipType(),
 				approval.getApprovalNo());
 	}
 
-	public String deletePartnerClaim(String approvalNo, String partner) {
-		String sql = "exec QualityIssueDAO_deletePartnerClaim ?,?";
-		return jdbc.queryForObject(sql,new Object[] {approvalNo,partner}, new RowMapper<String>(){
+	public void batchUpdatePartnerClaimValue(final String approvalNo,
+			final List<Map<String, Object>> newClaimInfoList, Locale locale) {
+		String sql = "update qis_claims set claim = ? where approvalNo=? and partner=?;";
+
+		jdbc.batchUpdate(sql, new BatchPreparedStatementSetter() {
+
 			@Override
-			public String mapRow(ResultSet rs, int i) throws SQLException {
-				return rs.getString(1);
+			public void setValues(PreparedStatement st, int i)
+					throws SQLException {
+				st.setDouble(
+						1,
+						Double.parseDouble(newClaimInfoList.get(i).get("claim")
+								.toString()));
+				st.setString(2, approvalNo);
+				st.setString(3, (String) newClaimInfoList.get(i).get("code"));
 			}
-			
+
+			@Override
+			public int getBatchSize() {
+				return newClaimInfoList.size();
+			}
 		});
+
+	}
+
+	public void deletePartnerClaim(String approvalNo, String partner) {
+		String sql = "delete from qis_claims where approvalNo =? and partner=?;";
+		jdbc.update(sql, approvalNo, partner);
 
 	}
 
@@ -882,7 +910,7 @@ public class QualityIssueDAO {
 
 		String sqlHead = "UPDATE [qis_ncr_step1_head] SET [locale] = ? , [title] = ?";
 		sqlHead += " ,[custManager] = ?, [custConfirmer] = ? ,[custApprover] = ?";
-		sqlHead += " ,[status] = 'REG', [updateBy] = ?, [updateDt] = getdate()";
+		sqlHead += " ,[status] = 'REG', [rejectCount] = 0 ,[updateBy] = ?, [updateDt] = getdate()";
 		sqlHead += " WHERE ncrNo = ?";
 		jdbc.update(
 				sqlHead,
@@ -1197,44 +1225,18 @@ public class QualityIssueDAO {
 		}
 
 	}
-	
-	public void updateNCRMeasureProcedure(Locale locale, String ncrNo, String updateType,String comment,
-				String date1, String date2, String date3, String date4, String date5, String manager,
-				String confirmer, String approver, String fileName, byte[] file, String resultEvaluation,
-				String user){
-		SqlParameterSource params = new MapSqlParameterSource()
-			.addValue("locale",locale.getCountry())
-			.addValue("ncrNo",ncrNo)
-			.addValue("updateType",updateType)
-			.addValue("comment",comment)
-			.addValue("date1",(date1.trim().equals(""))?null:date1)
-			.addValue("date2",(date2.trim().equals(""))?null:date2)
-			.addValue("date3",(date3.trim().equals(""))?null:date3)
-			.addValue("date4",(date4.trim().equals(""))?null:date4)
-			.addValue("date5",(date5.trim().equals(""))?null:date5)
-			.addValue("manager",manager)
-			.addValue("confirmer",confirmer)
-			.addValue("approver",approver)
-			.addValue("fileName",fileName)
-			.addValue("file",file)
-			.addValue("resultEvaluation",resultEvaluation)
-			.addValue("user",user);
-		sp =  new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueDAO_updateNCRMeasureProcedure");
-		sp.execute(params);
-		
-	}
-	
-	//평가파일 다운받는거
-	public byte[] getNCREvaluationFile(Locale locale, String ncrNo){
-		String sql  = "select [file] from dbo.qis_ncr_step3_evaluation_file where ncrNo =?";
-		return jdbc.queryForObject(sql,new Object[]{ncrNo},new RowMapper<byte[]>(){
-			@Override
-			public byte[] mapRow(ResultSet rs, int rowNum) throws SQLException {
-				return rs.getBytes(1);
-			}
-		});
-	}
 
+	public void updateClaim(String approvalNo, String partner, double rate,double claim,
+			String lot, String reason1, String reason2, String reason3,
+			String remark, MultipartFile pic1, MultipartFile pic2,
+			MultipartFile ref) {
+//		String sql = "exec QualityIssueDAO_updateClaim ?,?,?,?,?,?,?,?,?,?,?,?;";
+//		Map<String,Object> attaches = jdbc.queryForMap(sql,approvalNo,partner,rate,claim,lot,reason1,reason2,reason3,remark);
+//		
+//		int ncrNo = (Integer)attaches.get("ncrNo");
+//		String pic1Id =(String)attaches.get("pic1"); 
+//		String pic1Id =(String)attaches.get("pic1");
+	}
 
 	public String updateClaimAttach(String id, MultipartFile f) {
 		String sql = "exec QualityIssueDAO_updateClaimAttach ?,?,?,?;";
@@ -1302,46 +1304,6 @@ public class QualityIssueDAO {
 			}
 		});
 		return suppliers;
-	}
-	
-	public List<Map<String,Object>> getNCRList(Locale locale,String division, String occurSite,
-			String stdDt, String endDt, String reasonCust, String publishCust){
-		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
-		SqlParameterSource params = new MapSqlParameterSource()
-		.addValue("locale",locale.getCountry())
-		.addValue("occurDivision",division)
-		.addValue("occustSite",occurSite)
-		.addValue("stdDt",stdDt)
-		.addValue("endDt",endDt)
-		.addValue("reasonCust",reasonCust)
-		.addValue("publishCust",publishCust);
-		
-		sp = new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueDAO_getNcrList").returningResultSet("ncrList",new RowMapper<Map<String,Object>>() {
-
-			@Override
-			public Map<String, Object> mapRow(ResultSet rs, int rowNum)
-					throws SQLException {
-				Map<String,Object> m = new HashMap<String, Object>();
-				for(int x = 0; x<rs.getMetaData().getColumnCount();x++)
-					m.put("DATA"+x,rs.getObject(x+1));
-				list.add(m);
-				return null;
-			}
-		});
-		sp.execute(params);
-		return list;
-	}
-
-	public List<String> getClaimSharedPartnerList(String approvalNo) {
-		List<String> list = null;
-		String sql = "select partner from qis_claims where approvalNo=?";
-		list = jdbc.queryForList(sql, String.class,approvalNo);
-		return list;
-	}
-
-	public void rollbackIssue(String approvalNo) {
-		String sql = "update qis_quality_defect set action_ref = null where action_ref =?";
-		jdbc.update(sql,approvalNo);
 	}
 
 }
