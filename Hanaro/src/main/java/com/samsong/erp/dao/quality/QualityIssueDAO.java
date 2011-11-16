@@ -1343,5 +1343,21 @@ public class QualityIssueDAO {
 		String sql = "update qis_quality_defect set action_ref = null where action_ref =?";
 		jdbc.update(sql,approvalNo);
 	}
+	
+	//NCR 동일 품번 동일 불량건으로 발생된 최근 추이차트
+	public Map<String,Object> getNcrDetailChart(String ncrNo){		
+		SqlParameterSource params = new MapSqlParameterSource().addValue("ncrNo",ncrNo);
+		sp  = new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueDAO_getNcrDetailChart").returningResultSet("chartList",new RowMapper<Map<String,Object>>() {
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int rowNum)
+					throws SQLException {
+				Map<String,Object> m = new HashMap<String, Object>();
+				for(int x = 0; x <rs.getMetaData().getColumnCount();x++)
+					m.put("date"+(1+x),rs.getInt(x+1));
+				return m;
+			}
+		});
+		return sp.execute(params);
+	}
 
 }

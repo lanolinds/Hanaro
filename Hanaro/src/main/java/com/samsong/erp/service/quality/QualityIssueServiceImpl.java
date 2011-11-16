@@ -369,5 +369,10 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 		dao.rollbackIssue(approvalNo);
 	}
 
+	@Override
+	public Map<String, Object> getNcrDetailChart(String ncrNo) {
+		return dao.getNcrDetailChart(ncrNo);
+	}
+
 
 }

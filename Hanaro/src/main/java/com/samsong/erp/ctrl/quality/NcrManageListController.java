@@ -402,7 +402,13 @@ public class NcrManageListController {
 			table.put("total",0);
 		}
 		return table;
-	}		
+	}	
+	
+	//NCR 동일 품번 동일 불량건으로 발생된 최근 추이차트
+	@RequestMapping(value="/getNcrDetailChart",method=RequestMethod.GET)
+	public @ResponseBody Map<String,Object> getNcrDetailChart(@RequestParam("ncrNo")String ncrNo){
+		return  service.getNcrDetailChart(ncrNo);
+	}
 			
 			
 			
