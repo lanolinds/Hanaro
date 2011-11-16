@@ -34,7 +34,7 @@ import com.samsong.erp.model.quality.QualityIssueRegSheet;
 
 @Repository
 public class QualityIssueDAO {
-
+ 
 	private JdbcTemplate jdbc;
 	private SimpleJdbcCall sp;
 
