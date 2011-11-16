@@ -10,6 +10,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Hanaro System Login Page</title>
+<link rel="stylesheet" href='<c:url value="/resources/styles/app.default.css"/>'/>
+<link rel="shortcut icon" href='<c:url value="/resources/images/favi.ico"/>' />
 <link rel="stylesheet" href="resources/scripts/easyui/themes/gray/easyui.css"/>
 <link rel="stylesheet" href="resources/scripts/easyui/themes/icon.css"/>
 <link rel="stylesheet" href="resources/styles/app.default.css"/>
