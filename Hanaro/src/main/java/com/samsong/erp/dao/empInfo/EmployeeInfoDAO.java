@@ -130,7 +130,7 @@ public class EmployeeInfoDAO {
 		sp.execute(params);
 	}
 	
-	// 품질등록리스트를 조회한다.
+	// 사원등록리스트를 조회한다.
 	public List<Map<String, Object>> getEmployeeRegList(Locale locale,String keyword, String keyfield) {
 		final List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
 		SqlParameterSource params = new MapSqlParameterSource()
@@ -156,6 +156,32 @@ public class EmployeeInfoDAO {
 		return resultList;
 	}
 	
+	// 사원리스트를 조회한다.
+		public List<Map<String, Object>> getEmployeeList(Locale locale,String keyword, String keyfield) {
+			final List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+			SqlParameterSource params = new MapSqlParameterSource()
+					.addValue("locale", locale.getCountry())
+					.addValue("keyword", keyword)
+					.addValue("keyfield", keyfield);
+			sp = new SimpleJdbcCall(jdbc).withProcedureName(
+					"EmployeeInfoDAO_getEmployeeList").returningResultSet(
+					"issueRegList", new RowMapper<Map<String, Object>>() {
+						@Override
+						public Map<String, Object> mapRow(ResultSet rs, int i)
+								throws SQLException {
+							Map<String, Object> m = new HashMap<String, Object>();
+						
+							for (int x = 0; x < rs.getMetaData().getColumnCount(); x++) {
+								m.put("DATA" + x, rs.getObject((x + 1)));
+							}
+							resultList.add(m);
+							return null;
+						}
+					});
+			sp.execute(params);
+			return resultList;
+		}
+	
 	//사원사진 다운받는거
 	public byte[] getEmployeeFile(Locale locale, String empNo){
 		String sql  = "select PHOTO_IMG from MASTER_EMPLOYEE where LOCALE=? and EMP_NO =?";
@@ -165,5 +191,10 @@ public class EmployeeInfoDAO {
 				return rs.getBytes(1);
 			}
 		});
+	}
+	
+	public Map<String, Object> getEmployView(String empNo, Locale locale) {
+		return jdbc.queryForMap("exec EmployeeInfoDAO_getEmployeeView ?,? ",
+				new Object[] { empNo, locale.getCountry() });
 	}
 }

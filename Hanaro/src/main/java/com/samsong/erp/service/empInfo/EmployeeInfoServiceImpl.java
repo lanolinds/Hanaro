@@ -65,4 +65,14 @@ public class EmployeeInfoServiceImpl implements EmployeeInfoService {
 	public byte[] getEmployeeFile(Locale locale, String empNo){
 		return dao.getEmployeeFile(locale, empNo);
 	}
+	
+	@Override
+	public List<Map<String, Object>> getEmployeeList(Locale locale,String keyword, String keyfield){
+		return dao.getEmployeeList(locale, keyword, keyfield);
+	}
+	
+	@Override
+	public Map<String, Object> getEmployView(String empNo, Locale locale){
+		return dao.getEmployView(empNo, locale);
+	}
 }

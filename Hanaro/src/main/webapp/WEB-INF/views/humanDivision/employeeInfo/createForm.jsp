@@ -23,6 +23,14 @@
 	<script type="text/javascript" src='<c:url value="/resources/scripts/easyui/locale/easyui-lang-${pageContext.response.locale.language}.js"/>'></script>
 	<script type="text/javascript" src='<c:url value="/resources/scripts/common-utils.js" />' ></script>
 	<script type="text/javascript">
+	$(document).ready(function(){			
+		url:"getEmployeeList";
+		var params = {};
+		params.keyword = "";
+		params.keyfield = ""; 
+		$("#resultDataGrid").datagrid("load",params);
+		
+	});
 		//등록전에 검사 확인하기
 		function validate(){
 			if($("#form").form("validate")){			
@@ -84,7 +92,7 @@
 			$("b",$("#photoImg").parent()).empty();
 					
 			if(record.DATA0 !="")
-				$("b",$("#photoImg").parent()).append("<img src='getEmployeeFile?empNo="+record.DATA1+"&fileName="+encodeURIComponent(record.DATA0)+"'' width='45' height='45'><br><a  href='getEmployeeFile?empNo="+record.DATA1+"&fileName="+encodeURIComponent(record.DATA0)+"' >"+record.DATA0+"</a>");
+				$("b",$("#photoImg").parent()).append("<img src='getEmployeeFile?empNo="+record.DATA1+"&fileName="+encodeURIComponent(record.DATA0)+"'' width='60' height='60'><br><a  href='getEmployeeFile?empNo="+record.DATA1+"&fileName="+encodeURIComponent(record.DATA0)+"' >"+record.DATA0+"</a>");
 		}
 	</script> 
 
@@ -261,7 +269,7 @@
 			<td>
 				<table class="easyui-datagrid" iconCls="icon-application-view-list" style="width:830px;height:725px;" 
 				title='<fmt:message key="ui.label.employee.empList"/>' toolbar="#divSearch" pagination="true"  id="resultDataGrid" pageSize="30"   singleSelect="true" striped="true"   url="getEmployeeList" >
-					<thead frozen="true">
+					<thead>
 						        <tr> 
 						            <th field="DATA8" width="130" sortable="true" align="center"><fmt:message key="ui.label.employee.deptNm" /></th>  
 						            <th field="DATA10" width="100" sortable="true" align="center"><fmt:message key="ui.label.employee.position" /></th>   		
@@ -281,7 +289,7 @@
  <div id="divSearch" style="padding:5px;height:auto">
        <div>        
 		<select  id='keyword' >
-				<option value="1"><fmt:message key="ui.element.All"/></option>
+				<option value=""><fmt:message key="ui.element.All"/></option>
 				<option value="DEPT"><fmt:message key="ui.label.employee.deptNm"/></option>
 				<option value="EMP"><fmt:message key="ui.label.employee.empNm"/></option>
 		</select>
