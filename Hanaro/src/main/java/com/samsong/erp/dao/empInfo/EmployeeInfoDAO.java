@@ -45,7 +45,7 @@ public class EmployeeInfoDAO {
 		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
 		SqlParameterSource params = new MapSqlParameterSource().addValue("locale",locale.getCountry())
 				.addValue("user",user);
-		sp = new SimpleJdbcCall(jdbc).withProcedureName("EmployeeManagementDAO_getUserInfo").returningResultSet("userInfo", new RowMapper<Map<String,Object>>() {
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("EmployeeInfoDAO_getUserInfo").returningResultSet("userInfo", new RowMapper<Map<String,Object>>() {
 			@Override
 			public Map<String, Object> mapRow(ResultSet rs, int rowNum)
 					throws SQLException {

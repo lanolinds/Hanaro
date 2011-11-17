@@ -15,8 +15,8 @@
 				<a href="?locale=ko_KR" class="easyui-linkbutton" iconCls="icon-flag-kr" plain="true"></a>
 				<a href="?locale=zh_CN" class="easyui-linkbutton" iconCls="icon-flag-cn" plain="true"></a>
 				<a href="?locale=en_IN" class="easyui-linkbutton" iconCls="icon-flag-in" plain="true"></a>
-				<a href="?locale=cs_CZ" class="easyui-linkbutton" iconCls="icon-flag-cz" plain="true"></a>
-				<a href="?locale=pt_BR" class="easyui-linkbutton" iconCls="icon-flag-br" plain="true"></a>
+				<a href="?locale=en_CZ" class="easyui-linkbutton" iconCls="icon-flag-cz" plain="true"></a>
+				<a href="?locale=en_BR" class="easyui-linkbutton" iconCls="icon-flag-br" plain="true"></a>
 			    <a href="#" class="easyui-splitbutton" menu="#userDetails" iconCls="icon-user-gray">${pageContext.request.userPrincipal.name}</a>  
 			    <a href='<c:url value="/home"/>' class="easyui-linkbutton" iconCls="icon-house" plain="true"></a>
 			    <a href='<c:url value="/j_spring_security_logout" />' class="easyui-linkbutton" iconCls="icon-door-out" plain="true"><fmt:message key="system.logout"/></a> 
