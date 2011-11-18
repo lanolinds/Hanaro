@@ -562,7 +562,7 @@ public class QualityIssueDAO {
 				});
 		sp.execute(params);
 		return list;
-	}
+	} 
 
 	// NCR대책서파일을 다운한다.
 	public byte[] getNcrMeasureFile(Locale locale, String ncrNo) {
@@ -1343,8 +1343,7 @@ public class QualityIssueDAO {
 		String sql = "update qis_quality_defect set action_ref = null where action_ref =?";
 		jdbc.update(sql,approvalNo);
 	}
-	
-	//NCR 동일 품번 동일 불량건으로 발생된 최근 추이차트 
+
 	public Map<String,Object> getNcrDetailChart(String ncrNo){		
 		SqlParameterSource params = new MapSqlParameterSource().addValue("ncrNo",ncrNo);
 		sp  = new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueDAO_getNcrDetailChart").returningResultSet("chartList",new RowMapper<Map<String,Object>>() {

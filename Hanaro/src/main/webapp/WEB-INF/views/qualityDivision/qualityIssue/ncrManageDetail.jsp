@@ -10,7 +10,7 @@
 	<title><fmt:message key="menu.qualityNcrManagement" /></title>
 	<link rel="stylesheet" href='<c:url value="/resources/scripts/easyui/themes/gray/easyui.css"/>'/>
 	<link rel="stylesheet" href='<c:url value="/resources/scripts/easyui/themes/icon.css"/>'/>
-	<link rel="stylesheet" href='<c:url value="/resources/styles/app.default.css"/>'/>		
+	<link rel="stylesheet" href='<c:url value="/resources/styles/app.default.css"/>'/>
 	<style type="text/css">
 		#headTable th {background-color: #FAFAFA;height:22px; font-weight:normal; text-align: left; white-space:nowrap;width: 120px; }
 		#headTable td {border:1px dotted #CBC7C4	r;width:170px;}

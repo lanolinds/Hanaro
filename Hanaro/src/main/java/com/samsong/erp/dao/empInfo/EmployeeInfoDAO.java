@@ -24,6 +24,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
+import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
+import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,13 +41,13 @@ public class EmployeeInfoDAO {
 	public void init(DataSource ds) {
 		jdbc = new JdbcTemplate(ds);
 	}
-	 
+	
 	//접속된 계정에 대한 정보를 가져온다.
 	public List<Map<String,Object>> getUserInfo(Locale locale,String user){
 		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
 		SqlParameterSource params = new MapSqlParameterSource().addValue("locale",locale.getCountry())
 				.addValue("user",user);
-		sp = new SimpleJdbcCall(jdbc).withProcedureName("EmployeeManagementDAO_getUserInfo").returningResultSet("userInfo", new RowMapper<Map<String,Object>>() {
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("EmployeeInfoDAO_getUserInfo").returningResultSet("userInfo", new RowMapper<Map<String,Object>>() {
 			@Override
 			public Map<String, Object> mapRow(ResultSet rs, int rowNum)
 					throws SQLException {
@@ -104,6 +106,7 @@ public class EmployeeInfoDAO {
 	
 	public void setEmployeeInfo(String setType, Locale locale, EmployeeInfo info, String user, byte[] photo) {
 		Map<String, Object> params = new HashMap<String, Object>();
+
 		params.put("setType", setType);
 		params.put("locale", locale.getCountry());
 		params.put("empNo", info.getEmpNo());
@@ -126,6 +129,8 @@ public class EmployeeInfoDAO {
 		params.put("photoImg",photo);
 		params.put("retireDt", info.getRetireDt());
 		params.put("user", user);
+		PasswordEncoder encoder = new Md5PasswordEncoder();
+
 		sp = new SimpleJdbcCall(jdbc).withProcedureName("EmployeeInfoDAO_setEmployeeInfo");
 		sp.execute(params);
 	}
