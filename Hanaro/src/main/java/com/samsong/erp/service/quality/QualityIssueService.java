@@ -110,6 +110,8 @@ public interface QualityIssueService {
 	public void cancelApproval(String approvalNo, Locale locale);
 	
 	public Map<String,Object> getNcrDetailChart(String ncrNo);
+	
+	public List<Map<String,Object>> getNcrStatus(Locale locale,Map<String,Object> params);
 
 	
 }

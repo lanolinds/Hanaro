@@ -374,5 +374,11 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 		return dao.getNcrDetailChart(ncrNo);
 	}
 
+	@Override
+	public List<Map<String, Object>> getNcrStatus(Locale locale,
+			Map<String, Object> params) {
+		return dao.getNcrStatus(locale, params);
+	}
+
 
 }

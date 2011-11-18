@@ -160,11 +160,14 @@
 		$("#regNo").val(record.DATA0);
 		$("input[name='procType']").val("UPDATE");
 		$("#division").val(record.DATA20);
-		$("#occurSite").empty().append("<option value='"+record.DATA21+"'>"+record.DATA2+"</option>");
+		$("#occurSite").empty().append("<option value='"+record.DATA21+"'>"+record.DATA2+"</option>").trigger("change");
 		$("#occurDate").datebox('setValue',record.DATA22);		
 		$("#occurAmPm").val(record.DATA23);
 		$("#occurHour").val(record.DATA24);
 		$("#occurPartNo").combogrid("setValue",record.DATA9);
+		$("#occurPartNm").val(record.DATA10);
+		$("#car").val(record.DATA7);
+		$("#model").val(record.DATA8);
 		$("#partSupplier").val(record.DATA25);
 		$("#occurPlace").combobox("setValue",record.DATA27);
 		$("#occurLine").empty();
@@ -254,9 +257,10 @@
 				var partType = "";
 				switch($(this).val())
 				{
-					case 'CD' : partType = "1001"; break;
-					case 'CB' : partType = "1001"; break;
-					case 'CC' : partType = "1002"; break;
+					case 'CA' : partType = "1001"; break;
+					case 'CD' : partType = "1002"; break;
+					case 'CB' : partType = "1002"; break;
+					case 'CC' : partType = "1001"; break;
 					default : partType = "ALL"; break;
 				}
 				occurPartListCallbak(partType);
@@ -546,7 +550,7 @@
 				<option value=''><fmt:message key="ui.element.All"/></option>
 		</select>
 		 <fmt:message key="ui.label.SearchDate"/>
-		<input id="searchStdDt" class="easyui-datebox" style="width:90px;"  value="${today}"  />~
+		<input id="searchStdDt" class="easyui-datebox" style="width:90px;"  value="${today}"  /><span style="margin: 0em .3em;">~</span>
 		<input id="searchEndDt" class="easyui-datebox" style="width:90px;"  value="${today}"  />
 		<a  href="#" class="easyui-linkbutton" iconCls="icon-search" onclick="javascript:searchList();"><fmt:message key="ui.button.Search"/></a>		
 		  
