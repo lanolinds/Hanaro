@@ -11,7 +11,10 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.samsong.erp.dao.quality.QualityIssueDAO;
@@ -287,7 +290,8 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 
 			String item,String lot, String reason1, String reason2, String reason3,
 			String remark, MultipartFile pic1,String pic1id, MultipartFile pic2,String pic2id,
-			MultipartFile ref,String refid,Locale locale) {
+			MultipartFile ref,String refid,String ncr, String reqDate,
+			String request,Locale locale) {
 		
 		if(pic1.getSize()>0){
 			pic1id = dao.updateClaimAttach(pic1id,pic1);
@@ -299,11 +303,22 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 			refid = dao.updateClaimAttach(refid,ref);
 		}
 		
+		//NCR 발행하면 외래키 확보
+		String ncrNo = null;
+		if(ncr!=null && ncr.toUpperCase().equals("Y")){
+			ncrNo =dao.publishNcr(reqDate,request);
+		}
+		else if(ncr!=null && ncr.toUpperCase().equals("N")){
+			ncrNo=null;
+		}
+		else{
+			ncrNo=ncr;
+		}
 		//변경된 요율을 적용한다.
 		IssueApproval issue = dao.getApproval(approvalNo, locale);
 		double share = issue.getClaim()*(rate/100d);
 		
-		dao.updateClaim(approvalNo, partner, rate,share,item, lot, reason1, reason2, reason3, remark, pic1id, pic2id, refid);
+		dao.updateClaim(approvalNo, partner, rate,share,item, lot, reason1, reason2, reason3, remark, pic1id, pic2id, refid,ncrNo);
 	}
 
 	@Override
@@ -335,9 +350,10 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 		
 		//NCR 발행하면 외래키 확보
 		String ncrNo = null;
-		if(ncr!=null && ncr.equalsIgnoreCase("Y")){
+		if(ncr!=null && ncr.toUpperCase().equals("Y")){
 			ncrNo =dao.publishNcr(reqDate,request);
 		}
+		
 		
 		
 		//업체 클래임 금액 계산.

@@ -39,14 +39,17 @@
 			<artifactId>spring-jdbc</artifactId>
 			<version>${org.springframework-version}</version>
 		</dependency>
-		<!-- Roo dependencies -->
+		
 		<dependency>
-			<groupId>org.springframework.roo</groupId>
-			<artifactId>org.springframework.roo.annotations</artifactId>
-			<version>${org.springframework.roo-version}</version>
-			<scope>provided</scope>
+		    <groupId>commons-dbcp</groupId>
+		    <artifactId>commons-dbcp</artifactId>
+		    <version>1.4</version>
+		    <scope>runtime</scope>
 		</dependency>
 		
+		
+		<!-- Roo dependencies -->
+
 		<!-- Spring Security -->
 		 <dependency>
 		    <groupId>org.springframework.security</groupId>

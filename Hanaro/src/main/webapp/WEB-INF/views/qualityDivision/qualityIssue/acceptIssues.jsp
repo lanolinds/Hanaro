@@ -189,11 +189,16 @@
 			var title = '<fmt:message key="ui.label.editAction"/>';
 			var message = '<fmt:message key="question.noCausePartnerExist"/>';
 			$.messager.confirm(title,message,function(b){
-				if(!b)
-					return false;
+				if(b)
+				{
+					$("form[name='approvalForm']").submit();	
+				}
 			});
 		}
-		$("form[name='approvalForm']").submit();
+		else{
+			$("form[name='approvalForm']").submit();
+		}
+		
 	}
 	
 	function validateClaimForm(){
@@ -211,7 +216,9 @@
 		
 		
 		//ncr을 발행하면 필히 회신일을 입력 받는다.
-		var ncr = $("form[name='claimForm'] :radio:checked").val();
+		//ncr은 발행만 됨. 발행된 ncr은 라디오 버튼 값을 n으로 수정하여도 적용하지 않음.
+		var ncrNo = $.trim($("#ncrNo").text());
+		var ncr = (ncrNo=="")?$("form[name='claimForm'] :radio:checked").val():ncrNo;
 		var date = $("#reqDate").datebox("getValue");
 		if(ncr=="Y" && date.length==0){
 			$.messager.alert("Warnning",'<fmt:message key="ui.label.qualityIssue.measureReplyDate"/>'+'<fmt:message key="warn.enterSomething"/>',"warning");
@@ -226,7 +233,9 @@
 			return false;
 		}
 		
-		$("#claimPartner").combobox("enable");	
+		$("#claimPartner").combobox("enable");
+		$("form[name='claimForm'] :radio:checked").val(ncr);
+		$("#claimPartnerDlg").dialog("close");
 		$("form[name='claimForm']").submit();
 	}
 	

@@ -77,7 +77,7 @@
 	//발생처 자동완성
  	function occurPlaceCombobox(){		
 	    $('#occurPlace').combobox({
-	    	url : "codeCustOptionCallbak?searchType=QISALL",	        
+	    	url : "codeCustOptionCallbak?searchType=QISALLREG",	        
 	    	valueField:'custCode',  
 	    	textField:'custName',
 	        mode:'remote',	        

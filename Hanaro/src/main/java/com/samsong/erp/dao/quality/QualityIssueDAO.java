@@ -15,6 +15,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -27,12 +28,13 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.samsong.erp.model.quality.IssueApproval;
+
 import com.samsong.erp.model.quality.NcrInformSheet;
 import com.samsong.erp.model.quality.QualityIssueRegSheet;
 
 @Repository
 public class QualityIssueDAO {
- 
+
 	private JdbcTemplate jdbc;
 	private SimpleJdbcCall sp;
 
@@ -560,7 +562,7 @@ public class QualityIssueDAO {
 				});
 		sp.execute(params);
 		return list;
-	} 
+	}
 
 	// NCR대책서파일을 다운한다.
 	public byte[] getNcrMeasureFile(Locale locale, String ncrNo) {
@@ -1252,10 +1254,10 @@ public class QualityIssueDAO {
 	public void updateClaim(String approvalNo, String partner, double rate,
 			double claim,String item, String lot, String reason1, String reason2,
 			String reason3, String remark, String pic1id, String pic2id,
-			String refid) {
-		String sql = "update qis_claims set item=?, lot=?, reason1=?, reason2 =?, reason3=?, rate=?, claim=?, remark=?, ref1=?, ref2=?, ref3=?" +
+			String refid,String ncrNo) {
+		String sql = "update qis_claims set item=?, lot=?, reason1=?, reason2 =?, reason3=?, rate=?, claim=?, remark=?, ref1=?, ref2=?, ref3=?,ncr=?" +
 				" where approvalNo=? and partner=?";
-		jdbc.update(sql, item,lot,reason1,reason2,reason3,rate,claim,remark,pic1id,pic2id,refid,approvalNo,partner);
+		jdbc.update(sql, item,lot,reason1,reason2,reason3,rate,claim,remark,pic1id,pic2id,refid,ncrNo,approvalNo,partner);
 	}
 
 	public Map<String, Object> getClaimAttachment(String id) {
@@ -1378,6 +1380,7 @@ public class QualityIssueDAO {
 		return list;
 	}
 	
+
 	
 	//NCR현황 리스트용
 	public List<Map<String,Object>> getNcrStatusList(Locale locale, Map<String,Object> params){
