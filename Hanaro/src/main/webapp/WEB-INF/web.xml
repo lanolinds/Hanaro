@@ -19,6 +19,7 @@
 		<param-value>/WEB-INF/classes/log4j.properties</param-value>
 	</context-param>
 	
+	
 	<!-- Creates the Spring Container shared by all Servlets and Filters -->
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>

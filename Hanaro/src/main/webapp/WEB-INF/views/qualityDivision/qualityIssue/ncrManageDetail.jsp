@@ -423,16 +423,18 @@
 			modifyFile('d',$(this));
 		});
 		
-		//차트 그리디
-		$.get("getNcrDetailChart",{ncrNo:$("#ncrNo").val(),t:new Date().getTime()},function(map){
-			datas =[];
-			datas.push(Number(map.chartList[0].date1));
-			datas.push(Number(map.chartList[0].date2));
-			datas.push(Number(map.chartList[0].date3));
-			datas.push(Number(map.chartList[0].date4));
-			chart();
-		});
-		
+		if("${ncrInForm.status}"=='AGREE' || "${ncrInForm.status}"=='GOOD' || "${ncrInForm.status}"=='BAD'){
+			//차트 그리디
+			$.get("getNcrDetailChart",{ncrNo:$("#ncrNo").val(),t:new Date().getTime()},function(map){
+				datas =[];
+				datas.push(Number(map.chartList[0].date1));
+				datas.push(Number(map.chartList[0].date2));
+				datas.push(Number(map.chartList[0].date3));
+				datas.push(Number(map.chartList[0].date4));
+				chart();
+			});
+		}
+				
 	});
 	
 	
