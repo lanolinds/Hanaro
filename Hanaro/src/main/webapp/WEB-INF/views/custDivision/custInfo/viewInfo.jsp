@@ -38,44 +38,7 @@
 				return false;
 			}
 		}
-		
-		//사원정보 등록 리스트 조회하기
-		function searchList(){
-			var params = {};
-			params.keyfield = $("#keyfield").val(); 
-			$("#resultDataGrid").datagrid("load",params);
-			
-		}
-		
-		function resetForm(){
-			$('form')[0].reset();
-			$('#setType').val('INSERT');
-		}
-		
-		
-		//품질문제등록 내용을 폼에 넣는다.
-		function insertForm(){
-			var record = $("#resultDataGrid").datagrid("getSelected");
-			if(record ==null){
-				$.messager.alert("<fmt:message key='warn.infoWarn' />","<fmt:message key='warn.notSelectedItem' />");
-				return;
-			}
 
-			$("#custType").val(record.DATA0);
-			$("#custCd").val(record.DATA2);
-			$("input[name='setType']").val("UPDATE");
-			$("#custNm").val(record.DATA3);
-			$("#chief").val(record.DATA5);		
-			$("#custNo").val(record.DATA4);
-			$("#mobileChief").val(record.DATA6);
-			$("#phoneOffice").val(record.DATA7);
-			$("#phoneFax").val(record.DATA8);
-			$("#address").val(record.DATA11);
-			$("#email").val(record.DATA10);
-			$("#homepage").val(record.DATA9);
-			$("#stdDT").datebox('setValue',record.DATA12);
-			$("#endDtDt").datebox('setValue',record.DATA13);			
-		}
 	</script> 
 
 </head> 
@@ -90,12 +53,12 @@
 		<tr>
 			<td>
 				<div iconCls="icon-chart-bar-delete" class="easyui-panel" style="width:800px" title='<fmt:message key="menu.custForm"/>'>
-					<form:form action="addCustInfo" method="POST"  modelAttribute="custInfo"  id="form" name="frm" >
+					<form:form action="updateCustInfo" method="POST"  modelAttribute="custInfo"  id="form" name="frm" >
 						<table class="groupTable"  >
 							<tr>
 								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.cust.custType"  /></span>
-									<input type="hidden" name="setType" value="INSERT" >
+									<input type="hidden" name="setType" value="UPDATE" >
 								</th>
 								<td>						
 									<form:select path="custType" id="custType" class="easyui-validatebox" required='true' >
@@ -109,7 +72,7 @@
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.cust.custCd"  /></span>
 								</th>
 								<td>						
-									<form:input class="easyui-validatebox" readonly="true"  path="custCd"  id="custCd"  />		
+									<form:input class="easyui-validatebox" readonly="true"  path="custCd"  id="custCd" value="${view.CUST_CD }" />		
 								</td>
 							</tr>
 							<tr>  
@@ -117,13 +80,13 @@
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.cust.custNm"  /></span>
 								</th>
 								<td>						
-									<form:input class="easyui-validatebox"   path="custNm"  style="width:100%;"  id="custNm"  />		
+									<form:input class="easyui-validatebox"   path="custNm"  style="width:100%;"  id="custNm" value="${view.CUST_NM }" />		
 								</td>  
 								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.cust.chief"  /></span>
 								</th>
 								<td>								
-									<form:input class="easyui-validatebox" path="chief"  style="width:100%;"  id="chief" />
+									<form:input class="easyui-validatebox" path="chief"  style="width:100%;"  id="chief" value="${view.CHIEF }" />
 								</td>  
 							</tr>
 							<tr>
@@ -131,13 +94,13 @@
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.cust.chiefPhone" /></span>
 								</th>
 								<td>								
-									<form:input class="easyui-validatebox"   path="mobileChief"  style="width:100%;"   id="mobileChief"  />		
+									<form:input class="easyui-validatebox"   path="mobileChief"  style="width:100%;"   id="mobileChief" value="${view.MOBILE_CHIEF }"  />		
 								</td>  
 								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.cust.officePhone"/></span>
 								</th>
 								<td>						
-									<form:input class="easyui-validatebox"  path="phoneOffice"  style="width:100%;"   id="phoneOffice"    />
+									<form:input class="easyui-validatebox"  path="phoneOffice"  style="width:100%;"   id="phoneOffice"  value="${view.PHONE_OFFICE }"  />
 								</td>  
 							</tr>
 							<tr>
@@ -145,13 +108,13 @@
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.cust.officeFax"/></span>
 								</th>
 								<td>						
-									<form:input class="easyui-validatebox"  path="phoneFax"  style="width:100%;"   id="phoneFax"    />
+									<form:input class="easyui-validatebox"  path="phoneFax"  style="width:100%;"   id="phoneFax"  value="${view.PHONE_FAX }"  />
 								</td>  
 								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.cust.address"/></span>
 								</th>
 								<td>				
-									<form:input class="easyui-validatebox"  path="address"   style="width:100%;"  id="address"    />
+									<form:input class="easyui-validatebox"  path="address"   style="width:100%;"  id="address" value="${view.ADDRESS }"   />
 								</td>  
 							</tr>
 							<tr>
@@ -159,13 +122,13 @@
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.cust.email"/></span>
 								</th>
 								<td>				
-									<form:input class="easyui-validatebox"  path="email" style="width:100%;"  id="email"    />	
+									<form:input class="easyui-validatebox"  path="email" style="width:100%;"  id="email"  value="${view.EMAIL }"  />	
 								</td>  
 								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.cust.homepage"/></span>
 								</th>
 								<td>				
-									<form:input class="easyui-validatebox"  path="homepage" style="width:100%;"  id="homepage"    />	
+									<form:input class="easyui-validatebox"  path="homepage" style="width:100%;"  id="homepage"  value="${view.HOMEPAGE }"  />	
 								</td>  
 							</tr>
 							<tr>
@@ -173,19 +136,19 @@
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.cust.stdDt"/></span>
 								</th>
 								<td>						
-									<form:input class="easyui-datebox"  path="stdDt"  style="width:100px;"  id="stdDt"  editable="false"  />
+									<form:input class="easyui-datebox"  path="stdDt"  style="width:100px;"  id="stdDt"  editable="false" value="${view.STD_DT }" />
 								</td>  
 								<th>
 									<span  class="label-Leader-black" ><fmt:message key="ui.label.cust.endDt"/></span>
 								</th>
 								<td>								
-									<form:input class="easyui-datebox"  path="endDt"  style="width:100px;"  id="endDt"  editable="false"  />
+									<form:input class="easyui-datebox"  path="endDt"  style="width:100px;"  id="endDt"  editable="false" value="${view.END_DT }" />
 								</td>  
 							</tr>	
 							<tr>
 								<th colspan='4' style="text-align:center;"  id="tdButton">										
-									<a href="#" onclick="javascript:validate();" class="easyui-linkbutton"  iconCls="icon-disk"  id="btInsert"><fmt:message key="ui.button.Save"/></a>																		
-									<a href="#" onclick="javascript:resetForm()" class="easyui-linkbutton"  iconCls="icon-arrow-redo" id="btCancel"><fmt:message key="ui.button.Cancel"/></a>
+									<a href="#" onclick="javascript:validate();" class="easyui-linkbutton"  iconCls="icon-disk"  id="btInsert"><fmt:message key="ui.button.Save"/></a>
+									<a href='<c:url value="/custDivision/custInfo/list"/>' class="easyui-linkbutton"  iconCls="icon-application-view-detail"><fmt:message key="ui.label.toList"/></a>
 								</th>
 							</tr>															
 						</table>
@@ -194,22 +157,7 @@
 			</td>
 		</tr>
 	</table>
-</div>
-
- <div id="divSearch" style="padding:5px;height:auto">
-       <div>        
-		<fmt:message key="ui.label.cust.custNm"/>
-		<input id="keyfield" style="width:120px;"  value=""  />
-		<a  href="#" class="easyui-linkbutton" iconCls="icon-search" onclick="javascript:searchList();"><fmt:message key="ui.button.Search"/></a>		
-     </div>
-      
-     <div style="margin-bottom:5px" align="right"'>  
-         <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true"  onclick="javascript:resetForm();"><fmt:message key="ui.button.Reg"/></a>  
-         <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="javascript:insertForm();"><fmt:message key="ui.button.Edit"/></a>           
-      </div>
-
- 
- </div>  
+</div>  
 </body>
 
 </html>

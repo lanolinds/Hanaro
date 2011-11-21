@@ -145,4 +145,25 @@ public class CustManagementController {
 		return prefix+"/viewInfo";
 	}
 
+	//사원정보등록
+	@RequestMapping(value="/updateCustInfo", method=RequestMethod.POST )
+	public String updateCustInfo(String setType,Locale locale, CustInfo info,Principal prin,Model model,@RequestParam("custCd") String custCd){
+		  String user =prin.getName();
+		  try {
+		   //선택된 파일객체는 직접 입력한다.	   
+			service.setCustInfo(setType, locale, info, user);
+			
+		  } catch (Exception e) {
+			e.printStackTrace();
+		  }	  
+		Map<String,Object> custTypeList = service.getCodeCustType(locale);
+		  //업체상세정보
+	  	Map<String,Object> custView = service.getCustView(custCd, locale);
+	  		
+		model.addAttribute("custTypeList",custTypeList);
+		model.addAttribute("view",custView);
+		
+		model.addAttribute("custInfo",info);
+		return prefix+"/viewInfo";
+	}
 }

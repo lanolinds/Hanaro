@@ -35,10 +35,10 @@
 				
 			},
 			onDblClickRow:function(i,row){
-//				if(row.DATA1=="${user}"){
+				if(row.DATA2=="${user}"){
 					$("form[name='custInfoForm'] input[name='custCd']").val(row.DATA2);
 					$("form[name='custInfoForm']").attr("action","viewCustInfo").submit();
-//				}
+				}
 			}
 		});
 	});
