@@ -168,6 +168,7 @@ public class NcrManageListController {
 		if(measureProcType.equals("DELETE")){
 			try{
 				service.deleteNcrMeasure(locale, sheet);
+				logger.info(sheet.toString()+","+measureProcType);
 			}catch(Exception ex){
 				ex.printStackTrace();
 			}
@@ -185,6 +186,7 @@ public class NcrManageListController {
 						inputAddFiles,inputChangeFile,stanFile
 						,imgReasonFile1.getContentType(),imgReasonFile2.getContentType(),imgTempNameFile.getContentType(),
 						imgMeasureName1File.getContentType(),imgMeasureName2File.getContentType());
+				logger.info(sheet.toString()+","+measureProcType);
 			}catch(Exception ex){
 				ex.printStackTrace();
 			} 
@@ -201,6 +203,7 @@ public class NcrManageListController {
 						inputAddFiles,inputChangeFile,stanFile
 						,imgReasonFile1.getContentType(),imgReasonFile2.getContentType(),imgTempNameFile.getContentType(),
 						imgMeasureName1File.getContentType(),imgMeasureName2File.getContentType());
+				logger.info(sheet.toString()+","+measureProcType);
 			}catch(Exception ex){
 				ex.printStackTrace();
 			} 			
@@ -219,6 +222,7 @@ public class NcrManageListController {
 						imgMeasureName1File.getContentType(),imgMeasureName2File.getContentType());
 				service.updateNCRMeasureProcedure(locale, sheet.getNcrNo(), measureProcType,
 						"","","","","","","", "", "", null, null, "", user);
+				logger.info(sheet.toString()+",reEdit_do_plan");
 			}catch(Exception ex){
 				ex.printStackTrace();
 			} 				
@@ -348,6 +352,8 @@ public class NcrManageListController {
 						date2, date3,date4, date5, manager, confirmer, approver,
 						(file==null)?null:file.getOriginalFilename(),
 								(file==null)?null:file.getBytes(), resultEvaluation, prin.getName());
+				logger.info(ncrNo+","+updateType+","+comment+","+date1+","+date2+","+date3+","+date4+","+date5+","+manager
+						+","+confirmer+","+approver+","+resultEvaluation);
 			}catch(Exception e){
 				System.err.println(e.getMessage());
 			}

@@ -60,8 +60,7 @@
 	function popDetail(value){
          var win = window.open("ncrManageDetail?ncrNo="+value,"NCRDetail", "width=1145,height=797,location=no,menubar=no,resizable=no,scrollbars=yes,status=no,toolbar=no");
          win.focus();
-	}
-	
+	}	
 	$(document).ready(function(){
 		
 		

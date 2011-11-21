@@ -74,10 +74,10 @@ public class QualityIssueController {
 	   sheet.setFile2(files2.getOriginalFilename());
 	   //선택된 파일객체는 직접 입력한다.	   
 		service.procQualityIssueReg(procType,locale,sheet,user, files1.getBytes(), files2.getBytes());
+		logger.info(sheet.toString()+","+procType);
 	  } catch (IOException e) {
 		e.printStackTrace();
-	  }	  
-	   model.addAttribute("status","success");
+	  }
 	   return "redirect:"+prefix+"/qualityIssueReg";
 	}	
 	

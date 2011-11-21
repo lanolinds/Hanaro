@@ -81,5 +81,44 @@ public class NcrStatusController {
 	
 	}
 	
+	@RequestMapping(value="/getNcrStatusList")
+	public @ResponseBody Map<String,Object> getNcrStatusList(Locale locale,@RequestParam(value="searchType",required=false) String searchType
+			,@RequestParam(value="regStdYear",required=false) String regStdYear
+			,@RequestParam(value="regStdDate",required=false) String regStdDate, @RequestParam(value="regEndYear",required=false) String regEndYear
+			,@RequestParam(value="regEndDate",required=false) String regEndDate, @RequestParam(value="ncrStdYear",required=false) String ncrStdYear
+			,@RequestParam(value="ncrStdDate",required=false) String ncrStdDate, @RequestParam(value="ncrEndYear",required=false) String ncrEndYear
+			,@RequestParam(value="ncrEndDate",required=false) String ncrEndDate,@RequestParam(value="type_date",required=false) String typeDate
+			,@RequestParam(value="occurSite",required=false) String occurSite, @RequestParam(value="reasonCode",required=false)String reasonCode
+			,@RequestParam(value="defectS",required=false) String defectS){
+		
+		Map<String,Object> param = new HashMap<String,Object>();
+		param.put("searchType",searchType);		
+		param.put("regStdYear",(regStdYear==null)?"":regStdYear);
+		param.put("regStdDate",(regStdDate==null)?"":regStdDate);
+		param.put("regEndYear",(regEndYear==null)?"":regEndYear);
+		param.put("regEndDate",(regEndDate==null)?"":regEndDate);
+		param.put("ncrStdYear",(ncrStdYear==null)?"":ncrStdYear);
+		param.put("ncrStdDate",(ncrStdDate==null)?"":ncrStdDate);
+		param.put("ncrEndYear",(ncrEndYear==null)?"":ncrEndYear);
+		param.put("ncrEndDate",(ncrEndDate==null)?"":ncrEndDate);
+		param.put("type_date",(typeDate==null)?"":typeDate);
+		param.put("occurSite",(occurSite==null)?"":occurSite);
+		param.put("reasonCode",(reasonCode==null)?"":reasonCode);
+		param.put("defectS",(defectS==null)?"":defectS);
+		
+		
+		Map<String,Object> table = new LinkedHashMap<String,Object>();
+		List<Map<String,Object>> resultList = service.getNcrStatusList(locale, param);
+				
+		if(resultList!=null &&( regStdYear!=null || ncrStdYear!=null)){
+			table.put("total",resultList.size());
+			table.put("rows",resultList);
+		}else{
+			table.put("total",0);
+		}
+		return table;		
+	
+	}	
+	
 	
 }

@@ -224,10 +224,7 @@
 	
 	
 	
-		$(document).ready(function(){			
-			if('${param.status}'=='success'){
-				$.messager.alert("<fmt:message key='ui.label.Result'/>","<fmt:message key='info.Success'/>");			
-			}
+		$(document).ready(function(){
 			
 			occurPlaceCombobox();
 			

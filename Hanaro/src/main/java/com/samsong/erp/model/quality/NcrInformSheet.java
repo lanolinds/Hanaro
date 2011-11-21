@@ -55,6 +55,49 @@ public class NcrInformSheet {
 	int rejectCount;
 	
 	
+	
+	
+	
+
+
+	@Override
+	public String toString() {
+		return "NcrInformSheet [measureProcType=" + measureProcType
+				+ ", ncrNo=" + ncrNo + ", title=" + title + ", custManager="
+				+ custManager + ", custConfirmer=" + custConfirmer
+				+ ", custAppover=" + custAppover + ", measureFileName="
+				+ measureFileName + ", reasonIssue=" + reasonIssue
+				+ ", reasonOutflow=" + reasonOutflow + ", imgReason1FileName="
+				+ imgReason1FileName + ", imgReason2FileName="
+				+ imgReason2FileName + ", imgTempMeasureFileName="
+				+ imgTempMeasureFileName + ", imgMeasure1FileName="
+				+ imgMeasure1FileName + ", imgMeasure2FileName="
+				+ imgMeasure2FileName + ", reasonFileSeq="
+				+ Arrays.toString(reasonFileSeq) + ", reasonFileState="
+				+ Arrays.toString(reasonFileState) + ", tempMeasure="
+				+ Arrays.toString(tempMeasure) + ", tempMeasureDate="
+				+ Arrays.toString(tempMeasureDate) + ", measure="
+				+ Arrays.toString(measure) + ", measureDate="
+				+ Arrays.toString(measureDate) + ", lotNo="
+				+ Arrays.toString(lotNo) + ", confirm="
+				+ Arrays.toString(confirm) + ", remark="
+				+ Arrays.toString(remark) + ", inputChangeState="
+				+ Arrays.toString(inputChangeState) + ", inputBeforChange="
+				+ Arrays.toString(inputBeforChange) + ", inputAfterChange="
+				+ Arrays.toString(inputAfterChange) + ", inputChangeDate="
+				+ Arrays.toString(inputChangeDate) + ", inputStandardSeq="
+				+ Arrays.toString(inputStandardSeq) + ", stanContents="
+				+ Arrays.toString(stanContents) + ", standardState="
+				+ Arrays.toString(standardState) + ", standardEtcSeq="
+				+ Arrays.toString(standardEtcSeq) + ", sampleDate="
+				+ sampleDate + ", supplierDate=" + supplierDate
+				+ ", insideIncomeDate=" + insideIncomeDate + ", applyProcDate="
+				+ applyProcDate + ", applyCustDate=" + applyCustDate
+				+ ", status=" + status + ", rejectCount=" + rejectCount + "]";
+	}
+
+
+
 
 
 	public int getRejectCount() {

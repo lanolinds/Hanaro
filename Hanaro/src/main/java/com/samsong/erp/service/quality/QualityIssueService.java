@@ -112,6 +112,8 @@ public interface QualityIssueService {
 	public Map<String,Object> getNcrDetailChart(String ncrNo);
 	
 	public List<Map<String,Object>> getNcrStatus(Locale locale,Map<String,Object> params);
+	
+	public List<Map<String,Object>> getNcrStatusList(Locale locale, Map<String,Object> params);
 
 	
 }
