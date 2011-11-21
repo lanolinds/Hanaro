@@ -3,7 +3,6 @@ package com.samsong.erp.service.quality;
 
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -169,7 +168,7 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	public IssueApproval getApproval(String approvalNo, Locale locale) {
 		return dao.getApproval(approvalNo,locale);
 	}
-
+ 
 	@Override
 	public IssueApproval updateApproval(IssueApproval approval) {
 		
@@ -360,7 +359,7 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 		return dao.getNCRList(locale, division, occurSite, stdDt, endDt, reasonCust, publishCust);
 	}
 
-
+	@Override
 	public void cancelApproval(String approvalNo, Locale locale) {
 		List<String> partners =dao.getClaimSharedPartnerList(approvalNo);
 		for(String partner : partners){
@@ -377,7 +376,7 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	@Override
 	public List<Map<String, Object>> getNcrStatus(Locale locale,
 			Map<String, Object> params) {
-		return dao.getNcrStatus(locale, params);
+		return dao.getNcrStatus(locale, params); 
 	}
 
 	@Override

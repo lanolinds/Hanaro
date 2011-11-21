@@ -549,8 +549,6 @@ public class NcrInformSheet {
 	public void setStanContents(String[] stanContents) {
 		this.stanContents = stanContents;
 	}
-	
-	
 
-	
+
 }

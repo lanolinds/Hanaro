@@ -1,6 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
+
 	<link rel="shortcut icon" href='<c:url value="/resources/images/favi.ico"/>' />
  	<link rel="icon" href='<c:url value="/resources/images/favi.ico"/>' type="image/x-icon" />
+
 <!-- 메뉴그룹 level 1 -->
 <table style="width:100%; white-space: nowrap;">
 	<tr>
@@ -8,6 +10,7 @@
 			<div style="white-space: nowrap;"><!-- 좌측상단 메인 메뉴 -->
 				<a href="#" class="easyui-menubutton" menu="#qualityDivision" iconCls="icon-candlestickchart"><fmt:message key="menu.qualityDivision"/></a>
 			    <a href="#" class="easyui-menubutton" menu="#humanMgmt" iconCls="icon-candlestickchart"><fmt:message key="menu.employeeDivision"/></a>
+			    <a href="#" class="easyui-menubutton" menu="#custMgmt" iconCls="icon-candlestickchart"><fmt:message key="menu.custDivision"/></a>
 			</div>
 		</td>
 		<td style="text-align:right;">
@@ -50,6 +53,15 @@
 	<div style="width:150px;">			
 			<div href='<c:url value="/humanDivision/employeeInfo/createForm"/>'><fmt:message key="menu.employeeForm"/></div>
 			<div href='<c:url value="/humanDivision/employeeInfo/list"/>'><fmt:message key="menu.employeeList"/></div>
+	</div>
+	</div>
+</div>
+<!-- 협력업체부문 서브메뉴 -->
+<div id="custMgmt" style="width:150px;">
+	<div style="white-space: nowrap;"><fmt:message key="menu.custMgmt"/>      	
+	<div style="width:150px;">			
+			<div href='<c:url value="/custDivision/custInfo/createForm"/>'><fmt:message key="menu.custForm"/></div>
+			<div href='<c:url value="/custDivision/custInfo/list"/>'><fmt:message key="menu.custList"/></div>
 	</div>
 	</div>
 </div>

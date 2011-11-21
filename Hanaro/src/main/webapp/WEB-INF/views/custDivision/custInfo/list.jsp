@@ -24,9 +24,8 @@
 	<script type="text/javascript" src='<c:url value="/resources/scripts/common-utils.js" />' ></script>
 	<script type="text/javascript">
 	$(document).ready(function(){			
-		url:"getEmployeeList";
+		url:"getCustList";
 		var params = {};
-		params.keyword = "";
 		params.keyfield = ""; 
 		$("#resultDataGrid").datagrid("load",params);
 		
@@ -36,9 +35,9 @@
 				
 			},
 			onDblClickRow:function(i,row){
-				if(row.DATA1=="${user}"){
-					$("form[name='empInfoForm'] input[name='empNo']").val(row.DATA1);
-					$("form[name='empInfoForm']").attr("action","viewEmpInfo").submit();
+				if(row.DATA2=="${user}"){
+					$("form[name='custInfoForm'] input[name='custCd']").val(row.DATA2);
+					$("form[name='custInfoForm']").attr("action","viewCustInfo").submit();
 				}
 			}
 		});
@@ -47,7 +46,6 @@
 	//사원정보 등록 리스트 조회하기
 	function searchList(){
 		var params = {};
-		params.keyword = $("#keyword").val();
 		params.keyfield = $("#keyfield").val(); 
 		$("#resultDataGrid").datagrid("load",params);
 		
@@ -62,34 +60,30 @@
 <%@ include file="/WEB-INF/views/menu.jsp"%>
 </div>
 <div region="center" style="padding:10px;">	
-<table class="easyui-datagrid" iconCls="icon-application-view-list" style="width:830px;height:725px;" 
-title='<fmt:message key="ui.label.employee.empList"/>' toolbar="#divSearch" pagination="true"  id="resultDataGrid" pageSize="30"  
-		 singleSelect="true" striped="true"   url="getEmployeeSearchList" >
-	<thead frozen="true">
+<table class="easyui-datagrid" iconCls="icon-application-view-list" style="width:880px;height:725px;" 
+title='<fmt:message key="ui.label.cust.custList"/>' toolbar="#divSearch" pagination="true"  id="resultDataGrid" pageSize="30"  
+		 singleSelect="true" striped="true"   url="getCustSearchList" >
+	<thead>
 	        <tr> 
-	            <th field="DATA8" width="130" sortable="true" align="center"><fmt:message key="ui.label.employee.deptNm" /></th>  
-	            <th field="DATA10" width="100" sortable="true" align="center"><fmt:message key="ui.label.employee.position" /></th>   		
-	            <th field="DATA2" width="100" sortable="true" align="center"><fmt:message key="ui.label.employee.empNm" /></th>   				      
-	            <th field="DATA6" width="100" sortable="true" align="center" ><fmt:message key="ui.label.employee.employDt" /></th>  
-	            <th field="DATA11" width="100" sortable="true" align="center"><fmt:message key="ui.label.employee.phone" /></th>
-	            <th field="DATA12" width="100" sortable="true" align="center"><fmt:message key="ui.label.employee.cellPhone" /></th>  
-	            <th field="DATA13" width="200" sortable="true" align="center"><fmt:message key="ui.label.employee.email" /></th>   
- 				</tr>
+	            <th field="DATA1" width="80" sortable="true" align="center"><fmt:message key="ui.label.cust.custType" /></th>  
+	            <th field="DATA2" width="70" sortable="true" align="center"><fmt:message key="ui.label.cust.custCd" /></th>   		
+	            <th field="DATA3" width="160" sortable="true" align="center"><fmt:message key="ui.label.cust.custNm" /></th>   				      
+	            <th field="DATA7" width="90" sortable="true" align="center" ><fmt:message key="ui.label.cust.officePhone" /></th>  
+	            <th field="DATA8" width="90" sortable="true" align="center"><fmt:message key="ui.label.cust.officeFax" /></th>
+	            <th field="DATA10" width="200" sortable="true" align="center"><fmt:message key="ui.label.cust.email" /></th>  
+	            <th field="DATA12" width="80" sortable="true" align="center"><fmt:message key="ui.label.cust.stdDt" /></th>
+	            <th field="DATA13" width="80" sortable="true" align="center"><fmt:message key="ui.label.cust.endDt" /></th>     
+ 		</tr>
 	</thead>
 </table>
 </div>
 
  <div id="divSearch" style="padding:5px;height:auto">
        <div>        
-		<select  id='keyword' >
-				<option value=""><fmt:message key="ui.element.All"/></option>
-				<option value="DEPT"><fmt:message key="ui.label.employee.deptNm"/></option>
-				<option value="EMP"><fmt:message key="ui.label.employee.empNm"/></option>
-		</select>
 		<input id="keyfield" style="width:120px;"  value=""  />
 		<a  href="#" class="easyui-linkbutton" iconCls="icon-search" onclick="javascript:searchList();"><fmt:message key="ui.button.Search"/></a>		
-		<form name="empInfoForm" method="post" action="viewEmpInfo">
-    		<input type="hidden" name="empNo"/>
+		<form name="custInfoForm" method="post" action="viewCustInfo">
+    		<input type="hidden" name="custCd"/>
     	</form>
      </div>
  </div>  

@@ -41,6 +41,14 @@ if ($.fn.datebox){
 	$.fn.datebox.defaults.closeText = 'Close';
 	$.fn.datebox.defaults.okText = 'Ok';
 	$.fn.datebox.defaults.missingMessage = 'This field is required.';
+	
+	$.fn.datebox.defaults.formatter=function(date){
+		var y = date.getFullYear();
+		var m = date.getMonth()+1;
+		var d = date.getDate();
+		
+		return String(y)+"-"+String(m<10?("0"+String(m)):String(m))+"-"+String(d<10?("0"+String(d)):String(d));
+	};
 }
 if ($.fn.datetimebox && $.fn.datebox){
 	$.extend($.fn.datetimebox.defaults,{

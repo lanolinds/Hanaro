@@ -24,6 +24,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
+import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
+import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -104,6 +106,7 @@ public class EmployeeInfoDAO {
 	
 	public void setEmployeeInfo(String setType, Locale locale, EmployeeInfo info, String user, byte[] photo) {
 		Map<String, Object> params = new HashMap<String, Object>();
+
 		params.put("setType", setType);
 		params.put("locale", locale.getCountry());
 		params.put("empNo", info.getEmpNo());
@@ -126,7 +129,77 @@ public class EmployeeInfoDAO {
 		params.put("photoImg",photo);
 		params.put("retireDt", info.getRetireDt());
 		params.put("user", user);
+		PasswordEncoder encoder = new Md5PasswordEncoder();
+
 		sp = new SimpleJdbcCall(jdbc).withProcedureName("EmployeeInfoDAO_setEmployeeInfo");
 		sp.execute(params);
+	}
+	
+	// 사원등록리스트를 조회한다.
+	public List<Map<String, Object>> getEmployeeRegList(Locale locale,String keyword, String keyfield) {
+		final List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+		SqlParameterSource params = new MapSqlParameterSource()
+				.addValue("locale", locale.getCountry())
+				.addValue("keyword", keyword)
+				.addValue("keyfield", keyfield);
+		sp = new SimpleJdbcCall(jdbc).withProcedureName(
+				"EmployeeInfoDAO_getEmployeeRegList").returningResultSet(
+				"issueRegList", new RowMapper<Map<String, Object>>() {
+					@Override
+					public Map<String, Object> mapRow(ResultSet rs, int i)
+							throws SQLException {
+						Map<String, Object> m = new HashMap<String, Object>();
+					
+						for (int x = 0; x < rs.getMetaData().getColumnCount(); x++) {
+							m.put("DATA" + x, rs.getObject((x + 1)));
+						}
+						resultList.add(m);
+						return null;
+					}
+				});
+		sp.execute(params);
+		return resultList;
+	}
+	
+	// 사원리스트를 조회한다.
+		public List<Map<String, Object>> getEmployeeList(Locale locale,String keyword, String keyfield) {
+			final List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+			SqlParameterSource params = new MapSqlParameterSource()
+					.addValue("locale", locale.getCountry())
+					.addValue("keyword", keyword)
+					.addValue("keyfield", keyfield);
+			sp = new SimpleJdbcCall(jdbc).withProcedureName(
+					"EmployeeInfoDAO_getEmployeeList").returningResultSet(
+					"issueRegList", new RowMapper<Map<String, Object>>() {
+						@Override
+						public Map<String, Object> mapRow(ResultSet rs, int i)
+								throws SQLException {
+							Map<String, Object> m = new HashMap<String, Object>();
+						
+							for (int x = 0; x < rs.getMetaData().getColumnCount(); x++) {
+								m.put("DATA" + x, rs.getObject((x + 1)));
+							}
+							resultList.add(m);
+							return null;
+						}
+					});
+			sp.execute(params);
+			return resultList;
+		}
+	
+	//사원사진 다운받는거
+	public byte[] getEmployeeFile(Locale locale, String empNo){
+		String sql  = "select PHOTO_IMG from MASTER_EMPLOYEE where LOCALE=? and EMP_NO =?";
+		return jdbc.queryForObject(sql,new Object[]{locale.getCountry(),empNo},new RowMapper<byte[]>(){
+			@Override
+			public byte[] mapRow(ResultSet rs, int rowNum) throws SQLException {
+				return rs.getBytes(1);
+			}
+		});
+	}
+	
+	public Map<String, Object> getEmployView(String empNo, Locale locale) {
+		return jdbc.queryForMap("exec EmployeeInfoDAO_getEmployeeView ?,? ",
+				new Object[] { empNo, locale.getCountry() });
 	}
 }
