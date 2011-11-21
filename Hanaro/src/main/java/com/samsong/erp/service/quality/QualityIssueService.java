@@ -77,6 +77,15 @@ public interface QualityIssueService {
 	
 	public List<Map<String,Object>> getNcrMeasureImg(Locale locale, String ncrNo, String fileSeq);
 
+	
+	public void updateNCRMeasureProcedure(Locale locale, String ncrNo, String updateType,String comment,
+			String date1, String date2, String date3, String date4, String date5, String manager,
+			String confirmer, String approver, String fileName, byte[] file, String resultEvaluation,
+			String user);	
+	public byte[] getNCREvaluationFile(Locale locale, String ncrNo);
+
+
+
 	public void updateClaim(String approvalNo, String partner, double rate,
 			String item,String lot, String reason1, String reason2, String reason3,
 			String remark, MultipartFile pic1, String pic1id, MultipartFile pic2,
@@ -92,6 +101,16 @@ public interface QualityIssueService {
 
 	public Map<String, String> getClaimItemSuppliers(String item, Locale locale);
 
+	
+	public List<Map<String,Object>> getNCRList(Locale locale,String division, String occurSite,
+			String stdDt, String endDt, String reasonCust, String publishCust);	
+
+
 	public void cancelApproval(String approvalNo, Locale locale);
+	
+	public Map<String,Object> getNcrDetailChart(String ncrNo);
+	
+	public List<Map<String,Object>> getNcrStatus(Locale locale,Map<String,Object> params);
+
 	
 }

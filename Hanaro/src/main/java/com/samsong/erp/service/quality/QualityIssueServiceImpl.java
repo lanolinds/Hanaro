@@ -171,7 +171,7 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	public IssueApproval getApproval(String approvalNo, Locale locale) {
 		return dao.getApproval(approvalNo,locale);
 	}
-
+ 
 	@Override
 	public IssueApproval updateApproval(IssueApproval approval) {
 		
@@ -266,7 +266,28 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	}
 
 	@Override
+
+
+	public void updateNCRMeasureProcedure(Locale locale, String ncrNo,
+			String updateType, String comment, String date1, String date2,
+			String date3, String date4, String date5, String manager,
+			String confirmer, String approver, String fileName, byte[] file,
+			String resultEvaluation, String user) {
+		dao.updateNCRMeasureProcedure(locale, ncrNo, updateType, comment, date1, date2, date3, date4, date5, manager, confirmer, approver, fileName, file, resultEvaluation, user);
+		
+	}
+
+	@Override
+	public byte[] getNCREvaluationFile(Locale locale, String ncrNo) {
+		return dao.getNCREvaluationFile(locale, ncrNo);
+	}
+
+
+
+	
+
 	public void updateClaim(String approvalNo, String partner, double rate,
+
 			String item,String lot, String reason1, String reason2, String reason3,
 			String remark, MultipartFile pic1,String pic1id, MultipartFile pic2,String pic2id,
 			MultipartFile ref,String refid,String ncr, String reqDate,
@@ -347,6 +368,14 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	}
 
 	@Override
+
+	public List<Map<String, Object>> getNCRList(Locale locale, String division,
+			String occurSite, String stdDt, String endDt, String reasonCust,
+			String publishCust) {
+		return dao.getNCRList(locale, division, occurSite, stdDt, endDt, reasonCust, publishCust);
+	}
+
+	@Override
 	public void cancelApproval(String approvalNo, Locale locale) {
 		List<String> partners =dao.getClaimSharedPartnerList(approvalNo);
 		for(String partner : partners){
@@ -354,4 +383,17 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 		}
 		dao.rollbackIssue(approvalNo);
 	}
+
+	@Override
+	public Map<String, Object> getNcrDetailChart(String ncrNo) {
+		return dao.getNcrDetailChart(ncrNo);
+	}
+
+	@Override
+	public List<Map<String, Object>> getNcrStatus(Locale locale,
+			Map<String, Object> params) {
+		return dao.getNcrStatus(locale, params); 
+	}
+
+
 }

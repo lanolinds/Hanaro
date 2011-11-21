@@ -882,7 +882,7 @@ public class QualityIssueDAO {
 
 		String sqlHead = "UPDATE [qis_ncr_step1_head] SET [locale] = ? , [title] = ?";
 		sqlHead += " ,[custManager] = ?, [custConfirmer] = ? ,[custApprover] = ?";
-		sqlHead += " ,[status] = 'REG', [rejectCount] = 0 ,[updateBy] = ?, [updateDt] = getdate()";
+		sqlHead += " ,[status] = 'REG', [updateBy] = ?, [updateDt] = getdate()";
 		sqlHead += " WHERE ncrNo = ?";
 		jdbc.update(
 				sqlHead,
@@ -1197,6 +1197,43 @@ public class QualityIssueDAO {
 		}
 
 	}
+	
+	public void updateNCRMeasureProcedure(Locale locale, String ncrNo, String updateType,String comment,
+				String date1, String date2, String date3, String date4, String date5, String manager,
+				String confirmer, String approver, String fileName, byte[] file, String resultEvaluation,
+				String user){
+		SqlParameterSource params = new MapSqlParameterSource()
+			.addValue("locale",locale.getCountry())
+			.addValue("ncrNo",ncrNo)
+			.addValue("updateType",updateType)
+			.addValue("comment",comment)
+			.addValue("date1",(date1.trim().equals(""))?null:date1)
+			.addValue("date2",(date2.trim().equals(""))?null:date2)
+			.addValue("date3",(date3.trim().equals(""))?null:date3)
+			.addValue("date4",(date4.trim().equals(""))?null:date4)
+			.addValue("date5",(date5.trim().equals(""))?null:date5)
+			.addValue("manager",manager)
+			.addValue("confirmer",confirmer)
+			.addValue("approver",approver)
+			.addValue("fileName",fileName)
+			.addValue("file",file)
+			.addValue("resultEvaluation",resultEvaluation)
+			.addValue("user",user);
+		sp =  new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueDAO_updateNCRMeasureProcedure");
+		sp.execute(params);
+		
+	}
+	
+	//평가파일 다운받는거
+	public byte[] getNCREvaluationFile(Locale locale, String ncrNo){
+		String sql  = "select [file] from dbo.qis_ncr_step3_evaluation_file where ncrNo =?";
+		return jdbc.queryForObject(sql,new Object[]{ncrNo},new RowMapper<byte[]>(){
+			@Override
+			public byte[] mapRow(ResultSet rs, int rowNum) throws SQLException {
+				return rs.getBytes(1);
+			}
+		});
+	}
 
 
 	public String updateClaimAttach(String id, MultipartFile f) {
@@ -1266,6 +1303,34 @@ public class QualityIssueDAO {
 		});
 		return suppliers;
 	}
+	
+	public List<Map<String,Object>> getNCRList(Locale locale,String division, String occurSite,
+			String stdDt, String endDt, String reasonCust, String publishCust){
+		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		SqlParameterSource params = new MapSqlParameterSource()
+		.addValue("locale",locale.getCountry())
+		.addValue("occurDivision",division)
+		.addValue("occustSite",occurSite)
+		.addValue("stdDt",stdDt)
+		.addValue("endDt",endDt)
+		.addValue("reasonCust",reasonCust)
+		.addValue("publishCust",publishCust);
+		
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueDAO_getNcrList").returningResultSet("ncrList",new RowMapper<Map<String,Object>>() {
+
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int rowNum)
+					throws SQLException {
+				Map<String,Object> m = new HashMap<String, Object>();
+				for(int x = 0; x<rs.getMetaData().getColumnCount();x++)
+					m.put("DATA"+x,rs.getObject(x+1));
+				list.add(m);
+				return null;
+			}
+		});
+		sp.execute(params);
+		return list;
+	}
 
 	public List<String> getClaimSharedPartnerList(String approvalNo) {
 		List<String> list = null;
@@ -1278,4 +1343,41 @@ public class QualityIssueDAO {
 		String sql = "update qis_quality_defect set action_ref = null where action_ref =?";
 		jdbc.update(sql,approvalNo);
 	}
+
+	public Map<String,Object> getNcrDetailChart(String ncrNo){		
+		SqlParameterSource params = new MapSqlParameterSource().addValue("ncrNo",ncrNo);
+		sp  = new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueDAO_getNcrDetailChart").returningResultSet("chartList",new RowMapper<Map<String,Object>>() {
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int rowNum)
+					throws SQLException {
+				Map<String,Object> m = new HashMap<String, Object>();
+				for(int x = 0; x <rs.getMetaData().getColumnCount();x++)
+					m.put("date"+(1+x),rs.getInt(x+1));
+				return m;
+			}
+		});
+		return sp.execute(params);
+	}
+	
+	//NCR현황 차트 및 표용
+	public List<Map<String,Object>> getNcrStatus(Locale locale,Map<String,Object> params){ 
+		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		params.put("locale",locale.getCountry());
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueDAO_getNcrStatus").returningResultSet("ncrStatus",new RowMapper<Map<String,Object>>() {
+
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int rowNum)
+					throws SQLException {
+				Map<String,Object> m = new  LinkedHashMap<String,Object>();
+				for(int x = 0;x<rs.getMetaData().getColumnCount();x++)
+					m.put("DATA"+x,rs.getObject(x+1));
+				list.add(m);
+				return null;
+			}
+				
+		});
+		sp.execute(params);
+		return list;
+	}
+	
 }

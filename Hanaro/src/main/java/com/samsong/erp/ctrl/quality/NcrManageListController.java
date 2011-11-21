@@ -5,16 +5,22 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.log4j.Logger;
+import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +30,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.samsong.erp.model.quality.NcrInformSheet;
+import com.samsong.erp.service.empInfo.EmployeeInfoService;
 import com.samsong.erp.service.quality.QualityIssueService;
+import com.samsong.erp.util.HashMapComparator;
 
 
  
@@ -37,19 +45,39 @@ public class NcrManageListController {
 	@Autowired
 	QualityIssueService service;
 	
+	@Autowired
+	EmployeeInfoService serviceEmployee;
+	
 	@RequestMapping(value="/ncrManageList", method=RequestMethod.GET)
-	public String menuNcrManageList(){		
+	public String menuNcrManageList(Model model,Locale locale, LocalDate date, Authentication auth){
+		String deptCd ="";
+        List<Map<String,Object>> userInfoList = serviceEmployee.getUserInfo(locale, auth.getName());
+        if(userInfoList !=null){
+        	deptCd = String.valueOf(((HashMap)userInfoList.get(0)).get("DATA1"));
+        }
+
+        if(auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_USER")))
+        	model.addAttribute("isEMP",true);
+        else
+        	model.addAttribute("isEMP",false);
+		model.addAttribute("deptCd",deptCd);
+		
+		Map<String,Object> defects = service.getCodeDefectSource(locale, "");		
+	    model.addAttribute("defectSource",defects);
+	    model.addAttribute("today",date);
 		return prefix+"/ncrManageList"; 
 	}
 	@RequestMapping(value="/ncrManageDetail", method=RequestMethod.GET)
-	public String menuNcrManageDetail(Model model, @RequestParam(value="ncrNo", required=false) String ncrNo, Locale locale){
+	public String menuNcrManageDetail(Model model, @RequestParam(value="ncrNo", required=false) String ncrNo, Locale locale,Authentication auth,HttpServletRequest req){
 	    String[] standardNames = {"ui.label.quality.fmea","ui.label.quality.managePlan","ui.label.quality.workStandard","ui.label.quality.csheet"};
         model.addAttribute("stanNames",standardNames);
+        
+
         
 		NcrInformSheet sheet = new NcrInformSheet();
 		Map<String,Object> sheetMap = new HashMap<String,Object>(); 
 		List<Map<String,Object>> sheetList = service.getNcrDetail(locale, ncrNo);
-		if(sheetList !=null){
+		if(sheetList !=null && sheetList.size()>0){
 			sheet.setStatus(String.valueOf(((HashMap)sheetList.get(0)).get("DATA0"))); //상태
 			sheet.setTitle(String.valueOf(((HashMap)sheetList.get(0)).get("DATA1")));//제목
 			sheetMap.put("occurPartNo",String.valueOf(((HashMap)sheetList.get(0)).get("DATA3"))); //발생품번
@@ -95,9 +123,30 @@ public class NcrManageListController {
 			sheet.setImgMeasure1FileName(String.valueOf(((HashMap)sheetList.get(0)).get("DATA43")));
 			sheet.setImgMeasure2FileName(String.valueOf(((HashMap)sheetList.get(0)).get("DATA44")));
 			sheetMap.put("reasonOrgan",String.valueOf(((HashMap)sheetList.get(0)).get("DATA45")));
+			sheet.setRejectCount(Integer.parseInt(((HashMap)sheetList.get(0)).get("DATA46").toString()));
+			sheetMap.put("rejectComment", String.valueOf(((HashMap)sheetList.get(0)).get("DATA47")));
+			sheetMap.put("evaluationContent", String.valueOf(((HashMap)sheetList.get(0)).get("DATA48"))); 
+			sheetMap.put("evaluationManager", String.valueOf(((HashMap)sheetList.get(0)).get("DATA49")));
+			sheetMap.put("evaluationConfirmer", String.valueOf(((HashMap)sheetList.get(0)).get("DATA50")));
+			sheetMap.put("evaluationApprover", String.valueOf(((HashMap)sheetList.get(0)).get("DATA51")));
+			sheetMap.put("evaluationFileName", String.valueOf(((HashMap)sheetList.get(0)).get("DATA52")));
+			sheetMap.put("evaluationResult", String.valueOf(((HashMap)sheetList.get(0)).get("DATA53")));
+			sheetMap.put("ref1", String.valueOf(((HashMap)sheetList.get(0)).get("DATA54")));
+			sheetMap.put("ref2", String.valueOf(((HashMap)sheetList.get(0)).get("DATA55")));
+			sheetMap.put("ref3", String.valueOf(((HashMap)sheetList.get(0)).get("DATA56")));
+			
 		}
-		sheet.setNcrNo(ncrNo);	
+		sheet.setNcrNo(ncrNo);
 		
+        List<Map<String,Object>> userInfoList = serviceEmployee.getUserInfo(locale, auth.getName());
+        
+        if(auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_USER")))
+        	sheetMap.put("isEmp",true);
+        else
+        	sheetMap.put("isEmp",false);
+        if(userInfoList !=null){
+        	sheetMap.put("userDept",String.valueOf(((HashMap)userInfoList.get(0)).get("DATA1")));
+        }
 		model.addAttribute("sheetMap",sheetMap);
 		List<Map<String,Object>> standard = new ArrayList<Map<String,Object>>();		
 		standard = service.getNcrMeasureDataGrid(locale, ncrNo, "standard");		
@@ -155,7 +204,26 @@ public class NcrManageListController {
 			}catch(Exception ex){
 				ex.printStackTrace();
 			} 			
+		}else if(measureProcType.equals("do_plan")){
+			try{
+				sheet.setMeasureFileName(treatFile.getOriginalFilename());
+				sheet.setImgReason1FileName(imgReasonFile1.getOriginalFilename());
+				sheet.setImgReason2FileName(imgReasonFile2.getOriginalFilename());
+				sheet.setImgTempMeasureFileName(imgTempNameFile.getOriginalFilename());
+				sheet.setImgMeasure1FileName(imgMeasureName1File.getOriginalFilename());
+				sheet.setImgMeasure2FileName(imgMeasureName2File.getOriginalFilename());
+				service.updateNcrMeasure(locale, user, sheet, treatFile.getBytes(),imgReasonFile1.getBytes(),imgReasonFile2.getBytes(),
+						imgTempNameFile.getBytes(),imgMeasureName1File.getBytes(),imgMeasureName2File.getBytes(),
+						inputAddFiles,inputChangeFile,stanFile
+						,imgReasonFile1.getContentType(),imgReasonFile2.getContentType(),imgTempNameFile.getContentType(),
+						imgMeasureName1File.getContentType(),imgMeasureName2File.getContentType());
+				service.updateNCRMeasureProcedure(locale, sheet.getNcrNo(), measureProcType,
+						"","","","","","","", "", "", null, null, "", user);
+			}catch(Exception ex){
+				ex.printStackTrace();
+			} 				
 		}
+		
 		model.addAttribute("ncrNo",sheet.getNcrNo());
 		
 		return "redirect:"+prefix+"/ncrManageDetail";
@@ -255,6 +323,95 @@ public class NcrManageListController {
 			e.printStackTrace();
 		}
 	}		
+	
+	//NCR대책서 단계별 진행하기
+	@RequestMapping(value="/updateNCRMeasureProcedure", method=RequestMethod.POST)
+	public String updateNCRMeasureProcedure(Locale locale
+			,@RequestParam("ncrNo") String ncrNo
+			,@RequestParam("measureProcType") String updateType 
+			,@RequestParam(value="comment", required=false) String comment 
+			,@RequestParam(value="sampleDate",required=false) String date1
+			,@RequestParam(value="supplierDate",required=false) String date2
+			,@RequestParam(value="insideIncomeDate",required=false) String date3
+			,@RequestParam(value="applyProcDate",required=false) String date4
+			,@RequestParam(value="applyCustDate",required=false) String date5
+			,@RequestParam(value="evalManager",required=false) String manager
+			,@RequestParam(value="evalConfirmer",required=false) String confirmer
+			,@RequestParam(value="evalApprover",required=false) String approver
+			,@RequestParam(value="inputEvaluationFile", required=false) MultipartFile file
+			,@RequestParam(value="selectEvaluationResult",required=false) String resultEvaluation
+			,Principal prin
+			,Model model){
+		try{
+				
+				service.updateNCRMeasureProcedure(locale, ncrNo, updateType, comment, date1,
+						date2, date3,date4, date5, manager, confirmer, approver,
+						(file==null)?null:file.getOriginalFilename(),
+								(file==null)?null:file.getBytes(), resultEvaluation, prin.getName());
+			}catch(Exception e){
+				System.err.println(e.getMessage());
+			}
+		model.addAttribute("ncrNo",ncrNo);
+		return "redirect:"+prefix+"/ncrManageDetail";
+		
+		
+	}
+	
+	//NCR평가 파일 다운받는거
+	@RequestMapping(value="/getNCREvaluationFile", method=RequestMethod.GET)
+	public void getNCREvaluationFile(Locale locale, @RequestParam("ncrNo") String ncrNo,@RequestParam("fileName") String fileName, HttpServletResponse response){
+		byte[] file;
+		file = service.getNCREvaluationFile(locale, ncrNo);
+		BufferedOutputStream out;
+		try {
+			response.setHeader("Content-Disposition","attachment;filename=\""+URLEncoder.encode(fileName, "UTF-8")+"\"");
+			out = new BufferedOutputStream(response.getOutputStream());
+			out.write(file);
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	//NCR대책서 리스트 조회
+	//품질불량등록 메뉴의 등록된 목록조회
+	@RequestMapping(value="/getNCRList", method=RequestMethod.POST)
+	public @ResponseBody Map<String,Object> getNCRList(Locale locale, @RequestParam(value="division",required=false) String division, @RequestParam(value="occurSite",required=false) String occurSite,
+			@RequestParam(value="stdDt",required=false) String stdDt, @RequestParam(value="endDt",required=false) String endDt,
+			@RequestParam(value="reasonCust",required=false) String reasonCust, @RequestParam(value="publishCust",required=false) String publishCust,
+			@RequestParam("page") int page,@RequestParam("rows") int rows,
+			@RequestParam(value="sort",required=false) String sortKey,@RequestParam(value="order",required=false) String order){
+		
+		Map<String,Object> table = new LinkedHashMap<String,Object>();
+		List<Map<String,Object>> resultList = service.getNCRList(locale, division, occurSite, stdDt, endDt,
+				(reasonCust==null)?"":reasonCust,
+				(publishCust==null)?"":publishCust);
+				
+		if(resultList!=null){			
+			if(sortKey!=null){
+				Collections.sort(resultList,new HashMapComparator(sortKey, order.equalsIgnoreCase("asc")));
+			}
+			
+			table.put("total",resultList.size());
+			int start =  (page-1)*rows;
+			int end  = start +rows;
+			if(end>resultList.size())end = resultList.size();
+			table.put("rows",resultList.subList(start,end));
+		}else{
+			table.put("total",0);
+		}
+		return table;
+	}	
+	
+	//NCR 동일 품번 동일 불량건으로 발생된 최근 추이차트
+	@RequestMapping(value="/getNcrDetailChart",method=RequestMethod.GET)
+	public @ResponseBody Map<String,Object> getNcrDetailChart(@RequestParam("ncrNo")String ncrNo){
+		return  service.getNcrDetailChart(ncrNo);
+	}
+			
+			
+			
 	
 	
 	
