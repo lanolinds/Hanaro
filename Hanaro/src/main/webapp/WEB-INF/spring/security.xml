@@ -34,10 +34,13 @@
 		<beans:property name="authenticationFailureHandler" ref="authenticationFailHandler"></beans:property>
 		</beans:bean>
 		
+		<beans:bean id="hanaroUserDetailsService" class="com.samsong.erp.service.HanaroUserDetailsService">
+			<beans:constructor-arg name="ds" ref="dataSource"/>
+		</beans:bean>
+		
 		<authentication-manager alias="authenticationManager"> 
-		<authentication-provider>
+		<authentication-provider  user-service-ref="hanaroUserDetailsService">
 		<password-encoder hash="md5" ></password-encoder>
-		<jdbc-user-service data-source-ref="dataSource" />
 		</authentication-provider>
 		</authentication-manager> 
 		

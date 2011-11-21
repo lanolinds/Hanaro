@@ -1217,10 +1217,10 @@ public class QualityIssueDAO {
 	public void updateClaim(String approvalNo, String partner, double rate,
 			double claim,String item, String lot, String reason1, String reason2,
 			String reason3, String remark, String pic1id, String pic2id,
-			String refid) {
-		String sql = "update qis_claims set item=?, lot=?, reason1=?, reason2 =?, reason3=?, rate=?, claim=?, remark=?, ref1=?, ref2=?, ref3=?" +
+			String refid,String ncrNo) {
+		String sql = "update qis_claims set item=?, lot=?, reason1=?, reason2 =?, reason3=?, rate=?, claim=?, remark=?, ref1=?, ref2=?, ref3=?,ncr=?" +
 				" where approvalNo=? and partner=?";
-		jdbc.update(sql, item,lot,reason1,reason2,reason3,rate,claim,remark,pic1id,pic2id,refid,approvalNo,partner);
+		jdbc.update(sql, item,lot,reason1,reason2,reason3,rate,claim,remark,pic1id,pic2id,refid,ncrNo,approvalNo,partner);
 	}
 
 	public Map<String, Object> getClaimAttachment(String id) {
@@ -1278,5 +1278,4 @@ public class QualityIssueDAO {
 		String sql = "update qis_quality_defect set action_ref = null where action_ref =?";
 		jdbc.update(sql,approvalNo);
 	}
-
 }

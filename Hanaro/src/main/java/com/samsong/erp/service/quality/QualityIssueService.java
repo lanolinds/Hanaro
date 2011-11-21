@@ -80,7 +80,7 @@ public interface QualityIssueService {
 	public void updateClaim(String approvalNo, String partner, double rate,
 			String item,String lot, String reason1, String reason2, String reason3,
 			String remark, MultipartFile pic1, String pic1id, MultipartFile pic2,
-			String pic2id, MultipartFile ref,String refid, Locale locale);
+			String pic2id, MultipartFile ref,String refid,String ncr,String reqDate,String request, Locale locale);
 
 	public Map<String, Object> getClaimAttachment(String id);
 

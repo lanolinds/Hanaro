@@ -244,7 +244,7 @@ public class IssueAcceptController {
 		}
 		else if (action.equals("edit")){
 			//service.updateClaim(approvalNo,partner,rate,item,lot,reason1,reason2,reason3,remark,pic1,pic1id,pic2,pic2id,ref,refid,locale);
-			service.updateClaim(approvalNo, partner, rate, item, lot, reason1, reason2, reason3, remark, pic1, pic1id, pic2, pic2id, ref, refid, locale);
+			service.updateClaim(approvalNo, partner, rate, item, lot, reason1, reason2, reason3, remark, pic1, pic1id, pic2, pic2id, ref, refid,ncr,reqDate,request,locale);
 		}
 		else if(action.equals("delete")){
 			service.deletePartnerClaim(approvalNo,partner,locale); 
