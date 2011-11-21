@@ -15,7 +15,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -28,7 +27,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.samsong.erp.model.quality.IssueApproval;
-
 import com.samsong.erp.model.quality.NcrInformSheet;
 import com.samsong.erp.model.quality.QualityIssueRegSheet;
 
@@ -1358,5 +1356,27 @@ public class QualityIssueDAO {
 		});
 		return sp.execute(params);
 	}
+	
+	//NCR현황 차트 및 표용
+	public List<Map<String,Object>> getNcrStatus(Locale locale,Map<String,Object> params){ 
+		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		params.put("locale",locale.getCountry());
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueDAO_getNcrStatus").returningResultSet("ncrStatus",new RowMapper<Map<String,Object>>() {
+
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int rowNum)
+					throws SQLException {
+				Map<String,Object> m = new  LinkedHashMap<String,Object>();
+				for(int x = 0;x<rs.getMetaData().getColumnCount();x++)
+					m.put("DATA"+x,rs.getObject(x+1));
+				list.add(m);
+				return null;
+			}
+				
+		});
+		sp.execute(params);
+		return list;
+	}
+	
 
 }

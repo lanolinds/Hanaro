@@ -89,7 +89,7 @@
 </div>
 <div region="center" style="padding:10px;">
 			<table class="easyui-datagrid" iconCls="icon-application-view-list" style="width:900px;height:725px;" 
-				title='<fmt:message key="menu.qualityNcrStatus"/>' toolbar="#divSearch" pagination="true"  id="resultDataGrid" pageSize="30"   singleSelect="true" striped="true"   url="getNCRList">
+				title='<fmt:message key="menu.qualityNcrManagement"/>' toolbar="#divSearch" pagination="true"  id="resultDataGrid" pageSize="30"   singleSelect="true" striped="true"   url="getNCRList">
 					<thead>
 				       <tr>
 				            <th field="DATA0" width="110" sortable="true" align="center"><fmt:message key="ui.label.ncrNo" /></th>  

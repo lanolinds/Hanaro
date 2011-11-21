@@ -406,7 +406,7 @@
 		         enabled: false
 		      },
 		           series: [{
-		         name: null,
+		         name: '발행건수',
 		         data: datas
 		      }]
 		   });
