@@ -1381,6 +1381,7 @@ public class QualityIssueDAO {
 	}
 	
 
+
 	
 	//NCR현황 리스트용
 	public List<Map<String,Object>> getNcrStatusList(Locale locale, Map<String,Object> params){
@@ -1403,5 +1404,6 @@ public class QualityIssueDAO {
 		return list;		
 	}
 	
+
 
 }

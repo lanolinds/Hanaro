@@ -356,6 +356,7 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 		
 		
 		
+		
 		//업체 클래임 금액 계산.
 		IssueApproval approval = dao.getApproval(approvalNo, locale);
 		double share = approval.getClaim()*(rate/100d);
