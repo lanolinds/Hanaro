@@ -53,7 +53,7 @@ public class QualityIssueController {
 	 
 	//품질문제등록 메뉴이동
 	@RequestMapping(value="/qualityIssueReg", method=RequestMethod.GET)
-	public String menuQualityIssueReg(Model model,Authentication auth, LocalDate date){
+	public String menuQualityIssueReg(Model model,Authentication auth, LocalDate date,Locale locale){
 		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		Map<String,Object> defects = service.getCodeDefectSource(user.getLocale(), "");
 		Map<String,Object> defectc = service.getCodeDefect(user.getLocale(), 0, "");		
@@ -61,7 +61,7 @@ public class QualityIssueController {
 		model.addAttribute("defectCode", defectc);
 		model.addAttribute("today",date);
 		QualityIssueRegSheet sheet = new QualityIssueRegSheet();
-		sheet.setRegNo(message.getMessage("ui.label.AutoCreate",null, user.getLocale()));
+		sheet.setRegNo(message.getMessage("ui.label.AutoCreate",null,locale));
 		model.addAttribute("qualityIssueRegSheet",sheet);
 		return prefix+"/qualityIssueReg";
 	}	

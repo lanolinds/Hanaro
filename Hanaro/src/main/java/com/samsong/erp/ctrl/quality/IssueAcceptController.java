@@ -55,7 +55,7 @@ public class IssueAcceptController {
 	
 	
 	@RequestMapping(value="/acceptIssues", method=RequestMethod.POST)
-	public String accept(@RequestParam("regNo") String regNo,@RequestParam(value="no",required=false) String approvalNo,Model model,Authentication auth){
+	public String accept(@RequestParam("regNo") String regNo,@RequestParam(value="no",required=false) String approvalNo,Model model,Authentication auth,Locale locale){
 		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		
 		
@@ -64,7 +64,7 @@ public class IssueAcceptController {
 		
 		//출처별 처리 방법을 얻는다.
 		String originCode =(String)details.get("originCode");
-		Map<String,String> methods = getHandleMethods(originCode,user.getLocale());
+		Map<String,String> methods = getHandleMethods(originCode,locale);
 		
 		//기본 처리 내역을 얻는다.
 		if(approvalNo==null)
@@ -185,7 +185,7 @@ public class IssueAcceptController {
 			@RequestParam("method") String method,
 			@RequestParam(value="workCost",required=false) Integer workCost,
 			@RequestParam(value="testCost",required=false) Integer testCost,
-			Model model,Authentication auth){
+			Model model,Authentication auth,Locale locale){
 		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		int workCostVal = workCost==null?0:workCost.intValue();
 		int testCostVal = testCost==null?0:testCost.intValue();
@@ -208,7 +208,7 @@ public class IssueAcceptController {
 		
 		Map<String,Object> details = service.getIssueDetails(regNo, user.getLocale());
 		String originCode =(String)details.get("originCode");
-		Map<String,String> methods = getHandleMethods(originCode,user.getLocale());
+		Map<String,String> methods = getHandleMethods(originCode,locale);
 		String item = (String)details.get("item");
 		Map<String,String> suppliers = service.getClaimItemSuppliers(item,user.getLocale());
 		
@@ -242,7 +242,7 @@ public class IssueAcceptController {
 			@RequestParam("ncr") String ncr,
 			@RequestParam("reqDate") String reqDate,
 			@RequestParam("request") String request,
-			Model model,Authentication auth){
+			Model model,Authentication auth,Locale locale){
 		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		pic1id = pic1id.trim().length()==0?null:pic1id;
 		pic2id = pic2id.trim().length()==0?null:pic2id;
@@ -265,7 +265,7 @@ public class IssueAcceptController {
 		IssueApproval approval = service.getApproval(approvalNo, user.getLocale());
 		Map<String,Object> details = service.getIssueDetails(regNo, user.getLocale());
 		String originCode =(String)details.get("originCode");
-		Map<String,String> methods = getHandleMethods(originCode,user.getLocale());
+		Map<String,String> methods = getHandleMethods(originCode,locale);
 		String claimItem = (String)details.get("item");
 		Map<String,String> suppliers = service.getClaimItemSuppliers(claimItem,user.getLocale());
 		
