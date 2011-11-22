@@ -23,6 +23,7 @@
 	<script type="text/javascript" src='<c:url value="/resources/scripts/easyui/locale/easyui-lang-${pageContext.response.locale.language}.js"/>'></script>
 	<script type="text/javascript" src='<c:url value="/resources/scripts/common-utils.js" />' ></script>
 	<script type="text/javascript">
+	var partCust = "";
 
 	 
 	//등록전에 검사 확인하기
@@ -43,6 +44,8 @@
 				options+='<option value='+key+'>'+map[key]+'</option>';
 			}
 			$("#partSupplier").empty().append(options);
+			if(partCust!="")
+				$("#partSupplier").val(partCust);	
 		});
 		
 		
@@ -65,7 +68,7 @@
 	        idField:'partNo',  
 	        textField:'partNo',
 	        mode:'remote',
-	        onSelect:function(rowIndex, rowData){	        	
+	        onSelect:function(rowIndex, rowData){
 	        	$("#occurPartNm").val(rowData.partName);
 	        	$("#car").val(rowData.car);
 	        	$("#model").val(rowData.model);
@@ -156,7 +159,8 @@
 			$.messager.alert("<fmt:message key='warn.infoWarn' />","<fmt:message key='warn.notSelectedItem' />");
 			return;
 		}
-		
+		partCust = "";
+		partCust = record.DATA25;
 		$("#regNo").val(record.DATA0);
 		$("input[name='procType']").val("UPDATE");
 		$("#division").val(record.DATA20);
@@ -168,13 +172,12 @@
 		$("#occurPartNm").val(record.DATA10);
 		$("#car").val(record.DATA7);
 		$("#model").val(record.DATA8);
-		$("#partSupplier").val(record.DATA25);
 		$("#occurPlace").combobox("setValue",record.DATA27);
 		$("#occurLine").empty();
 		if(record.DATA5 !=null && record.DATA5 !="")
-			$("#occurLine").append("<option value'"+record.DATA5+"'>"+record.DATA5+"</option>");
+			$("#occurLine").append("<option value='"+record.DATA5+"'>"+record.DATA5+"</option>");
 		if(record.DATA28 !=null && record.DATA28 !="")
-			$("#occurProc").append("<option value'"+record.DATA28+"'>"+record.DATA6+"</option>");
+			$("#occurProc").append("<option value='"+record.DATA28+"'>"+record.DATA6+"</option>");
 		$("#lotNo").val(record.DATA11);
 		$("#defectL").val(record.DATA29);
 		$("#defectM").empty().append("<option value='"+record.DATA30+"'>"+record.DATA14+"</option>");
