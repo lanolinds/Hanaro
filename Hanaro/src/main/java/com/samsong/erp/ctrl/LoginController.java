@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class LoginController {
 	private static Logger logger = Logger.getLogger(LoginController.class);
 	@RequestMapping("/login")
-	public String login(Locale locale){
+	public String login(){
 		return "login";
 	}
 

@@ -13,7 +13,8 @@
 		<intercept-url pattern="/accessDenied.jsp" access="isAuthenticated()"/><!-- 		접근 권한 경고 페이지. 로그인한 사용자면 누구나 -->
 		<intercept-url pattern="/dataAccessFailure.jsp" access="isAuthenticated()"/><!-- 		DB error  페이지. 로그인한 사용자면 누구나 -->
  		<intercept-url pattern="/home" access="hasAnyRole('ROLE_USER','ROLE_CUST')"/><!-- 기본 사용자 역할 -->
- 		<intercept-url pattern="/qualityDivision/qualityIssue/list" access="hasAnyRole('ROLE_USER')"/><!--  		삼송직원만 출입가능 --> 		
+ 		<intercept-url pattern="/qualityDivision/qualityIssue/list" access="hasAnyRole('ROLE_USER')"/><!--  		삼송직원만 출입가능 -->
+ 		<intercept-url pattern="/qualityDivision/qualityIssue/ncrStatus" access="hasAnyRole('ROLE_USER')"/><!--  		삼송직원만 출입가능 --> 		 		
  		<intercept-url pattern="/qualityDivision/**" access="hasAnyRole('ROLE_USER','ROLE_CUST')"/><!--  		기본 사용자 역할 -->
  		<intercept-url pattern="/humanDivision/**" access="hasAnyRole('ROLE_USER')"/><!-- 삼송직원 역할 -->
  		<intercept-url pattern="/custDivision/**" access="hasAnyRole('ROLE_USER','ROLE_CUST')"/><!-- 기본 사용자 역할 -->

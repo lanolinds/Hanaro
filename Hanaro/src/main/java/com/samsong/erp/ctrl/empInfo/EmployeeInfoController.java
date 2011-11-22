@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.samsong.erp.model.HanaroUser;
 import com.samsong.erp.model.empInfo.EmployeeInfo;
 import com.samsong.erp.service.empInfo.EmployeeInfoService;
 import com.samsong.erp.util.HashMapComparator;
@@ -46,30 +48,32 @@ public class EmployeeInfoController {
 	
 	//사원정보등록 메뉴이동
 	@RequestMapping(value="/createForm", method=RequestMethod.GET)
-	public String menuEmployReg(Model model,Locale locale, LocalDate date){				
-		Map<String,Object> deptList = service.getCodeDept(locale);
-		Map<String,Object> positionList = service.getCodePosition(locale);	
-		Map<String,Object> roleList = service.getCodeRole(locale);		
+	public String menuEmployReg(Model model,Authentication auth, LocalDate date){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		Map<String,Object> deptList = service.getCodeDept(user.getLocale());
+		Map<String,Object> positionList = service.getCodePosition(user.getLocale());	
+		Map<String,Object> roleList = service.getCodeRole(user.getLocale());		
 	    model.addAttribute("deptList",deptList);
 		model.addAttribute("positionList", positionList);
 		model.addAttribute("roleList",roleList);
 		EmployeeInfo info = new EmployeeInfo();
-		info.setEmpNo(message.getMessage("ui.label.AutoCreate",null, locale));
+		info.setEmpNo(message.getMessage("ui.label.AutoCreate",null, user.getLocale()));
 		model.addAttribute("employeeInfo",info);
 		return prefix+"/createForm";
 	}	
 	
 	//사원정보등록
 	@RequestMapping(value="/addEmployeeInfo", method=RequestMethod.POST )
-	public String addEmployeeInfo(String setType,Locale locale, EmployeeInfo info,Principal prin,Model model, @RequestParam("photoImg") MultipartFile photoImg){
-	   String user =prin.getName();
+	public String addEmployeeInfo(String setType,Authentication auth, EmployeeInfo info,Model model, @RequestParam("photoImg") MultipartFile photoImg){
+	  HanaroUser user = (HanaroUser)auth.getPrincipal();
+	   
 	  try {
 		  System.out.println(photoImg.getOriginalFilename());
 	   //선택된 파일이름은 모델에 담는다.		  
 	   info.setPhoto(photoImg.getOriginalFilename());
 
 	   //선택된 파일객체는 직접 입력한다.	   
-		service.setEmployeeInfo(setType, locale, info, user, photoImg.getBytes());
+		service.setEmployeeInfo(setType, user.getLocale(), info, user.getUsername(), photoImg.getBytes());
 	  } catch (IOException e) {
 		e.printStackTrace();
 	  }	  
@@ -79,16 +83,17 @@ public class EmployeeInfoController {
 	
 	//사원정보등록 메뉴의 등록된 목록조회
 	@RequestMapping(value="/getEmployeeList", method=RequestMethod.POST)
-	public @ResponseBody Map<String,Object> getQualityIssueRegList(Locale locale, 
+	public @ResponseBody Map<String,Object> getQualityIssueRegList(Authentication auth, 
 			@RequestParam(value="keyword",required=false) String keyword,
 			@RequestParam(value="keyfield",required=false) String keyfield,
 			@RequestParam("page") int page,
 			@RequestParam("rows") int rows,
 			@RequestParam(value="sort",required=false) String sortKey,
 			@RequestParam(value="order",required=false) String order){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		
 		Map<String,Object> table = new LinkedHashMap<String,Object>();
-		List<Map<String,Object>> resultList = service.getEmployeeRegList(locale,keyword,keyfield);
+		List<Map<String,Object>> resultList = service.getEmployeeRegList(user.getLocale(),keyword,keyfield);
 	
 		if(resultList!=null){			
 			if(sortKey!=null){
@@ -108,16 +113,16 @@ public class EmployeeInfoController {
 	
 	//사원정보 검색 목록조회
 	@RequestMapping(value="/getEmployeeSearchList", method=RequestMethod.POST)
-	public @ResponseBody Map<String,Object> getQualityIssueSearchList(Locale locale, 
+	public @ResponseBody Map<String,Object> getQualityIssueSearchList(Authentication auth, 
 			@RequestParam(value="keyword",required=false) String keyword,
 			@RequestParam(value="keyfield",required=false) String keyfield,
 			@RequestParam("page") int page,
 			@RequestParam("rows") int rows,
 			@RequestParam(value="sort",required=false) String sortKey,
 			@RequestParam(value="order",required=false) String order){
-		
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		Map<String,Object> table = new LinkedHashMap<String,Object>();
-		List<Map<String,Object>> resultList = service.getEmployeeList(locale,keyword,keyfield);
+		List<Map<String,Object>> resultList = service.getEmployeeList(user.getLocale(),keyword,keyfield);
 	
 		if(resultList!=null){			
 			if(sortKey!=null){
@@ -137,19 +142,19 @@ public class EmployeeInfoController {
 	
 	//사원정보등록 메뉴이동
 	@RequestMapping(value="/list", method=RequestMethod.GET)
-	public String getEmployDefaultList(Model model,Locale locale, LocalDate date,Principal prin){
-		String user =prin.getName();
-		model.addAttribute("user",user);
+	public String getEmployDefaultList(Model model,Authentication auth, LocalDate date){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		model.addAttribute("user",user.getUsername());
 		return prefix+"/list";
 	}	
 	
 	//사원사진 파일 다운
 	@RequestMapping(value="/getEmployeeFile", method=RequestMethod.GET)
-	public  void  getEmployeeFile(Locale locale, @RequestParam("empNo") String empNo, @RequestParam("fileName") String fileName, HttpServletResponse response){		
-	
+	public  void  getEmployeeFile(Authentication auth, @RequestParam("empNo") String empNo, @RequestParam("fileName") String fileName, HttpServletResponse response){		
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		byte[] file = null;
 		BufferedOutputStream out = null;
-		file = service.getEmployeeFile(locale, empNo);	    
+		file = service.getEmployeeFile(user.getLocale(), empNo);	    
 
 		try {
 		    response.setHeader("Content-Disposition","attachment;filename=\""+URLEncoder.encode(fileName, "UTF-8")+"\"");	    
@@ -164,12 +169,13 @@ public class EmployeeInfoController {
 	}
 	
 	@RequestMapping(value="/viewEmpInfo", method=RequestMethod.POST)
-	public String accept(@RequestParam("empNo") String empNo,Model model, Locale locale,Principal p){
-		Map<String,Object> deptList = service.getCodeDept(locale);
-		Map<String,Object> positionList = service.getCodePosition(locale);	
-		Map<String,Object> roleList = service.getCodeRole(locale);		
+	public String accept(@RequestParam("empNo") String empNo,Model model,Authentication auth){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		Map<String,Object> deptList = service.getCodeDept(user.getLocale());
+		Map<String,Object> positionList = service.getCodePosition(user.getLocale());	
+		Map<String,Object> roleList = service.getCodeRole(user.getLocale());		
 		//사원상세정보
-		Map<String,Object> view = service.getEmployView(empNo, locale);
+		Map<String,Object> view = service.getEmployView(empNo, user.getLocale());
 		
 	    model.addAttribute("deptList",deptList);
 		model.addAttribute("positionList", positionList);
@@ -183,24 +189,25 @@ public class EmployeeInfoController {
 	
 	//사원정보등록
 	@RequestMapping(value="/updateEmployeeInfo", method=RequestMethod.POST )
-	public String updateEmployeeInfo(String setType,Locale locale, EmployeeInfo info,Principal prin,Model model,@RequestParam("empNo") String empNo,
+	public String updateEmployeeInfo(String setType,Authentication auth, EmployeeInfo info,Model model,@RequestParam("empNo") String empNo,
 			@RequestParam("photoImg") MultipartFile photoImg){
-		  String user =prin.getName();
+			HanaroUser user = (HanaroUser)auth.getPrincipal();
+		  
 		  try {
 		   //선택된 파일이름은 모델에 담는다.		  
 		   info.setPhoto(photoImg.getOriginalFilename());
 
 		   //선택된 파일객체는 직접 입력한다.	   
-			service.setEmployeeInfo(setType, locale, info, user, photoImg.getBytes());
+			service.setEmployeeInfo(setType, user.getLocale(), info, user.getUsername(), photoImg.getBytes());
 			
 		  } catch (IOException e) {
 			e.printStackTrace();
 		  }	  
-		  Map<String,Object> deptList = service.getCodeDept(locale);
-		  Map<String,Object> positionList = service.getCodePosition(locale);	
-		  Map<String,Object> roleList = service.getCodeRole(locale);		
+		  Map<String,Object> deptList = service.getCodeDept(user.getLocale());
+		  Map<String,Object> positionList = service.getCodePosition(user.getLocale());	
+		  Map<String,Object> roleList = service.getCodeRole(user.getLocale());		
 		  //사원상세정보
-		  Map<String,Object> view = service.getEmployView(empNo, locale);
+		  Map<String,Object> view = service.getEmployView(empNo, user.getLocale());
 		
 		  model.addAttribute("deptList",deptList);
 		  model.addAttribute("positionList", positionList);
