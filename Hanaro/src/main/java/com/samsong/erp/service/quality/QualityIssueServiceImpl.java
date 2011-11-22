@@ -85,8 +85,7 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	@Override
 	public String acceptIssue(String regNo, Locale locale,String user) {
 		//기본값으로 등록.
-		String approvalNo = dao.acceptIssue(regNo,locale,user); 
-		
+		String approvalNo = dao.acceptIssue(regNo,locale,user);
 		Map<String,Object> claimParams = dao.getClaimParams(approvalNo);
 		double claim = this.calculateClaim(claimParams);
 		
