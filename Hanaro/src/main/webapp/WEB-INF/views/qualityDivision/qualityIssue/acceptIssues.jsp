@@ -385,7 +385,7 @@
 <tr>
 <th><fmt:message key="ui.label.qualityIssue.fixedClaim"/></th>
 <td >
-<span id="totalClaim" style="width:800px;display:inline-table;"><fmt:formatNumber maxFractionDigits="2" value="${approval.claim }"/></span>
+<span id="totalClaim" style="width:800px;display:inline-table;"><fmt:formatNumber minFractionDigits="2" value="${approval.claim }"/></span>
 <a href="#" iconCls="icon-accept" class="easyui-linkbutton" onclick="javascript:validateApprovalForm()"><fmt:message key="ui.label.apply"/></a>
 </td>
 </tr>

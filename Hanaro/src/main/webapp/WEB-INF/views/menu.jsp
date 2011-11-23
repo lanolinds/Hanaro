@@ -8,6 +8,7 @@
 	<tr>
 		<td style="text-align:left;">
 			<div style="white-space: nowrap;"><!-- 좌측상단 메인 메뉴 -->
+				<a href="#" class="easyui-menubutton" menu="#basicDivision" iconCls="icon-database-edit"><fmt:message key="menu.basicDivision"/></a>
 				<a href="#" class="easyui-menubutton" menu="#qualityDivision" iconCls="icon-candlestickchart"><fmt:message key="menu.qualityDivision"/></a>
 			    <a href="#" class="easyui-menubutton" menu="#humanMgmt" iconCls="icon-candlestickchart"><fmt:message key="menu.employeeDivision"/></a>
 			    <a href="#" class="easyui-menubutton" menu="#custMgmt" iconCls="icon-candlestickchart"><fmt:message key="menu.custDivision"/></a>
@@ -33,6 +34,15 @@
 <!-- 사용자 서브메뉴 -->
 <div id="userDetails" style="width:150px;">  
     <div iconCls="icon-change-password"><fmt:message key="menu.changePassword"/></div>   
+</div>
+
+<!-- 기준정보 서브메뉴 -->
+<div id="basicDivision" style="width:150px;">
+	<div style="white-space: nowrap;"><fmt:message key="menu.items"/>      	
+	<div style="width:150px;">			
+			<div href='<c:url value="/basicDivision/items/itemLocalization"/>'><fmt:message key="menu.itemLocalization"/></div>
+	</div>
+	</div>
 </div>
 
 <!-- 품질부문 서브메뉴 -->
