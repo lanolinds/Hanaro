@@ -64,7 +64,7 @@ public class QualityIssueController {
 		sheet.setRegNo(message.getMessage("ui.label.AutoCreate",null,locale));
 		model.addAttribute("qualityIssueRegSheet",sheet);
 		return prefix+"/qualityIssueReg";
-	}	
+	}
 	
 	//품질문제등록
 	@RequestMapping(value="/addQualityIssueReg", method=RequestMethod.POST )
