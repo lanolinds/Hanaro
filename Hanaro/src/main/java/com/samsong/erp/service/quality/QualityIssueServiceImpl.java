@@ -85,8 +85,7 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	@Override
 	public String acceptIssue(String regNo, Locale locale,String user) {
 		//기본값으로 등록.
-		String approvalNo = dao.acceptIssue(regNo,locale,user); 
-		
+		String approvalNo = dao.acceptIssue(regNo,locale,user);
 		Map<String,Object> claimParams = dao.getClaimParams(approvalNo);
 		double claim = this.calculateClaim(claimParams);
 		
@@ -356,6 +355,7 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 		
 		
 		
+		
 		//업체 클래임 금액 계산.
 		IssueApproval approval = dao.getApproval(approvalNo, locale);
 		double share = approval.getClaim()*(rate/100d);
@@ -393,6 +393,12 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	public List<Map<String, Object>> getNcrStatus(Locale locale,
 			Map<String, Object> params) {
 		return dao.getNcrStatus(locale, params); 
+	}
+
+	@Override
+	public List<Map<String, Object>> getNcrStatusList(Locale locale,
+			Map<String, Object> params) {
+		return dao.getNcrStatusList(locale, params);
 	}
 
 

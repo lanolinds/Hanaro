@@ -20,7 +20,15 @@ public class QualityIssueRegSheet {
 	private String defectM;
 	private String defectS;
 	private int defectAmount = 1;
-	private String explanation;	
+	private String explanation;
+
+	private String state;
+	private String file1;
+	private String file2;
+	
+	
+	
+	
 	@Override
 	public String toString() {
 		return "QualityIssueRegSheet [regNo=" + regNo + ", division="
@@ -32,14 +40,25 @@ public class QualityIssueRegSheet {
 				+ ", occurProc=" + occurProc + ", lotNo=" + lotNo
 				+ ", defectL=" + defectL + ", defectM=" + defectM
 				+ ", defectS=" + defectS + ", defectAmount=" + defectAmount
-				+ ", explanation=" + explanation + ", inputDeptCust="
-				+ ", state=" + state + ", file1=" + file1
-				+ ", file2=" + file2 + "]";
+				+ ", explanation=" + explanation + ", state=" + state
+				+ ", file1=" + file1 + ", file2=" + file2 + ", getRegNo()="
+				+ getRegNo() + ", getDivision()=" + getDivision()
+				+ ", getOccurSite()=" + getOccurSite() + ", getOccurDate()="
+				+ getOccurDate() + ", getOccurAmPm()=" + getOccurAmPm()
+				+ ", getOccurHour()=" + getOccurHour() + ", getOccurPartNo()="
+				+ getOccurPartNo() + ", getCar()=" + getCar() + ", getModel()="
+				+ getModel() + ", getPartSupplier()=" + getPartSupplier()
+				+ ", getOccurPlace()=" + getOccurPlace() + ", getOccurLine()="
+				+ getOccurLine() + ", getOccurProc()=" + getOccurProc()
+				+ ", getLotNo()=" + getLotNo() + ", getDefectL()="
+				+ getDefectL() + ", getDefectM()=" + getDefectM()
+				+ ", getDefectS()=" + getDefectS() + ", getDefectAmount()="
+				+ getDefectAmount() + ", getExplanation()=" + getExplanation()
+				+ ", getState()=" + getState() + ", getFile1()=" + getFile1()
+				+ ", getFile2()=" + getFile2() + ", getClass()=" + getClass()
+				+ ", hashCode()=" + hashCode() + ", toString()="
+				+ super.toString() + "]";
 	}
-	private String state;
-	private String file1;
-	private String file2;
-	
 	public String getRegNo() {
 		return regNo;
 	}

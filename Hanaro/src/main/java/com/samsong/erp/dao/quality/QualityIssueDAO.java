@@ -1380,4 +1380,30 @@ public class QualityIssueDAO {
 		return list;
 	}
 	
+
+
+	
+	//NCR현황 리스트용
+	public List<Map<String,Object>> getNcrStatusList(Locale locale, Map<String,Object> params){
+		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		params.put("locale",locale.getCountry());
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueDAO_getNcrStatusList").returningResultSet("ncrStatusList",new RowMapper<Map<String,Object>>() {
+
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int rowNum)
+					throws SQLException {
+				Map<String,Object> m = new  LinkedHashMap<String,Object>();
+				for(int x = 0;x<rs.getMetaData().getColumnCount();x++)
+					m.put("DATA"+x,rs.getObject(x+1));
+				list.add(m);
+				return null;
+			}
+				
+		});
+		sp.execute(params);
+		return list;		
+	}
+	
+
+
 }

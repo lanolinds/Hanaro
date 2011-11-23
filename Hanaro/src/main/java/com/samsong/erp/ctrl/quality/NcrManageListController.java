@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.samsong.erp.model.HanaroUser;
 import com.samsong.erp.model.quality.NcrInformSheet;
 import com.samsong.erp.service.empInfo.EmployeeInfoService;
 import com.samsong.erp.service.quality.QualityIssueService;
@@ -49,9 +50,10 @@ public class NcrManageListController {
 	EmployeeInfoService serviceEmployee;
 	
 	@RequestMapping(value="/ncrManageList", method=RequestMethod.GET)
-	public String menuNcrManageList(Model model,Locale locale, LocalDate date, Authentication auth){
+	public String menuNcrManageList(Model model,LocalDate date, Authentication auth){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		String deptCd ="";
-        List<Map<String,Object>> userInfoList = serviceEmployee.getUserInfo(locale, auth.getName());
+        List<Map<String,Object>> userInfoList = serviceEmployee.getUserInfo(user.getLocale(),user.getUsername());
         if(userInfoList !=null){
         	deptCd = String.valueOf(((HashMap)userInfoList.get(0)).get("DATA1"));
         }
@@ -62,13 +64,14 @@ public class NcrManageListController {
         	model.addAttribute("isEMP",false);
 		model.addAttribute("deptCd",deptCd);
 		
-		Map<String,Object> defects = service.getCodeDefectSource(locale, "");		
+		Map<String,Object> defects = service.getCodeDefectSource(user.getLocale(), "");		
 	    model.addAttribute("defectSource",defects);
 	    model.addAttribute("today",date);
 		return prefix+"/ncrManageList"; 
 	}
 	@RequestMapping(value="/ncrManageDetail", method=RequestMethod.GET)
-	public String menuNcrManageDetail(Model model, @RequestParam(value="ncrNo", required=false) String ncrNo, Locale locale,Authentication auth,HttpServletRequest req){
+	public String menuNcrManageDetail(Model model, @RequestParam(value="ncrNo", required=false) String ncrNo,Authentication auth,HttpServletRequest req){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
 	    String[] standardNames = {"ui.label.quality.fmea","ui.label.quality.managePlan","ui.label.quality.workStandard","ui.label.quality.csheet"};
         model.addAttribute("stanNames",standardNames);
         
@@ -76,7 +79,7 @@ public class NcrManageListController {
         
 		NcrInformSheet sheet = new NcrInformSheet();
 		Map<String,Object> sheetMap = new HashMap<String,Object>(); 
-		List<Map<String,Object>> sheetList = service.getNcrDetail(locale, ncrNo);
+		List<Map<String,Object>> sheetList = service.getNcrDetail(user.getLocale(), ncrNo);
 		if(sheetList !=null && sheetList.size()>0){
 			sheet.setStatus(String.valueOf(((HashMap)sheetList.get(0)).get("DATA0"))); //상태
 			sheet.setTitle(String.valueOf(((HashMap)sheetList.get(0)).get("DATA1")));//제목
@@ -138,7 +141,7 @@ public class NcrManageListController {
 		}
 		sheet.setNcrNo(ncrNo);
 		
-        List<Map<String,Object>> userInfoList = serviceEmployee.getUserInfo(locale, auth.getName());
+        List<Map<String,Object>> userInfoList = serviceEmployee.getUserInfo(user.getLocale(), user.getUsername());
         
         if(auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_USER")))
         	sheetMap.put("isEmp",true);
@@ -149,7 +152,7 @@ public class NcrManageListController {
         }
 		model.addAttribute("sheetMap",sheetMap);
 		List<Map<String,Object>> standard = new ArrayList<Map<String,Object>>();		
-		standard = service.getNcrMeasureDataGrid(locale, ncrNo, "standard");		
+		standard = service.getNcrMeasureDataGrid(user.getLocale(), ncrNo, "standard");		
 		model.addAttribute("standard",standard);
 		model.addAttribute("ncrInForm",sheet);
 
@@ -157,17 +160,17 @@ public class NcrManageListController {
 	}
 	//대책서머리를 등록한다.
 	@RequestMapping(value="/procNcrMeasure",method=RequestMethod.POST)
-	public String addNcrMeasureForm(NcrInformSheet sheet,Locale locale,Principal prin,@RequestParam("treatFile") MultipartFile treatFile,
+	public String addNcrMeasureForm(NcrInformSheet sheet,Authentication auth,@RequestParam("treatFile") MultipartFile treatFile,
 			@RequestParam("imgReasonFile1") MultipartFile imgReasonFile1, @RequestParam("imgReasonFile2") MultipartFile imgReasonFile2,
 			@RequestParam("imgTempNameFile") MultipartFile imgTempNameFile,@RequestParam("imgMeasureName1File") MultipartFile imgMeasureName1File,
 			@RequestParam("imgMeasureName2File") MultipartFile imgMeasureName2File,@RequestParam(value="inputAddFile", required=false) MultipartFile[] inputAddFiles,
 			@RequestParam(value="inputChangeFile",required=false) MultipartFile[] inputChangeFile, @RequestParam(value="stanFile",required=false) MultipartFile[] stanFile,
 			@RequestParam("measureProcType") String measureProcType,Model model){
-		String user = prin.getName(); 
-		
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		if(measureProcType.equals("DELETE")){
 			try{
-				service.deleteNcrMeasure(locale, sheet);
+				service.deleteNcrMeasure(user.getLocale(), sheet);
+				logger.info(sheet.toString()+","+measureProcType);
 			}catch(Exception ex){
 				ex.printStackTrace();
 			}
@@ -180,11 +183,12 @@ public class NcrManageListController {
 				sheet.setImgTempMeasureFileName(imgTempNameFile.getOriginalFilename());
 				sheet.setImgMeasure1FileName(imgMeasureName1File.getOriginalFilename());
 				sheet.setImgMeasure2FileName(imgMeasureName2File.getOriginalFilename());
-				service.addNcrMeasure(locale, user, sheet, treatFile.getBytes(),imgReasonFile1.getBytes(),imgReasonFile2.getBytes(),
+				service.addNcrMeasure(user.getLocale(), user.getUsername(), sheet, treatFile.getBytes(),imgReasonFile1.getBytes(),imgReasonFile2.getBytes(),
 						imgTempNameFile.getBytes(),imgMeasureName1File.getBytes(),imgMeasureName2File.getBytes(),
 						inputAddFiles,inputChangeFile,stanFile
 						,imgReasonFile1.getContentType(),imgReasonFile2.getContentType(),imgTempNameFile.getContentType(),
 						imgMeasureName1File.getContentType(),imgMeasureName2File.getContentType());
+				logger.info(sheet.toString()+","+measureProcType);
 			}catch(Exception ex){
 				ex.printStackTrace();
 			} 
@@ -196,11 +200,12 @@ public class NcrManageListController {
 				sheet.setImgTempMeasureFileName(imgTempNameFile.getOriginalFilename());
 				sheet.setImgMeasure1FileName(imgMeasureName1File.getOriginalFilename());
 				sheet.setImgMeasure2FileName(imgMeasureName2File.getOriginalFilename());
-				service.updateNcrMeasure(locale, user, sheet, treatFile.getBytes(),imgReasonFile1.getBytes(),imgReasonFile2.getBytes(),
+				service.updateNcrMeasure(user.getLocale(), user.getUsername(), sheet, treatFile.getBytes(),imgReasonFile1.getBytes(),imgReasonFile2.getBytes(),
 						imgTempNameFile.getBytes(),imgMeasureName1File.getBytes(),imgMeasureName2File.getBytes(),
 						inputAddFiles,inputChangeFile,stanFile
 						,imgReasonFile1.getContentType(),imgReasonFile2.getContentType(),imgTempNameFile.getContentType(),
 						imgMeasureName1File.getContentType(),imgMeasureName2File.getContentType());
+				logger.info(sheet.toString()+","+measureProcType);
 			}catch(Exception ex){
 				ex.printStackTrace();
 			} 			
@@ -212,13 +217,14 @@ public class NcrManageListController {
 				sheet.setImgTempMeasureFileName(imgTempNameFile.getOriginalFilename());
 				sheet.setImgMeasure1FileName(imgMeasureName1File.getOriginalFilename());
 				sheet.setImgMeasure2FileName(imgMeasureName2File.getOriginalFilename());
-				service.updateNcrMeasure(locale, user, sheet, treatFile.getBytes(),imgReasonFile1.getBytes(),imgReasonFile2.getBytes(),
+				service.updateNcrMeasure(user.getLocale(), user.getUsername(), sheet, treatFile.getBytes(),imgReasonFile1.getBytes(),imgReasonFile2.getBytes(),
 						imgTempNameFile.getBytes(),imgMeasureName1File.getBytes(),imgMeasureName2File.getBytes(),
 						inputAddFiles,inputChangeFile,stanFile
 						,imgReasonFile1.getContentType(),imgReasonFile2.getContentType(),imgTempNameFile.getContentType(),
 						imgMeasureName1File.getContentType(),imgMeasureName2File.getContentType());
-				service.updateNCRMeasureProcedure(locale, sheet.getNcrNo(), measureProcType,
-						"","","","","","","", "", "", null, null, "", user);
+				service.updateNCRMeasureProcedure(user.getLocale(), sheet.getNcrNo(), measureProcType,
+						"","","","","","","", "", "", null, null, "", user.getUsername());
+				logger.info(sheet.toString()+",reEdit_do_plan");
 			}catch(Exception ex){
 				ex.printStackTrace();
 			} 				
@@ -230,11 +236,11 @@ public class NcrManageListController {
 	}
 	
 	@RequestMapping(value="/getNcrMeasureDataGrid", method=RequestMethod.POST)
-	public @ResponseBody Map<String,Object> getNcrMeasureDataGrid(Locale locale, @RequestParam("ncrNo") String ncrNo,@RequestParam("gridType") String gridType){
-		
+	public @ResponseBody Map<String,Object> getNcrMeasureDataGrid(Authentication auth, @RequestParam("ncrNo") String ncrNo,@RequestParam("gridType") String gridType){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		Map<String,Object> table = new LinkedHashMap<String,Object>();
 		
-		List<Map<String,Object>> resultList = service.getNcrMeasureDataGrid(locale, ncrNo, gridType);
+		List<Map<String,Object>> resultList = service.getNcrMeasureDataGrid(user.getLocale(), ncrNo, gridType);
 		if(resultList!=null){
 			table.put("rows",resultList);
 		}else{
@@ -245,12 +251,12 @@ public class NcrManageListController {
 	
 	//NCR대책서 파일다운
 	@RequestMapping(value="/getNcrMeasureFile", method=RequestMethod.GET)
-	public  void  getNcrMeasureFile(Locale locale, @RequestParam("ncrNo") String ncrNo, @RequestParam("fileName") String fileName, HttpServletResponse response){		
-	
+	public  void  getNcrMeasureFile(Authentication auth, @RequestParam("ncrNo") String ncrNo, @RequestParam("fileName") String fileName, HttpServletResponse response){		
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		
 		byte[] file = null;
 		BufferedOutputStream out = null;
-		file = service.getNcrMeasureFile(locale, ncrNo);
+		file = service.getNcrMeasureFile(user.getLocale(), ncrNo);
 		try {
 		    response.setHeader("Content-Disposition","attachment;filename=\""+URLEncoder.encode(fileName, "UTF-8")+"\"");	    
 
@@ -265,11 +271,11 @@ public class NcrManageListController {
 	
 	//NCR임시대책 파일 다운
 	@RequestMapping(value="/getNcrMeasureReasonFile", method=RequestMethod.GET)
-	public  void  getNcrMeasureReasonFile(Locale locale, @RequestParam("ncrNo") String ncrNo, @RequestParam("fileName") String fileName, @RequestParam("fileSeq") String fileSeq, HttpServletResponse response){		
-		
+	public  void  getNcrMeasureReasonFile(Authentication auth, @RequestParam("ncrNo") String ncrNo, @RequestParam("fileName") String fileName, @RequestParam("fileSeq") String fileSeq, HttpServletResponse response){		
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		byte[] file = null;
 		BufferedOutputStream out = null;
-		file = service.getNcrMeasureReasonFile(locale, ncrNo, fileSeq);
+		file = service.getNcrMeasureReasonFile(user.getLocale(), ncrNo, fileSeq);
 		try {
 		    response.setHeader("Content-Disposition","attachment;filename=\""+URLEncoder.encode(fileName, "UTF-8")+"\"");	    
 
@@ -284,11 +290,11 @@ public class NcrManageListController {
 	
 	//NCR표준반영사항파일다운
 	@RequestMapping(value="/getNcrMeasureStandardFile", method=RequestMethod.GET)
-	public  void  getNcrMeasureStandardFile(Locale locale, @RequestParam("ncrNo") String ncrNo, @RequestParam("fileName") String fileName, @RequestParam("fileSeq") String fileSeq, HttpServletResponse response){		
-		
+	public  void  getNcrMeasureStandardFile(Authentication auth, @RequestParam("ncrNo") String ncrNo, @RequestParam("fileName") String fileName, @RequestParam("fileSeq") String fileSeq, HttpServletResponse response){		
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		byte[] file = null;
 		BufferedOutputStream out = null;
-		file = service.getNcrMeasureStandardFile(locale, ncrNo, fileSeq);
+		file = service.getNcrMeasureStandardFile(user.getLocale(), ncrNo, fileSeq);
 		try {
 		    response.setHeader("Content-Disposition","attachment;filename=\""+URLEncoder.encode(fileName, "UTF-8")+"\"");	    
 
@@ -303,12 +309,12 @@ public class NcrManageListController {
 	
 	//NCR대책서 이미지 처리
 	@RequestMapping(value="/getNcrMeasureImg", method=RequestMethod.GET)
-	public  void  getNcrMeasureImg(Locale locale, @RequestParam("ncrNo") String ncrNo,@RequestParam("fileSeq") String fileSeq, HttpServletResponse response){		
-		
+	public  void  getNcrMeasureImg(Authentication auth, @RequestParam("ncrNo") String ncrNo,@RequestParam("fileSeq") String fileSeq, HttpServletResponse response){		
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		byte[] file = null;
 		String type = "";
 		BufferedOutputStream out = null;
-		List<Map<String,Object>> list = service.getNcrMeasureImg(locale, ncrNo, fileSeq);
+		List<Map<String,Object>> list = service.getNcrMeasureImg(user.getLocale(), ncrNo, fileSeq);
 		file = (byte[]) ((HashMap)list.get(0)).get("file");
 		type = (String) ((HashMap)list.get(0)).get("type");
 		try {
@@ -326,7 +332,8 @@ public class NcrManageListController {
 	
 	//NCR대책서 단계별 진행하기
 	@RequestMapping(value="/updateNCRMeasureProcedure", method=RequestMethod.POST)
-	public String updateNCRMeasureProcedure(Locale locale
+	public String updateNCRMeasureProcedure(
+			Authentication auth
 			,@RequestParam("ncrNo") String ncrNo
 			,@RequestParam("measureProcType") String updateType 
 			,@RequestParam(value="comment", required=false) String comment 
@@ -339,15 +346,17 @@ public class NcrManageListController {
 			,@RequestParam(value="evalConfirmer",required=false) String confirmer
 			,@RequestParam(value="evalApprover",required=false) String approver
 			,@RequestParam(value="inputEvaluationFile", required=false) MultipartFile file
-			,@RequestParam(value="selectEvaluationResult",required=false) String resultEvaluation
-			,Principal prin
+			,@RequestParam(value="selectEvaluationResult",required=false) String resultEvaluation			
 			,Model model){
+			HanaroUser user = (HanaroUser)auth.getPrincipal();
 		try{
 				
-				service.updateNCRMeasureProcedure(locale, ncrNo, updateType, comment, date1,
+				service.updateNCRMeasureProcedure(user.getLocale(), ncrNo, updateType, comment, date1,
 						date2, date3,date4, date5, manager, confirmer, approver,
 						(file==null)?null:file.getOriginalFilename(),
-								(file==null)?null:file.getBytes(), resultEvaluation, prin.getName());
+								(file==null)?null:file.getBytes(), resultEvaluation, user.getUsername());
+				logger.info(ncrNo+","+updateType+","+comment+","+date1+","+date2+","+date3+","+date4+","+date5+","+manager
+						+","+confirmer+","+approver+","+resultEvaluation);
 			}catch(Exception e){
 				System.err.println(e.getMessage());
 			}
@@ -359,9 +368,10 @@ public class NcrManageListController {
 	
 	//NCR평가 파일 다운받는거
 	@RequestMapping(value="/getNCREvaluationFile", method=RequestMethod.GET)
-	public void getNCREvaluationFile(Locale locale, @RequestParam("ncrNo") String ncrNo,@RequestParam("fileName") String fileName, HttpServletResponse response){
+	public void getNCREvaluationFile(Authentication auth, @RequestParam("ncrNo") String ncrNo,@RequestParam("fileName") String fileName, HttpServletResponse response){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		byte[] file;
-		file = service.getNCREvaluationFile(locale, ncrNo);
+		file = service.getNCREvaluationFile(user.getLocale(), ncrNo);
 		BufferedOutputStream out;
 		try {
 			response.setHeader("Content-Disposition","attachment;filename=\""+URLEncoder.encode(fileName, "UTF-8")+"\"");
@@ -377,14 +387,14 @@ public class NcrManageListController {
 	//NCR대책서 리스트 조회
 	//품질불량등록 메뉴의 등록된 목록조회
 	@RequestMapping(value="/getNCRList", method=RequestMethod.POST)
-	public @ResponseBody Map<String,Object> getNCRList(Locale locale, @RequestParam(value="division",required=false) String division, @RequestParam(value="occurSite",required=false) String occurSite,
+	public @ResponseBody Map<String,Object> getNCRList(Authentication auth, @RequestParam(value="division",required=false) String division, @RequestParam(value="occurSite",required=false) String occurSite,
 			@RequestParam(value="stdDt",required=false) String stdDt, @RequestParam(value="endDt",required=false) String endDt,
 			@RequestParam(value="reasonCust",required=false) String reasonCust, @RequestParam(value="publishCust",required=false) String publishCust,
 			@RequestParam("page") int page,@RequestParam("rows") int rows,
 			@RequestParam(value="sort",required=false) String sortKey,@RequestParam(value="order",required=false) String order){
-		
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		Map<String,Object> table = new LinkedHashMap<String,Object>();
-		List<Map<String,Object>> resultList = service.getNCRList(locale, division, occurSite, stdDt, endDt,
+		List<Map<String,Object>> resultList = service.getNCRList(user.getLocale(), division, occurSite, stdDt, endDt,
 				(reasonCust==null)?"":reasonCust,
 				(publishCust==null)?"":publishCust);
 				

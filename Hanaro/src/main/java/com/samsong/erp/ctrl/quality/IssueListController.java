@@ -15,6 +15,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.samsong.erp.model.HanaroUser;
 import com.samsong.erp.service.cust.CustManagementService;
 import com.samsong.erp.service.quality.QualityIssueService;
 import com.samsong.erp.util.HashMapComparator;
@@ -53,8 +55,9 @@ public class IssueListController {
 			@RequestParam(value="order",required=false) String order,
 			@RequestParam(value="fromDate",required=false) String fromDateStr,
 			@RequestParam(value="toDate",required=false) String toDateStr,
-			@RequestParam(value="item",required=false) String item,
-			Locale locale){
+			@RequestParam(value="item",required=false) String item,Authentication auth
+			){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
 		Date fromDate=null;
 		Date toDate = null;
@@ -66,7 +69,7 @@ public class IssueListController {
 		}
 		
 		Map<String,Object> json = new HashMap<String, Object>();
-		List<Map<String,Object>> list =service.getUndoneIssueList(fromDate,toDate,item,locale);	
+		List<Map<String,Object>> list =service.getUndoneIssueList(fromDate,toDate,item,user.getLocale());	
 		if(sortKey!=null){
 			Collections.sort(list,new HashMapComparator(sortKey, order.equalsIgnoreCase("asc")));
 		}
@@ -93,7 +96,8 @@ public class IssueListController {
 			@RequestParam(value="fromDate",required=false) String fromDateStr,
 			@RequestParam(value="toDate",required=false) String toDateStr,
 			@RequestParam(value="item",required=false) String item,
-			Locale locale){
+			Authentication auth){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
 		Date fromDate=null;
 		Date toDate = null;
@@ -105,7 +109,7 @@ public class IssueListController {
 		}
 		
 		Map<String,Object> json = new HashMap<String, Object>();
-		List<Map<String,Object>> list =service.getDoneIssueList(fromDate,toDate,item,locale);	
+		List<Map<String,Object>> list =service.getDoneIssueList(fromDate,toDate,item,user.getLocale());	
 		if(sortKey!=null){
 			Collections.sort(list,new HashMapComparator(sortKey, order.equalsIgnoreCase("asc")));
 		}
@@ -125,8 +129,9 @@ public class IssueListController {
 	}
 	
 	@RequestMapping(value="/list/itemAssistCallback", method=RequestMethod.POST)
-	public @ResponseBody Map<String,Object> getAssistItemList(Locale locale){
-		List<Map<String,Object>> list = service.getAssistItemList(locale,"ready");	
+	public @ResponseBody Map<String,Object> getAssistItemList(Authentication auth){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		List<Map<String,Object>> list = service.getAssistItemList(user.getLocale(),"ready");	
 		Map<String,Object> json = new HashMap<String, Object>();
 		if(list!=null){
 			json.put("total",list.size());
@@ -140,8 +145,9 @@ public class IssueListController {
 	}
 	
 	@RequestMapping(value="/list/itemAssistCallback2", method=RequestMethod.POST)
-	public @ResponseBody Map<String,Object> getAssistItemList2(Locale locale){
-		List<Map<String,Object>> list = service.getAssistItemList(locale,"done");	
+	public @ResponseBody Map<String,Object> getAssistItemList2(Authentication auth){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		List<Map<String,Object>> list = service.getAssistItemList(user.getLocale(),"done");	
 		Map<String,Object> json = new HashMap<String, Object>();
 		if(list!=null){
 			json.put("total",list.size());

@@ -13,7 +13,7 @@
 		<property name="url" value="jdbc:jtds:sqlserver://210.216.217.238:1433/GLOBALPROJECT"></property>
 		<property name="username" value="inside"></property>
 		<property name="password" value="ssong"></property> 
-	</bean>
+	</bean> 
 	
 	 <!-- 	Spring Security 설정 -->
 	<import resource="security.xml"/>

@@ -12,6 +12,8 @@ import org.apache.log4j.Logger;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.samsong.erp.ctrl.cust.CustManagementController;
+import com.samsong.erp.model.HanaroUser;
 import com.samsong.erp.model.cust.CustInfo;
 import com.samsong.erp.model.empInfo.EmployeeInfo;
 import com.samsong.erp.service.cust.CustManagementService;
@@ -43,22 +46,25 @@ public class CustManagementController {
 	
 	//사원정보등록 메뉴이동
 	@RequestMapping(value="/createForm", method=RequestMethod.GET)
-	public String menuCustReg(Model model,Locale locale, LocalDate date){				
-		Map<String,Object> custTypeList = service.getCodeCustType(locale);
+	public String menuCustReg(Model model,Authentication auth, LocalDate date){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		Map<String,Object> custTypeList = service.getCodeCustType(user.getLocale());
 	    model.addAttribute("custTypeList",custTypeList);
 
 		CustInfo info = new CustInfo();
-		info.setCustCd(message.getMessage("ui.label.AutoCreate",null, locale));
+		info.setCustCd(message.getMessage("ui.label.AutoCreate",null, user.getLocale()));
 		model.addAttribute("custInfo",info);
 		return prefix+"/createForm";
 	}
 	
 	//업체정보등록
 	@RequestMapping(value="/addCustInfo", method=RequestMethod.POST )
-	public String addCustInfo(String setType,Locale locale, CustInfo info,Principal prin,Model model){
-	   String user =prin.getName();
+	public String addCustInfo(String setType,Authentication auth, CustInfo info,Model model){
+	  
+	  HanaroUser user = (HanaroUser)auth.getPrincipal();
+	  
 	  try {  
-		 service.setCustInfo(setType, locale, info, user);
+		 service.setCustInfo(setType, user.getLocale(), info, user.getUsername());
 	  } catch (Exception e) {
 		e.printStackTrace();
 	  }	  
@@ -68,15 +74,15 @@ public class CustManagementController {
 	
 	//사원정보등록 메뉴의 등록된 목록조회
 	@RequestMapping(value="/getCustList", method=RequestMethod.POST)
-	public @ResponseBody Map<String,Object> getCustRegList(Locale locale, 
+	public @ResponseBody Map<String,Object> getCustRegList(Authentication auth, 
 			@RequestParam(value="keyfield",required=false) String keyfield,
 			@RequestParam("page") int page,
 			@RequestParam("rows") int rows,
 			@RequestParam(value="sort",required=false) String sortKey,
 			@RequestParam(value="order",required=false) String order){
-		
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		Map<String,Object> table = new LinkedHashMap<String,Object>();
-		List<Map<String,Object>> resultList = service.getCusteRegList(locale, keyfield);
+		List<Map<String,Object>> resultList = service.getCusteRegList(user.getLocale(), keyfield);
 	
 		if(resultList!=null){			
 			if(sortKey!=null){
@@ -96,15 +102,15 @@ public class CustManagementController {
 	
 	//업체정보 검색 목록조회
 	@RequestMapping(value="/getCustSearchList", method=RequestMethod.POST)
-	public @ResponseBody Map<String,Object> getCustSearchList(Locale locale, 
+	public @ResponseBody Map<String,Object> getCustSearchList(Authentication auth, 
 			@RequestParam(value="keyfield",required=false) String keyfield,
 			@RequestParam("page") int page,
 			@RequestParam("rows") int rows,
 			@RequestParam(value="sort",required=false) String sortKey,
 			@RequestParam(value="order",required=false) String order){
-		
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		Map<String,Object> table = new LinkedHashMap<String,Object>();
-		List<Map<String,Object>> resultList = service.getCusteRegList(locale,keyfield);
+		List<Map<String,Object>> resultList = service.getCusteRegList(user.getLocale(),keyfield);
 	
 		if(resultList!=null){			
 			if(sortKey!=null){
@@ -124,17 +130,18 @@ public class CustManagementController {
 	
 	//업체정보등록 메뉴이동
 	@RequestMapping(value="/list", method=RequestMethod.GET)
-	public String getCustDefaultList(Model model,Locale locale, LocalDate date,Principal prin){
-		String user =prin.getName();
-		model.addAttribute("user",user);
+	public String getCustDefaultList(Model model,Authentication auth, LocalDate date){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		model.addAttribute("user",user.getUsername());
 		return prefix+"/list";
 	}	
 	
 	@RequestMapping(value="/viewCustInfo", method=RequestMethod.POST)
-	public String accept(@RequestParam("custCd") String custCd,Model model, Locale locale,Principal p){
-		Map<String,Object> custTypeList = service.getCodeCustType(locale);
+	public String accept(@RequestParam("custCd") String custCd,Model model,Authentication auth){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		Map<String,Object> custTypeList = service.getCodeCustType(user.getLocale());
 	    //업체상세정보
-	  	Map<String,Object> custView = service.getCustView(custCd, locale);
+	  	Map<String,Object> custView = service.getCustView(custCd, user.getLocale());
 	  		
 		model.addAttribute("custTypeList",custTypeList);
 		model.addAttribute("view",custView);
@@ -147,18 +154,18 @@ public class CustManagementController {
 
 	//사원정보등록
 	@RequestMapping(value="/updateCustInfo", method=RequestMethod.POST )
-	public String updateCustInfo(String setType,Locale locale, CustInfo info,Principal prin,Model model,@RequestParam("custCd") String custCd){
-		  String user =prin.getName();
+	public String updateCustInfo(String setType,CustInfo info,Model model,@RequestParam("custCd") String custCd,Authentication auth){
+		  HanaroUser user = (HanaroUser)auth.getPrincipal();
 		  try {
 		   //선택된 파일객체는 직접 입력한다.	   
-			service.setCustInfo(setType, locale, info, user);
+			service.setCustInfo(setType, user.getLocale(), info, user.getUsername());
 			
 		  } catch (Exception e) {
 			e.printStackTrace();
 		  }	  
-		Map<String,Object> custTypeList = service.getCodeCustType(locale);
+		Map<String,Object> custTypeList = service.getCodeCustType(user.getLocale());
 		  //업체상세정보
-	  	Map<String,Object> custView = service.getCustView(custCd, locale);
+	  	Map<String,Object> custView = service.getCustView(custCd, user.getLocale());
 	  		
 		model.addAttribute("custTypeList",custTypeList);
 		model.addAttribute("view",custView);

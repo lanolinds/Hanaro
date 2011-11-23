@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.samsong.erp.model.HanaroUser;
 import com.samsong.erp.model.quality.IssueApproval;
 import com.samsong.erp.service.cust.CustManagementService;
 import com.samsong.erp.service.quality.QualityIssueService;
@@ -44,19 +46,21 @@ public class IssueAcceptController {
 	private MessageSource message;
 	
 	@RequestMapping(value="/cancelAccept", method=RequestMethod.POST)
-	public String cancelAccept(@RequestParam("regNo") String regNo,@RequestParam(value="no",required=false) String approvalNo,Model model,Locale locale){
-		
-		service.cancelApproval(approvalNo,locale);
+	public String cancelAccept(@RequestParam("regNo") String regNo,@RequestParam(value="no",required=false) String approvalNo,Model model, Authentication auth){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();		
+		service.cancelApproval(approvalNo,user.getLocale());
 		
 		return "redirect:/qualityDivision/qualityIssue/list";
 	}
 	
 	
 	@RequestMapping(value="/acceptIssues", method=RequestMethod.POST)
-	public String accept(@RequestParam("regNo") String regNo,@RequestParam(value="no",required=false) String approvalNo,Model model, Locale locale,Principal p){
+	public String accept(@RequestParam("regNo") String regNo,@RequestParam(value="no",required=false) String approvalNo,Model model,Authentication auth,Locale locale){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		
 		
 		//등록된 품질문제 상세 내역을 얻는다.
-		Map<String,Object> details = service.getIssueDetails(regNo, locale);
+		Map<String,Object> details = service.getIssueDetails(regNo, user.getLocale());
 		
 		//출처별 처리 방법을 얻는다.
 		String originCode =(String)details.get("originCode");
@@ -64,25 +68,26 @@ public class IssueAcceptController {
 		
 		//기본 처리 내역을 얻는다.
 		if(approvalNo==null)
-			approvalNo=service.acceptIssue(regNo,locale, p.getName());
-		IssueApproval approval = service.getApproval(approvalNo, locale);
+			approvalNo=service.acceptIssue(regNo,user.getLocale(), user.getUsername());
+		IssueApproval approval = service.getApproval(approvalNo, user.getLocale());
 		
 		//원인품번 납품처 리스트
 		String item = (String)details.get("item");
-		Map<String,String> suppliers = service.getClaimItemSuppliers(item,locale);
+		Map<String,String> suppliers = service.getClaimItemSuppliers(item,user.getLocale());
 		
 		
 		
 		model.addAttribute("issue",details);
 		model.addAttribute("methods",methods);
 		model.addAttribute("approval",approval);
-		model.addAttribute("partners",partnerService.getCustOption(locale, "qisall", ""));
+		model.addAttribute("partners",partnerService.getCustOption(user.getLocale(), "qisall", ""));
 		model.addAttribute("suppliers",suppliers);
 		return "qualityDivision/qualityIssue/acceptIssues";
 	}
 	@RequestMapping("/issueDetailCallback")
-	public @ResponseBody Map<String,Object> getIssueDetails(@RequestParam("no") String regNo,Locale locale){
-		return service.getIssueDetails(regNo, locale);
+	public @ResponseBody Map<String,Object> getIssueDetails(@RequestParam("no") String regNo,Authentication auth){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		return service.getIssueDetails(regNo, user.getLocale());
 	}
 	
 	
@@ -101,11 +106,12 @@ public class IssueAcceptController {
 	
 	@RequestMapping("/acceptIssues/downloadFile")
 	public void downloadFile(@RequestParam("seq") int seq,@RequestParam("no") String regNo,@RequestParam("name") String name,
-			Locale locale,HttpServletRequest req, HttpServletResponse res){
+			Authentication auth,HttpServletRequest req, HttpServletResponse res){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		
 		try{
 			name = ClientFileNameEncoder.encodeFileName(name, req.getHeader("User-Agent"));
-			byte[] binary =service.getQualityIssueFile(locale, regNo, Integer.toString(seq));
+			byte[] binary =service.getQualityIssueFile(user.getLocale(), regNo, Integer.toString(seq));
 			res.setHeader("Content-Disposition", "inline;filename=" + name);
 			res.setContentType("application/octet-stream");
 			res.setContentLength(binary.length);
@@ -118,24 +124,27 @@ public class IssueAcceptController {
 		
 	}
 	@RequestMapping("/acceptIssues/defectTreeCallback")
-	public @ResponseBody List<Map<String,Object>> getDefectTreeData(Locale locale){
-		return service.getDefectTreeData(locale);
+	public @ResponseBody List<Map<String,Object>> getDefectTreeData(Authentication auth){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		return service.getDefectTreeData(user.getLocale());
 	}
 	
 	@RequestMapping("/acceptIssues/4mTreeCallback")
-	public @ResponseBody List<Map<String,Object>> get4mTreeData(Locale locale){
-		return service.get4mTreeData(locale);
+	public @ResponseBody List<Map<String,Object>> get4mTreeData(Authentication auth){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		return service.get4mTreeData(user.getLocale());
 	}
 	
 	@RequestMapping("/acceptIssues/itemAssistCallback")
-	public @ResponseBody List<Map<String,Object>> getItemAssistant(Locale locale){
-		return service.getClaimItemAssistantList(locale);
+	public @ResponseBody List<Map<String,Object>> getItemAssistant(Authentication auth){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		return service.getClaimItemAssistantList(user.getLocale());
 	}
 	
 	@RequestMapping("/acceptIssues/claimListGridCallback")
-	public @ResponseBody Map<String,Object> getClaimPartnerList(@RequestParam("approvalNo") String approvalNo,Locale locale){
-		
-		List<Map<String,Object>> claims =service.getClaimList(approvalNo,locale);
+	public @ResponseBody Map<String,Object> getClaimPartnerList(@RequestParam("approvalNo") String approvalNo,Authentication auth){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		List<Map<String,Object>> claims =service.getClaimList(approvalNo,user.getLocale());
 		double claimTotal = 0d;
 		NumberFormat fmt = NumberFormat.getInstance();
 		fmt.setMaximumFractionDigits(2);
@@ -176,8 +185,8 @@ public class IssueAcceptController {
 			@RequestParam("method") String method,
 			@RequestParam(value="workCost",required=false) Integer workCost,
 			@RequestParam(value="testCost",required=false) Integer testCost,
-			Model model,Locale locale){
-		
+			Model model,Authentication auth,Locale locale){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		int workCostVal = workCost==null?0:workCost.intValue();
 		int testCostVal = testCost==null?0:testCost.intValue();
 		
@@ -197,16 +206,16 @@ public class IssueAcceptController {
 		approval =service.updateApproval(approval); 
 		logger.info(approval);
 		
-		Map<String,Object> details = service.getIssueDetails(regNo, locale);
+		Map<String,Object> details = service.getIssueDetails(regNo, user.getLocale());
 		String originCode =(String)details.get("originCode");
 		Map<String,String> methods = getHandleMethods(originCode,locale);
 		String item = (String)details.get("item");
-		Map<String,String> suppliers = service.getClaimItemSuppliers(item,locale);
+		Map<String,String> suppliers = service.getClaimItemSuppliers(item,user.getLocale());
 		
 		model.addAttribute("issue",details);
 		model.addAttribute("methods",methods);
 		model.addAttribute("approval",approval);
-		model.addAttribute("partners",partnerService.getCustOption(locale, "qisall", ""));
+		model.addAttribute("partners",partnerService.getCustOption(user.getLocale(), "qisall", ""));
 		model.addAttribute("suppliers",suppliers);
 		return "qualityDivision/qualityIssue/acceptIssues";
 	}
@@ -233,37 +242,37 @@ public class IssueAcceptController {
 			@RequestParam("ncr") String ncr,
 			@RequestParam("reqDate") String reqDate,
 			@RequestParam("request") String request,
-			Model model,Locale locale){
-		
+			Model model,Authentication auth,Locale locale){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		pic1id = pic1id.trim().length()==0?null:pic1id;
 		pic2id = pic2id.trim().length()==0?null:pic2id;
 		refid = refid.trim().length()==0?null:refid;
 		
 		if(action.equals("add")){
-			service.addClaim(approvalNo,partner,rate,item,lot,reason1,reason2,reason3,remark,pic1,pic2,ref,ncr,reqDate,request,locale);
+			service.addClaim(approvalNo,partner,rate,item,lot,reason1,reason2,reason3,remark,pic1,pic2,ref,ncr,reqDate,request,user.getLocale());
 		}
 		else if (action.equals("edit")){
 			//service.updateClaim(approvalNo,partner,rate,item,lot,reason1,reason2,reason3,remark,pic1,pic1id,pic2,pic2id,ref,refid,locale);
-			service.updateClaim(approvalNo, partner, rate, item, lot, reason1, reason2, reason3, remark, pic1, pic1id, pic2, pic2id, ref, refid,ncr,reqDate,request,locale);
+			service.updateClaim(approvalNo, partner, rate, item, lot, reason1, reason2, reason3, remark, pic1, pic1id, pic2, pic2id, ref, refid,ncr,reqDate,request,user.getLocale());
 		}
 		else if(action.equals("delete")){
-			service.deletePartnerClaim(approvalNo,partner,locale); 
+			service.deletePartnerClaim(approvalNo,partner,user.getLocale()); 
 		}
 		else
 		{
 			; //do nothing.
 		}
-		IssueApproval approval = service.getApproval(approvalNo, locale);
-		Map<String,Object> details = service.getIssueDetails(regNo, locale);
+		IssueApproval approval = service.getApproval(approvalNo, user.getLocale());
+		Map<String,Object> details = service.getIssueDetails(regNo, user.getLocale());
 		String originCode =(String)details.get("originCode");
 		Map<String,String> methods = getHandleMethods(originCode,locale);
 		String claimItem = (String)details.get("item");
-		Map<String,String> suppliers = service.getClaimItemSuppliers(claimItem,locale);
+		Map<String,String> suppliers = service.getClaimItemSuppliers(claimItem,user.getLocale());
 		
 		model.addAttribute("issue",details);
 		model.addAttribute("methods",methods);
 		model.addAttribute("approval",approval);
-		model.addAttribute("partners",partnerService.getCustOption(locale, "qisall", ""));
+		model.addAttribute("partners",partnerService.getCustOption(user.getLocale(), "qisall", ""));
 		model.addAttribute("suppliers",suppliers);
 		return "qualityDivision/qualityIssue/acceptIssues";
 	}
