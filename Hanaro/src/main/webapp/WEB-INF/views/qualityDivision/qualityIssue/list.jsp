@@ -199,7 +199,7 @@
 	    <span style="margin-left:2em;"><a href="javascript:validFilter()" class="easyui-linkbutton" iconCls="icon-search"><fmt:message key="ui.button.Search"/></a></span>
     </div>
     <div style="text-align:right;">
-    	<form name="acceptForm" method="post" action="acceptIssues">
+    	<form name="acceptForm" method="get" action="readyApproval">
     		<input type="hidden" name="regNo"/>
     	</form>
 
@@ -207,7 +207,7 @@
     </div>
     </div>
     
-    <!-- 툴바 -->
+    <!-- 툴바2 -->
     <div  id="toolbar2" style="padding:5px;height:auto;">
     <div style="margin-top:.5em;">
 	    <span style="margin-right:.5em"><fmt:message key="ui.label.SearchDate"/></span>
