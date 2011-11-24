@@ -1403,7 +1403,149 @@ public class QualityIssueDAO {
 		sp.execute(params);
 		return list;		
 	}
-	
 
+	public String readyToAcceptIssue(String regNo, Locale locale,
+			String username) {
+		String sql = "exec QualityIssueDAO_readyToAcceptIssue ?,?,?;";
+		return jdbc.queryForObject(sql, new Object[] { regNo,locale.getCountry(), username },
+				new RowMapper<String>() {
+
+					@Override
+					public String mapRow(ResultSet rs, int i)
+							throws SQLException {
+						return rs.getString(1);
+					}
+
+				});
+	}
+
+	public Map<String, Object> getTempClaimParams(String tempApprovalNo, String regNo, Locale locale) {
+		String sql = "exec QualityIssueDAO_getTempClaimParams ?,?,?;";
+		return jdbc.queryForMap(sql,tempApprovalNo,regNo,locale.getCountry());
+	}
+
+	public void updateTempApprovalTotalClaim(String tempApprovalNo, double claim) {
+		String sql = "update qis_issue_approvals_temp set claim=? where approvalNo=?;";
+		jdbc.update(sql, claim,tempApprovalNo);
+	}
+
+	public void updateAllTempSharedClaim(String tempApprovalNo) {
+		jdbc.update("exec QualityIssueDAO_updateAllTempSharedClaim ?; ",tempApprovalNo);
+		
+	}
+
+	public IssueApproval getTempApproval(String tempApprovalNo, Locale locale) {
+		String sql = "exec QualityIssueDAO_getTempApproval ?,?;";
+		return jdbc.queryForObject(sql,
+				new Object[] { tempApprovalNo, locale.getCountry() },
+				new RowMapper<IssueApproval>() {
+
+					@Override
+					public IssueApproval mapRow(ResultSet rs, int i)
+							throws SQLException {
+						IssueApproval approval = new IssueApproval();
+
+						approval.setApprovalNo(rs.getString(1));
+						approval.setDefect1(rs.getString(2));
+						approval.setDefect2(rs.getString(3));
+						approval.setDefect3(rs.getString(4));
+						approval.setRemark(rs.getString(5));
+						approval.setMethod(rs.getString(6));
+						approval.setWorkCost(rs.getInt(7));
+						approval.setTestCost(rs.getInt(8));
+						approval.setShipType(rs.getString(9));
+						approval.setCausePartner(rs.getString(10));
+						approval.setClaim(rs.getDouble(11));
+						return approval;
+					}
+
+				});
+	}
+
+	public List<Map<String, Object>> getTempClaimList(String approvalNo,
+			Locale locale) {
+		String sql = "exec QualityIssueDAO_getTempClaimList ?,?;";
+		return jdbc.queryForList(sql, approvalNo, locale.getCountry());
+	}
+
+	public void updateTempApproval(IssueApproval approval) {
+		String sql = "update qis_issue_approvals_temp set causePartner=?, reason1=?,reason2=?, reason3=?,remark=?,method=?,workCost=?,testCost=?,shipType=? where approvalNo =?;";
+		jdbc.update(sql,approval.getCausePartner(), approval.getDefect1(), approval.getDefect2(),
+				approval.getDefect3(), approval.getRemark(),
+				approval.getMethod(), approval.getWorkCost(),
+				approval.getTestCost(), approval.getShipType(),
+				approval.getApprovalNo());
+	}
+
+	public String updateTempClaimAttach(String id, MultipartFile f) {
+		String sql = "exec QualityIssueDAO_updateTempClaimAttach ?,?,?,?;";
+		try{
+		id = jdbc.queryForObject(sql,new Object[]{id,f.getContentType(),f.getOriginalFilename(),f.getBytes()},new RowMapper<String>(){
+
+			@Override
+			public String mapRow(ResultSet rs, int i) throws SQLException {
+				return rs.getString(1);
+			}
+			
+		});
+		}catch(Exception ex){}
+		return id;
+	}
+
+	public String publishTempNcr(String reqDate, String request) {
+		String sql = "exec QualityIssueDAO_publishTempNcr ?,?;";
+		return jdbc.queryForObject(sql,new Object[]{reqDate,request},new RowMapper<String>(){
+
+			@Override
+			public String mapRow(ResultSet rs, int i) throws SQLException {
+				return rs.getString(1);
+			}
+			
+		});
+	}
+
+	public void addTempClaimPartner(String approvalNo, String partner,
+			String item, String lot, String reason1, String reason2,
+			String reason3, double rate, double claim, String comment,
+			String ref1, String ref2, String ref3, String ncr,
+			Locale locale) {
+		String sql = "insert qis_claims_temp(approvalNo, partner, item, lot, reason1, reason2, reason3, rate, claim, remark, ref1, ref2, ref3, ncr, locale, inputTime) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,getdate());";
+		jdbc.update(sql, approvalNo, partner, item, lot, reason1, reason2,
+				reason3, rate, claim, comment, ref1, ref2, ref3, ncr,
+				locale.getCountry());
+		
+	}
+
+	public void updateTempClaim(String approvalNo, String partner, double rate,
+			double claim, String item, String lot, String reason1,
+			String reason2, String reason3, String remark, String pic1id,
+			String pic2id, String refid, String ncrNo) {
+		
+		String sql = "update qis_claims_temp set item=?, lot=?, reason1=?, reason2 =?, reason3=?, rate=?, claim=?, remark=?, ref1=?, ref2=?, ref3=?,ncr=?" +
+				" where approvalNo=? and partner=?";
+		jdbc.update(sql, item,lot,reason1,reason2,reason3,rate,claim,remark,pic1id,pic2id,refid,ncrNo,approvalNo,partner);
+		
+	}
+
+	public String deletePartnerTempClaim(String approvalNo, String partner) {
+		String sql = "exec QualityIssueDAO_deletePartnerTempClaim ?,?";
+		return jdbc.queryForObject(sql,new Object[] {approvalNo,partner}, new RowMapper<String>(){
+			@Override
+			public String mapRow(ResultSet rs, int i) throws SQLException {
+				return rs.getString(1);
+			}
+			
+		});
+	}
+
+	public Map<String, Object> getTempClaimAttachment(String id) {
+		return jdbc.queryForMap("select fileName,contentType,binary from qis_claims_attaches_temp where uid=?",id);
+	}
+
+	public void persistApproval(String regNo,String approvalNo, String username, Locale locale) {
+		String sql = "exec QualityIssueDAO_persistApproval ?,?,?,?";
+		jdbc.update(sql,regNo, approvalNo,username,locale.getCountry());
+		
+	}
 
 }

@@ -199,7 +199,7 @@
 	    <span style="margin-left:2em;"><a href="javascript:validFilter()" class="easyui-linkbutton" iconCls="icon-search"><fmt:message key="ui.button.Search"/></a></span>
     </div>
     <div style="text-align:right;">
-    	<form name="acceptForm" method="get" action="readyApproval">
+    	<form name="acceptForm" method="post" action="readyApproval">
     		<input type="hidden" name="regNo"/>
     	</form>
 

@@ -25,15 +25,17 @@
 	$(document).ready(function(){
 		
 		//클래임 리스트 랜더링.
-		$("#claimList").datagrid({queryParams:{approvalNo:"${approval.approvalNo}"}});
-		
-		//다이얼로드 랜더링.
-		$("#claimPartnerDlg").dialog({buttons:[{text:'<fmt:message key="ui.button.Save"/>',iconCls:"icon-disk",handler:function(){
-			validateClaimForm();
-		}},{text:'<fmt:message key="ui.button.Cancel"/>',iconCls:"icon-cancel",handler:function(){
-			$("#claimPartnerDlg").dialog("close");
-		}}]});
-		
+		$("#claimList").datagrid({
+			queryParams:{approvalNo:"${approval.approvalNo}"},
+			onLoadSuccess:function(data){
+				if(data.total>0){
+					$("#claimList").datagrid("selectRow",0);
+					editClaim();
+				}
+				
+			}
+		});
+				
 		//불량현상 콤보트리 랜더링.
 		$("#defects").combotree({onBeforeSelect:function(node){
 			if(!$("#defects").combotree("tree").tree("isLeaf",node.target)){
@@ -53,7 +55,8 @@
 		}});
 		
 		//4m 콤보트리 랜더링.
-		$("#claim4m").combotree({onBeforeSelect:function(node){
+		$("#claim4m").combotree({
+			onBeforeSelect:function(node){
 			if(!$("#claim4m").combotree("tree").tree("isLeaf",node.target)){
 				return false;
 			}
@@ -80,12 +83,17 @@
 			else{
 				$("#workCost").fadeOut();
 			}
-			
 		});
+		
+		//재사용이면 귀책관련 정보 숨김.
+		var action = ("${approval.method}"=="reuse")?"collapse":"expand";
+		$("#claimList").datagrid("getPanel").panel(action);
+		$("#editPanel").panel(action);
 	});
 	
 	function addNewClaimPartner(){
-		openClaimDlg();
+		bindClaimForEdit();
+		$("#claimPartner").combobox("showPanel");
 	}
 	
 	function editClaim(){
@@ -95,10 +103,10 @@
 			$.messager.alert("Warnning",'<fmt:message key="warn.notSelectedItem"/>',"warning");
 			return false;
 		}
-		openClaimDlg(selected);
+		bindClaimForEdit(selected);
 	}
 	
-	function openClaimDlg(data){
+	function bindClaimForEdit(data){
 		var $form = $("form[name='claimForm']");
 		$form[0].reset();
 		if(data){
@@ -109,9 +117,10 @@
 			$("input[name='claimLot']",$form).val(data.lot); //로트 바인딩.
 			$("#claim4m").combotree("setValue",data.reason3);//4m바인딩.
 			$("textarea[name='claimRemark']",$form).val(data.remark);//귀책 원인 바인딩.
+			//$("#claimPartner")
 			if(data.pic1){
 				$("input[name='pic1id']",$form).val(data.pic1); 
-				$("#pic1Link",$form).attr("href","acceptIssues/downloadClaimRef?id="+data.pic1).show();
+				$("#pic1Link",$form).attr("href","readyApproval/downloadTempClaimRef?id="+data.pic1).show();
 			}
 			else{
 				$("#pic1Link",$form).hide();
@@ -146,7 +155,7 @@
 			$("#reqDate").datebox("setValue",""); 
 			$("#claim4m").combotree("clear");//4m바인딩.
 		}
-		$("#claimPartnerDlg").dialog("open");
+		
 	}
 	
 	function getClaimRateSum(action){
@@ -169,16 +178,6 @@
 			$.messager.alert("Warnning",'<fmt:message key="warn.notSelectedItem"/>',"warning");
 			return false;
 		}
-		var title = '<fmt:message key="ui.label.qualityIssue.deleteClaim"/>';
-		var question = '<fmt:message key="question.deleteClaim"/>';
-		$.messager.confirm(title,question,function(yes){
-			if(yes){
-				$("form[name='claimForm'] input[name='action']").val("delete");
-				$("#claimPartner").combobox("setValue",selected.code); //업체바인딩.
-				$("form[name='claimForm']").submit();
-			}
-		});
-		
 	}
 	
 	function validateApprovalForm(){
@@ -206,10 +205,15 @@
 		var action = $("form[name='claimForm'] input[name='action']").val();
 		
 		
-		if(action=="add"){  // 신규 추가일 경우 귀책처 누락 없게...
+		if(action=="add"){  // 신규 추가일 경우 귀책처,귀책품번, 4m 분석을 반드시 입력받는다. 
 			var partner =  $("#claimPartner").combobox("getValue");
 			if(partner==""){
 				$.messager.alert("Warnning",'<fmt:message key="warn.enterFaultPartner"/>',"warning");
+				return false;
+			}
+			var claimItem = $.trim($("#claimItem").val());
+			if(claimItem==""){
+				$.messager.alert("Warnning",'<fmt:message key="warn.enterFaultItem"/>',"warning");
 				return false;
 			}
 		}
@@ -235,10 +239,20 @@
 		
 		$("#claimPartner").combobox("enable");
 		$("form[name='claimForm'] :radio:checked").val(ncr);
-		$("#claimPartnerDlg").dialog("close");
 		$("form[name='claimForm']").submit();
 	}
 	
+	
+	function persistApproval(){
+		//처리 방법이 재사용이 아니면 귀책처는 반드시 하나 있어야 한다.
+		var method = "${approval.method}";
+		var claimCount = $($("#claimList").datagrid("getRows")).size();
+		if(method!="reuse" && claimCount==0){
+			$.messager.alert("Warnning",'<fmt:message key="warn.emptyClaimPartner"/>',"warning");
+			return false;
+		}
+		$("form[name='persistForm']").submit();
+	}
 	</script>
 </head>
 
@@ -249,10 +263,6 @@
 </div>
 <div region="center" style="padding:10px;">
 
-
-<div style="width:1000px;text-align:right; padding:6px 0px;">
-<a href='<c:url value="/qualityDivision/qualityIssue/list"/>' class="easyui-linkbutton"  iconCls="icon-application-view-detail"><fmt:message key="ui.label.toList"/></a>
-</div>
 <div id="issueDetails" class="easyui-panel" title='<fmt:message key="ui.label.regInfo"/>' iconCls="icon-document-info" style="width:1000px;height:auto;padding:2px;">
 
 <table class="simple-table" style="width:100%;">
@@ -317,7 +327,7 @@
 </div>
 <br/>
 <div id="actionPanel" class="easyui-panel" style="width:1000px;height:auto;" title='<fmt:message key="ui.label.finalActionDescription"/>' iconCls="icon-page-lightning">
-<form name="approvalForm" action="approval" method="post">
+<form name="approvalForm" action="reapproval" method="post">
 <input type="hidden" name="regNo" value="${issue.regNo}"></input>
 <table class="simple-table" style="width:100%;">
 <tr>
@@ -340,7 +350,7 @@
 <td style="padding:4px;">
 <input name="reason1"  type='hidden'/>
 <input name="reason2"  type='hidden'/>
-<input id="defects" name="reason3"  url="acceptIssues/defectTreeCallback" style="width:300px;margin-left:1em;" value='${approval.defect3}'/>
+<input id="defects" name="reason3"  url="readyApproval/defectTreeCallback" style="width:300px;margin-left:1em;" value='${approval.defect3}'/>
 <span id="finalDefects" style="margin-left: 2em;"></span>
 </td>
 </tr>
@@ -392,42 +402,11 @@
 </table>
 </form>
 </div>
+
 <br/>
-<table id="claimList" title='<fmt:message key="ui.label.faultList"/>' iconCls="icon-table-money" rownumbers="true" fitColumns="true"
-url="acceptIssues/claimListGridCallback" showFooter="true" toolbar="#claimToolbar" style="width:1000px;height:200px;" singleSelect="true" >
-<thead>
-<tr>
-<th field="code" width="50" hidden="true"><fmt:message key="ui.label.code"/></th>
-<th field="name" width="150"><fmt:message key="ui.label.qualityIssue.reasonOrgan"/></th>
-<th field="item" width="150"><fmt:message key="ui.label.qualityIssue.reasonPartNo"/></th>
-<th field="car" width="50" hidden="true"><fmt:message key="ui.label.Car"/></th>
-<th field="model" width="50" hidden="true"><fmt:message key="ui.label.Model"/></th>
-<th field="lot" width="100"  align="center">LOT</th>
-<th field="reason1" width="100" hidden="true"><fmt:message key="ui.label.qualityIssue.4m1"/></th>
-<th field="reason2" width="100" hidden="true"><fmt:message key="ui.label.qualityIssue.4m2"/></th>
-<th field="reason3" width="100" hidden="true"><fmt:message key="ui.label.qualityIssue.analysisName"/></th>
-<th field="rate" width="50" align="right;"><fmt:message key="ui.label.shareRate"/></th>
-<th field="remark" width="150" hidden="true" ><fmt:message key="ui.label.reason"/></th>
-<th field="pic1" width="100" hidden="true"><fmt:message key="ui.label.picture"/>1</th>
-<th field="pic2" width="100" hidden="true"><fmt:message key="ui.label.picture"/>2</th>
-<th field="ref" width="100" hidden="true"><fmt:message key="ui.label.reference"/></th>
-<th field="ncr" width="100" align="center;" >NCR</th>
-<th field="reqDate" width="100" align="center;" hidden="true"><fmt:message key="ui.label.qualityIssue.measureReplyDate"/></th>
-<th field="request" width="150" hidden="true"><fmt:message key="ui.label.requestContents"/></th>
-<th field="claim" width="100" align="right;"><fmt:message key="ui.label.money"/></th>
-</tr>
-</thead>
-</table>
 
-</div>
-<div id="claimToolbar" style="text-align:right;">
-<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="javascript:addNewClaimPartner();"><fmt:message key="ui.button.Add"/></a>
-<a href="#" class="easyui-linkbutton" iconCls="icon-pencil" plain="true" onclick="javascript:editClaim();"><fmt:message key="ui.button.Edit"/></a>
-<a href="#" class="easyui-linkbutton" iconCls="icon-delete" plain="true" onclick="javascript:deleteClaim();"><fmt:message key="ui.button.Delete"/></a>
-</div>
-
-<div id="claimPartnerDlg" closed="true" title='<fmt:message key="ui.label.qualityIssue.changeFaultPartner"/>' iconCls="icon-page-edit" style="width:610px;height:490px;" modal="true">
-<form name="claimForm" action="updateClaim" method="post" enctype="multipart/form-data">
+<div id="editPanel"  title='<fmt:message key="ui.label.qualityIssue.reasonOrgan"/>' iconCls="icon-page-edit" style="width:1000px" class="easyui-panel">
+<form name="claimForm" action="updateTempClaim" method="post" enctype="multipart/form-data">
 <input type="hidden" name="action"></input>
 <input type="hidden" name="regNo" value="${issue.regNo}"></input>
 <input type="hidden" name="approvalNo" value="${approval.approvalNo }"></input>
@@ -442,7 +421,7 @@ url="acceptIssues/claimListGridCallback" showFooter="true" toolbar="#claimToolba
 </c:forEach>
 </select>
 </td>
-<th><fmt:message key="ui.label.applyRate"/></th>
+<th><fmt:message key="ui.label.shareRate"/></th>
 <td>
 <input name="claimRate"  min="10" max="100" increment="5" value="10" class="easyui-numberspinner" style="width:200px;text-align:right;"></input>
 </td>
@@ -462,7 +441,7 @@ url="acceptIssues/claimListGridCallback" showFooter="true" toolbar="#claimToolba
 <td colspan="3">
 <input name="reason1"  type="hidden"></input>
 <input name="reason2"  type="hidden"></input>
-<input name="claim4m" id="claim4m"  url="acceptIssues/4mTreeCallback" style="width:200px;"/>
+<input name="claim4m" id="claim4m"  url="readyApproval/4mTreeCallback" style="width:200px;"/>
 <span id="claim4mLabels" style="margin-left:2em;"></span>
 </td>
 </tr>
@@ -515,8 +494,55 @@ url="acceptIssues/claimListGridCallback" showFooter="true" toolbar="#claimToolba
 <textarea name="request"  rows="3" style="width:99%;"></textarea>
 </td>
 </tr>
+<tr style="border:none;">
+<td colspan="4" align="right">
+<a href='#' class="easyui-linkbutton"  iconCls="icon-accept" onclick="validateClaimForm()"><fmt:message key="ui.label.apply"/></a>
+</td>
+</tr>
 </table>
 </form>
+</div>
+<br/>
+<table id="claimList" title='<fmt:message key="ui.label.faultList"/>' iconCls="icon-table-money" rownumbers="true" fitColumns="true"
+url="readyApproval/claimListGridCallback" showFooter="true" toolbar="#claimToolbar" style="width:1000px;height:200px;" singleSelect="true" >
+<thead>
+<tr>
+<th field="code" width="50" hidden="true"><fmt:message key="ui.label.code"/></th>
+<th field="name" width="150"><fmt:message key="ui.label.qualityIssue.reasonOrgan"/></th>
+<th field="item" width="150"><fmt:message key="ui.label.qualityIssue.reasonPartNo"/></th>
+<th field="car" width="50" hidden="true"><fmt:message key="ui.label.Car"/></th>
+<th field="model" width="50" hidden="true"><fmt:message key="ui.label.Model"/></th>
+<th field="lot" width="100"  align="center">LOT</th>
+<th field="reason1" width="100" hidden="true"><fmt:message key="ui.label.qualityIssue.4m1"/></th>
+<th field="reason2" width="100" hidden="true"><fmt:message key="ui.label.qualityIssue.4m2"/></th>
+<th field="reason3" width="100" hidden="true"><fmt:message key="ui.label.qualityIssue.analysisName"/></th>
+<th field="rate" width="50" align="right;"><fmt:message key="ui.label.shareRate"/></th>
+<th field="remark" width="150" hidden="true" ><fmt:message key="ui.label.reason"/></th>
+<th field="pic1" width="100" hidden="true"><fmt:message key="ui.label.picture"/>1</th>
+<th field="pic2" width="100" hidden="true"><fmt:message key="ui.label.picture"/>2</th>
+<th field="ref" width="100" hidden="true"><fmt:message key="ui.label.reference"/></th>
+<th field="ncr" width="100" align="center;" >NCR</th>
+<th field="reqDate" width="100" align="center;" hidden="true"><fmt:message key="ui.label.qualityIssue.measureReplyDate"/></th>
+<th field="request" width="150" hidden="true"><fmt:message key="ui.label.requestContents"/></th>
+<th field="claim" width="100" align="right;"><fmt:message key="ui.label.money"/></th>
+</tr>
+</thead>
+</table>
+</br>
+<div style="width:1000px;text-align:right; padding:6px 0px;">
+<form name="persistForm" action = "persistApproval" method="post">
+<input type="hidden" name="approvalNo" value="${approval.approvalNo }"></input>
+<input type="hidden" name="regNo" value="${issue.regNo }"></input>
+<a href='#' class="easyui-linkbutton"  iconCls="icon-disk" onclick="persistApproval()"><fmt:message key="ui.label.qualityIssue.done"/></a>
+<a href='<c:url value="/qualityDivision/qualityIssue/list"/>' class="easyui-linkbutton"  iconCls="icon-application-view-detail"><fmt:message key="ui.label.toList"/></a>
+</form>
+</div>
+</div>
+
+<div id="claimToolbar" style="text-align:right;">
+<a href="#editPanel" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="javascript:addNewClaimPartner();"><fmt:message key="ui.button.Add"/></a>
+<a href="#editPanel" class="easyui-linkbutton" iconCls="icon-pencil" plain="true" onclick="javascript:editClaim();"><fmt:message key="ui.button.Edit"/></a>
+<a href="#" class="easyui-linkbutton" iconCls="icon-delete" plain="true" onclick="javascript:deleteClaim();"><fmt:message key="ui.button.Delete"/></a>
 </div>
 </body>
 </html>

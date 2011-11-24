@@ -45,5 +45,13 @@ public class ItemDAO {
 		String sql = "exec ItemDAO_getLocalItemPricePerPartnerList ?,?;";
 		return jdbc.queryForList(sql, item,country);
 	}
+
+	public void updateLocalItemPrice(String action, String item,
+			String partner, double price, String currency, String enabled,
+			String username, Locale locale) {
+		String country = locale.getCountry();
+		String sql = "exec ItemDAO_updateLocalItemPrice ?,?,?,?,?,?,?,?;";
+		jdbc.update(sql, action,item,partner,price,currency,enabled,username,country);
+	}
 	
 }

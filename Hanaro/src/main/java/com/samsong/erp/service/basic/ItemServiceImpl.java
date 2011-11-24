@@ -42,5 +42,14 @@ public class ItemServiceImpl implements ItemService {
 			String item, Locale locale) {
 		return dao.getLocalItemPricePerPartnerList(item,locale);
 	}
+
+
+	@Override
+	public void updateLocalItemPrice(String action, String item,
+			String partner, double price, String currency,
+			String enabled, String username, Locale locale) {
+		dao.updateLocalItemPrice(action,item,partner,price,currency,enabled,username,locale);
+		
+	}
 	
 }
