@@ -172,7 +172,7 @@
 				<thead>
 					<tr>
 						<th field="approvalNo" width="100" sortable="true" align="center;"><fmt:message key="ui.label.actionNo"/></th>
-						<th field="accepter" width="50" sortable="true"><fmt:message key="ui.label.actor"/></th> 
+						<th field="accepter" width="100" sortable="true"><fmt:message key="ui.label.actor"/></th> 
 						<th field="regNo" width="250" sortable="true"><fmt:message key="ui.label.RegNo"/></th>
 						<th field="date" width="150" align="center" sortable="true"><fmt:message key="ui.label.OccurHour"/></th>
 						<th field="place" width="100" sortable="true"><fmt:message key="ui.label.RegPlace"/></th>

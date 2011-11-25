@@ -156,7 +156,9 @@ function validateEditForm(){
 	</c:forEach>
 	</tbody>
 </table>
-
+<div style="width:1000px;text-align:right; padding:6px 0px;">
+<a href='<c:url value="/basicDivision/items/itemLocalization"/>' class="easyui-linkbutton"  iconCls="icon-application-view-detail"><fmt:message key="ui.label.toList"/></a>
+</div>
 <!-- 툴바 -->
 <div  id="toolbar" style="padding:5px;height:auto;">
  <div style="text-align:right;margin-top:.5em;">
