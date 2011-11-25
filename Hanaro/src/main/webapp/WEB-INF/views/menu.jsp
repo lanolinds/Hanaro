@@ -33,7 +33,7 @@
 
 <!-- 사용자 서브메뉴 -->
 <div id="userDetails" style="width:150px;">  
-    <div iconCls="icon-change-password"><fmt:message key="menu.changePassword"/></div>   
+    <div iconCls="icon-change-password" href='<c:url value="/changePassword"/>'><fmt:message key="menu.changePassword"/></div>   
 </div>
 
 <!-- 기준정보 서브메뉴 -->
