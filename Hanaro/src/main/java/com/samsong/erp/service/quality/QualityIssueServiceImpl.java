@@ -1,6 +1,6 @@
 package com.samsong.erp.service.quality;
-
-
+ 
+ 
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -21,7 +21,7 @@ import com.samsong.erp.dao.quality.QualityIssueDAO;
 import com.samsong.erp.model.quality.IssueApproval;
 import com.samsong.erp.model.quality.NcrInformSheet;
 import com.samsong.erp.model.quality.QualityIssueRegSheet;
-
+ 
 @Service
 public class QualityIssueServiceImpl implements QualityIssueService {
  
@@ -172,10 +172,11 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	}
  
 	@Override
-	public IssueApproval updateApproval(IssueApproval approval) {
+	public IssueApproval updateApproval(IssueApproval approval,Locale locale) {
 		
 		//변경사항 저장.
 		dao.updateApproval(approval);
+		
 		
 		//변경사항에 맞게 클래임을 다시 계산한다.
 		Map<String,Object> params = dao.getClaimParams(approval.getApprovalNo());
@@ -184,6 +185,12 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 		//클레임 가격 저장.
 		dao.updateTotalClaim(approval.getApprovalNo(), claim);
 		
+		if(approval.getMethod().equals("reuse")){
+			List<String> partners =dao.getClaimSharedPartnerList(approval.getApprovalNo());
+			for(String partner : partners){
+				this.deletePartnerClaim(approval.getApprovalNo(), partner, locale);
+			}
+		}
 		// 배분한 귀책처들 배분값 다시 계산.
 		dao.updateAllSharedClaim(approval.getApprovalNo());
 		
@@ -399,6 +406,137 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	public List<Map<String, Object>> getNcrStatusList(Locale locale,
 			Map<String, Object> params) {
 		return dao.getNcrStatusList(locale, params);
+	}
+
+	@Override
+	public String readyToAcceptIssue(String regNo, Locale locale,
+			String username) {
+		String tempApprovalNo = dao.readyToAcceptIssue(regNo, locale, username);
+		Map<String,Object> claimParams = dao.getTempClaimParams(tempApprovalNo,regNo,locale);
+		double claim = this.calculateClaim(claimParams);
+		
+		dao.updateTempApprovalTotalClaim(tempApprovalNo,claim);
+		
+		dao.updateAllTempSharedClaim(tempApprovalNo);
+		
+		return tempApprovalNo;
+	}
+
+	@Override
+	public IssueApproval getTempApproval(String tempApprovalNo, Locale locale) {
+		return dao.getTempApproval(tempApprovalNo,locale);
+	}
+
+	@Override
+	public List<Map<String, Object>> getTempClaimList(String approvalNo,
+			Locale locale) {
+		return dao.getTempClaimList(approvalNo,locale);
+	}
+
+	@Override
+	public IssueApproval updateTempApproval(String regNo,IssueApproval approval,Locale locale) {
+		
+		dao.updateTempApproval(approval);
+		//변경사항에 맞게 클래임을 다시 계산한다.
+		Map<String,Object> params = dao.getTempClaimParams(approval.getApprovalNo(), regNo, locale);
+		double claim = this.calculateClaim(params);
+		approval.setClaim(claim);
+		//클레임 가격 저장.
+		dao.updateTempApprovalTotalClaim(approval.getApprovalNo(), claim);
+		
+		// 배분한 귀책처들 배분값 다시 계산.
+		dao.updateAllTempSharedClaim(approval.getApprovalNo());
+		
+		return approval;
+	}
+
+	@Override
+	public void addTempClaim(String approvalNo, String partner, double rate,
+			String item, String lot, String reason1, String reason2,
+			String reason3, String remark, MultipartFile pic1,
+			MultipartFile pic2, MultipartFile ref, String ncr, String reqDate,
+			String request, Locale locale) {
+		//첨부파일 있으면 외래키 확보.
+				String pic1id = null;
+				String pic2id = null;
+				String refid = null;
+				if(pic1.getSize()>0){
+					pic1id = dao.updateTempClaimAttach(pic1id,pic1);
+				}
+				if(pic2.getSize()>0){
+					pic2id = dao.updateTempClaimAttach(pic2id,pic2);
+				}
+				if(ref.getSize()>0){
+					refid = dao.updateTempClaimAttach(refid,ref);
+				}
+				
+				//NCR 발행하면 외래키 확보
+				String ncrNo = null;
+				if(ncr!=null && ncr.toUpperCase().equals("Y")){
+					ncrNo =dao.publishTempNcr(reqDate,request);
+				}
+				
+				
+				
+				
+				//업체 클래임 금액 계산.
+				IssueApproval approval = dao.getTempApproval(approvalNo, locale);
+				double share = approval.getClaim()*(rate/100d);
+				dao.addTempClaimPartner(approvalNo, partner, item, lot, reason1, reason2, reason3, rate, share, remark, pic1id, pic2id,refid, ncrNo, locale);
+		
+	}
+
+	@Override
+	public void updateTempClaim(String approvalNo, String partner, double rate,
+			String item, String lot, String reason1, String reason2,
+			String reason3, String remark, MultipartFile pic1, String pic1id,
+			MultipartFile pic2, String pic2id, MultipartFile ref, String refid,
+			String ncr, String reqDate, String request, Locale locale) {
+		if(pic1.getSize()>0){
+			pic1id = dao.updateTempClaimAttach(pic1id,pic1);
+		}
+		if(pic2.getSize()>0){
+			pic2id = dao.updateTempClaimAttach(pic2id,pic2);
+		}
+		if(ref.getSize()>0){
+			refid = dao.updateTempClaimAttach(refid,ref);
+		}
+		
+		//NCR 발행하면 외래키 확보
+		String ncrNo = null;
+		if(ncr!=null && ncr.toUpperCase().equals("Y")){
+			ncrNo =dao.publishTempNcr(reqDate,request);
+		}
+		else if(ncr!=null && ncr.toUpperCase().equals("N")){
+			ncrNo=null;
+		}
+		else{
+			ncrNo=ncr;
+		}
+		//변경된 요율을 적용한다.
+		IssueApproval issue = dao.getTempApproval(approvalNo, locale);
+		double share = issue.getClaim()*(rate/100d);
+		
+		dao.updateTempClaim(approvalNo, partner, rate,share,item, lot, reason1, reason2, reason3, remark, pic1id, pic2id, refid,ncrNo);
+		
+	}
+
+	@Override
+	public void deletePartnerTempClaim(String approvalNo, String partner,
+			Locale locale) {
+		String ncrNo = dao.deletePartnerTempClaim(approvalNo,partner);
+		//dao.deleteTempNcr(ncrNo);
+	}
+
+	@Override
+	public Map<String, Object> getTempClaimAttachment(String id) {
+		return dao.getTempClaimAttachment(id);
+	}
+
+	@Override
+	public void persistApproval(String regNo,String approvalNo,String username, Locale locale) {
+		dao.persistApproval(regNo,approvalNo,username,locale);
+		
 	}
 
 

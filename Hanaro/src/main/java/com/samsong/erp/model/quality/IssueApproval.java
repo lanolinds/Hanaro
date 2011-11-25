@@ -24,8 +24,7 @@ public class IssueApproval {
 	public void setClaim(double claim) {
 		this.claim = claim;
 	}
-	private List<Map<String,Object>> claims;
-	
+
 	public String getApprovalNo() {
 		return approvalNo;
 	}
@@ -87,12 +86,6 @@ public class IssueApproval {
 		this.shipType = shipType;
 	}
 
-	public List<Map<String, Object>> getClaims() {
-		return claims;
-	}
-	public void setClaims(List<Map<String, Object>> claims) {
-		this.claims = claims;
-	}
 	public String getCausePartner() {
 		return causePartner;
 	}
@@ -106,7 +99,7 @@ public class IssueApproval {
 				+ defect2 + ", defect3=" + defect3 + ", remark=" + remark
 				+ ", adHocs=" + adHocs + ", method=" + method + ", workCost="
 				+ workCost + ", testCost=" + testCost + ", shipType="
-				+ shipType + ", claim=" + claim + ", claims=" + claims + "]";
+				+ shipType + ", claim=" + claim + "]";
 	}
 	
 }

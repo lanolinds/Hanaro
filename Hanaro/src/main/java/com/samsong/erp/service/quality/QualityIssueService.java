@@ -46,7 +46,7 @@ public interface QualityIssueService {
 
 	public IssueApproval getApproval(String approvalNo, Locale locale);
 
-	public IssueApproval updateApproval( IssueApproval approval);
+	public IssueApproval updateApproval( IssueApproval approval,Locale locale);
 
 	public void deletePartnerClaim(String approvalNo, String partner,Locale locale);
 	public Map<String, Object> getIssueDetails(String regNo, Locale locale);
@@ -113,6 +113,36 @@ public interface QualityIssueService {
 	public List<Map<String,Object>> getNcrStatus(Locale locale,Map<String,Object> params);
 	
 	public List<Map<String,Object>> getNcrStatusList(Locale locale, Map<String,Object> params);
+
+	public String readyToAcceptIssue(String regNo, Locale locale,
+			String username);
+
+	public IssueApproval getTempApproval(String tempApprovalNo, Locale locale);
+ 
+	public List<Map<String, Object>> getTempClaimList(String approvalNo,
+			Locale locale);
+
+	public IssueApproval updateTempApproval(String regNo, IssueApproval approval, Locale locale);
+
+	public void addTempClaim(String approvalNo, String partner, double rate,
+			String item, String lot, String reason1, String reason2,
+			String reason3, String remark, MultipartFile pic1,
+			MultipartFile pic2, MultipartFile ref, String ncr, String reqDate,
+			String request, Locale locale);
+
+	public void updateTempClaim(String approvalNo, String partner, double rate,
+			String item, String lot, String reason1, String reason2,
+			String reason3, String remark, MultipartFile pic1, String pic1id,
+			MultipartFile pic2, String pic2id, MultipartFile ref, String refid,
+			String ncr, String reqDate, String request, Locale locale);
+
+	public void deletePartnerTempClaim(String approvalNo, String partner,
+			Locale locale);
+
+	public Map<String, Object> getTempClaimAttachment(String id);
+
+
+	public void persistApproval(String regNo,String approvalNo,String username, Locale locale);
 
 	
 }

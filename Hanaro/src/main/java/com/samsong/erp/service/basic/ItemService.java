@@ -14,4 +14,8 @@ public interface ItemService {
 
 	public List<Map<String, Object>> getLocalItemPricePerPartnerList(
 			String item, Locale locale);
+
+	public void updateLocalItemPrice(String action, String item,
+			String partner, double doubleValue, String currency,
+			String enabled, String username, Locale locale);
 }

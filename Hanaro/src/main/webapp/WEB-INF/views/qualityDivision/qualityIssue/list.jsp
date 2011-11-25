@@ -172,7 +172,7 @@
 				<thead>
 					<tr>
 						<th field="approvalNo" width="100" sortable="true" align="center;"><fmt:message key="ui.label.actionNo"/></th>
-						<th field="accepter" width="50" sortable="true"><fmt:message key="ui.label.actor"/></th> 
+						<th field="accepter" width="100" sortable="true"><fmt:message key="ui.label.actor"/></th> 
 						<th field="regNo" width="250" sortable="true"><fmt:message key="ui.label.RegNo"/></th>
 						<th field="date" width="150" align="center" sortable="true"><fmt:message key="ui.label.OccurHour"/></th>
 						<th field="place" width="100" sortable="true"><fmt:message key="ui.label.RegPlace"/></th>
@@ -199,7 +199,7 @@
 	    <span style="margin-left:2em;"><a href="javascript:validFilter()" class="easyui-linkbutton" iconCls="icon-search"><fmt:message key="ui.button.Search"/></a></span>
     </div>
     <div style="text-align:right;">
-    	<form name="acceptForm" method="post" action="acceptIssues">
+    	<form name="acceptForm" method="post" action="readyApproval">
     		<input type="hidden" name="regNo"/>
     	</form>
 
@@ -207,7 +207,7 @@
     </div>
     </div>
     
-    <!-- 툴바 -->
+    <!-- 툴바2 -->
     <div  id="toolbar2" style="padding:5px;height:auto;">
     <div style="margin-top:.5em;">
 	    <span style="margin-right:.5em"><fmt:message key="ui.label.SearchDate"/></span>

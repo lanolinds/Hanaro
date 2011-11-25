@@ -35,9 +35,9 @@ import com.samsong.erp.util.ClientFileNameEncoder;
 
 @Controller
 @RequestMapping("/qualityDivision/qualityIssue")
-public class IssueAcceptController {
+public class ReadyApprovalController {
 	
-	private Logger logger = Logger.getLogger(IssueAcceptController.class);
+	private Logger logger = Logger.getLogger(ReadyApprovalController.class);
 	@Autowired
 	private QualityIssueService service;
 	@Autowired
@@ -45,45 +45,32 @@ public class IssueAcceptController {
 	@Autowired
 	private MessageSource message;
 	
-	@RequestMapping(value="/cancelAccept", method=RequestMethod.POST)
-	public String cancelAccept(@RequestParam("regNo") String regNo,@RequestParam(value="no",required=false) String approvalNo,Model model, Authentication auth){
-		HanaroUser user = (HanaroUser)auth.getPrincipal();		
-		service.cancelApproval(approvalNo,user.getLocale());
-		
-		logger.info("사용자:"+user.getUsername()+" 이(가) 품질문제(등록번호:"+regNo+")의 전체 처리내역을 취소합니다. 등록된 품질 문제는 등록 시점으로 복귀됩니다.");
-		return "redirect:/qualityDivision/qualityIssue/list";
-	}
-	
-	
-	@RequestMapping(value="/acceptIssues", method=RequestMethod.POST)
-	public String accept(@RequestParam("regNo") String regNo,@RequestParam(value="no",required=false) String approvalNo,Model model,Authentication auth,Locale locale){
+	@RequestMapping(value="/readyApproval", method = RequestMethod.POST)
+	public String readyApproval(@RequestParam("regNo") String regNo,Model model, Authentication auth,Locale locale){
 		HanaroUser user = (HanaroUser)auth.getPrincipal();
-		
-		
 		//등록된 품질문제 상세 내역을 얻는다.
 		Map<String,Object> details = service.getIssueDetails(regNo, user.getLocale());
+		
+		
+		String	tempApprovalNo=service.readyToAcceptIssue(regNo,user.getLocale(), user.getUsername());
+		
+		IssueApproval approval = service.getTempApproval(tempApprovalNo, user.getLocale());
 		
 		//출처별 처리 방법을 얻는다.
 		String originCode =(String)details.get("originCode");
 		Map<String,String> methods = getHandleMethods(originCode,locale);
 		
-		//기본 처리 내역을 얻는다.
-		if(approvalNo==null)
-			approvalNo=service.acceptIssue(regNo,user.getLocale(), user.getUsername());
-		IssueApproval approval = service.getApproval(approvalNo, user.getLocale());
-		
 		//원인품번 납품처 리스트
 		String item = (String)details.get("item");
 		Map<String,String> suppliers = service.getClaimItemSuppliers(item,user.getLocale());
-		
-		
-		
+					
 		model.addAttribute("issue",details);
 		model.addAttribute("methods",methods);
 		model.addAttribute("approval",approval);
 		model.addAttribute("partners",partnerService.getCustOption(user.getLocale(), "qisall", ""));
 		model.addAttribute("suppliers",suppliers);
-		return "qualityDivision/qualityIssue/acceptIssues";
+				
+		return "qualityDivision/qualityIssue/readyApproval";
 	}
 	private Map<String,String> getHandleMethods(String code,Locale locale){
 		Map<String,String> m = new LinkedHashMap<String,String>();
@@ -98,79 +85,8 @@ public class IssueAcceptController {
 		return m;
 	}
 	
-	@RequestMapping("/acceptIssues/downloadFile")
-	public void downloadFile(@RequestParam("seq") int seq,@RequestParam("no") String regNo,@RequestParam("name") String name,
-			Authentication auth,HttpServletRequest req, HttpServletResponse res){
-		HanaroUser user = (HanaroUser)auth.getPrincipal();
-		
-		try{
-			name = ClientFileNameEncoder.encodeFileName(name, req.getHeader("User-Agent"));
-			byte[] binary =service.getQualityIssueFile(user.getLocale(), regNo, Integer.toString(seq));
-			
-			logger.info("사용자:"+user.getUsername()+" 이(가) 품질문제(등록번호:"+regNo+")의 첨부파일(이름:"+name+")을 다운받습니다.");
-			
-			res.setHeader("Content-Disposition", "inline;filename=" + name);
-			res.setContentType("application/octet-stream");
-			res.setContentLength(binary.length);
-			OutputStream out = res.getOutputStream();
-			out.write(binary);
-			out.flush();
-		}catch(IOException ex){
-			logger.error("파일 다운로드 중 다음 에러 발생:"+ex.getMessage());
-		}
-		
-	}
-	@RequestMapping("/acceptIssues/defectTreeCallback")
-	public @ResponseBody List<Map<String,Object>> getDefectTreeData(Authentication auth){
-		HanaroUser user = (HanaroUser)auth.getPrincipal();
-		return service.getDefectTreeData(user.getLocale());
-	}
 	
-	@RequestMapping("/acceptIssues/4mTreeCallback")
-	public @ResponseBody List<Map<String,Object>> get4mTreeData(Authentication auth){
-		HanaroUser user = (HanaroUser)auth.getPrincipal();
-		return service.get4mTreeData(user.getLocale());
-	}
-	
-	@RequestMapping("/acceptIssues/itemAssistCallback")
-	public @ResponseBody List<Map<String,Object>> getItemAssistant(Authentication auth){
-		HanaroUser user = (HanaroUser)auth.getPrincipal();
-		return service.getClaimItemAssistantList(user.getLocale());
-	}
-	
-	@RequestMapping("/acceptIssues/claimListGridCallback")
-	public @ResponseBody Map<String,Object> getClaimPartnerList(@RequestParam("approvalNo") String approvalNo,Authentication auth){
-		HanaroUser user = (HanaroUser)auth.getPrincipal();
-		List<Map<String,Object>> claims =service.getClaimList(approvalNo,user.getLocale());
-		double claimTotal = 0d;
-		NumberFormat fmt = NumberFormat.getInstance();
-		fmt.setMaximumFractionDigits(2);
-		
-		for(Map<String,Object> claim : claims){			
-			double money =  Double.parseDouble(claim.get("claim").toString());
-			claimTotal +=money;
-			claim.put("claim",fmt.format(money));
-		}
-		List<Map<String,Object>> footers = new ArrayList<Map<String,Object>>();
-		Map<String,Object> footer = new HashMap<String,Object>();
-		footer.put("name", "Total");
-		footer.put("claim", fmt.format(claimTotal));
-		footers.add(footer);
-		Map<String,Object> json = new HashMap<String, Object>();
-		if(claims!=null){
-			json.put("total",claims.size());
-			json.put("rows", claims);
-			json.put("footer",footers);
-		}
-		else
-		{
-			json.put("total", 0);
-			json.put("rows", 0);
-			json.put("footer",footers);
-		}
-		return json;
-	}
-	@RequestMapping(value="/approval",method=RequestMethod.POST )
+	@RequestMapping(value="/reapproval",method=RequestMethod.POST )
 	public String updateApproval(
 			@RequestParam("regNo") String regNo,
 			@RequestParam("approvalNo") String approvalNo,
@@ -200,8 +116,8 @@ public class IssueAcceptController {
 		approval.setCausePartner(causePartner);
 		
 		//처리내역 변경 사항을 업데이트한다.
-		approval =service.updateApproval(approval,user.getLocale()); 
-		logger.info("사용자:"+user.getUsername()+" 이(가) 품질문제 처리 내역을 다음과 같이 수정합니다. "+approval);
+		approval =service.updateTempApproval(regNo,approval,user.getLocale()); 
+		
 		
 		Map<String,Object> details = service.getIssueDetails(regNo, user.getLocale());
 		String originCode =(String)details.get("originCode");
@@ -214,11 +130,54 @@ public class IssueAcceptController {
 		model.addAttribute("approval",approval);
 		model.addAttribute("partners",partnerService.getCustOption(user.getLocale(), "qisall", ""));
 		model.addAttribute("suppliers",suppliers);
-		return "qualityDivision/qualityIssue/acceptIssues";
+		return "qualityDivision/qualityIssue/readyApproval";
 	}
 	
+	@RequestMapping("readyApproval/claimListGridCallback")
+	public @ResponseBody Map<String,Object> getClaimPartnerList(@RequestParam("approvalNo") String approvalNo,Authentication auth){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		List<Map<String,Object>> claims =service.getTempClaimList(approvalNo,user.getLocale());
+		double claimTotal = 0d;
+		NumberFormat fmt = NumberFormat.getInstance();
+		fmt.setMaximumFractionDigits(2);
+		
+		for(Map<String,Object> claim : claims){			
+			double money =  Double.parseDouble(claim.get("claim").toString());
+			claimTotal +=money;
+			claim.put("claim",fmt.format(money));
+		}
+		List<Map<String,Object>> footers = new ArrayList<Map<String,Object>>();
+		Map<String,Object> footer = new HashMap<String,Object>();
+		footer.put("name", "Total");
+		footer.put("claim", fmt.format(claimTotal));
+		footers.add(footer);
+		Map<String,Object> json = new HashMap<String, Object>();
+		if(claims!=null){
+			json.put("total",claims.size());
+			json.put("rows", claims);
+			json.put("footer",footers);
+		}
+		else
+		{
+			json.put("total", 0);
+			json.put("rows", 0);
+			json.put("footer",footers);
+		}
+		return json;
+	}
+	@RequestMapping("/readyApproval/defectTreeCallback")
+	public @ResponseBody List<Map<String,Object>> getDefectTreeData(Authentication auth){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		return service.getDefectTreeData(user.getLocale());
+	}
 	
-	@RequestMapping(value="/updateClaim",method=RequestMethod.POST )
+	@RequestMapping("/readyApproval/4mTreeCallback")
+	public @ResponseBody List<Map<String,Object>> get4mTreeData(Authentication auth){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		return service.get4mTreeData(user.getLocale());
+	}
+	
+	@RequestMapping(value="/updateTempClaim",method=RequestMethod.POST )
 	public String updateClaim(@RequestParam("action") String action,
 			@RequestParam("regNo") String regNo,
 			@RequestParam("approvalNo") String approvalNo,
@@ -246,25 +205,20 @@ public class IssueAcceptController {
 		refid = refid.trim().length()==0?null:refid;
 		
 		if(action.equals("add")){
-			service.addClaim(approvalNo,partner,rate,item,lot,reason1,reason2,reason3,remark,pic1,pic2,ref,ncr,reqDate,request,user.getLocale());
-			logger.info("사용자:"+user.getUsername()+" 이(가) 품질문제 처리 내역에 클래임 업체를 추가합니다. 처리번호:"+approvalNo+", 협력사:"+partner+", 분담율:"+rate+"%,귀책품번:"+item);
+			service.addTempClaim(approvalNo,partner,rate,item,lot,reason1,reason2,reason3,remark,pic1,pic2,ref,ncr,reqDate,request,user.getLocale());
 		}
 		else if (action.equals("edit")){
 			//service.updateClaim(approvalNo,partner,rate,item,lot,reason1,reason2,reason3,remark,pic1,pic1id,pic2,pic2id,ref,refid,locale);
-			service.updateClaim(approvalNo, partner, rate, item, lot, reason1, reason2, reason3, remark, pic1, pic1id, pic2, pic2id, ref, refid,ncr,reqDate,request,user.getLocale());
-			logger.info("사용자:"+user.getUsername()+" 이(가) 품질문제 처리 내역에 등록된 업체 클래임 내용을 수정합니다. 처리번호:"+approvalNo+", 협력사:"+partner
-					+", 분담율:"+rate+"%,귀책품번:"+item+",lot:"+lot+",reason1:"+reason1+",reason2:"+reason2+",reason3:"+reason3+",remark:"+remark+",pic1:"+pic1id
-					+",pic2:"+pic2id+",ref:"+refid);
+			service.updateTempClaim(approvalNo, partner, rate, item, lot, reason1, reason2, reason3, remark, pic1, pic1id, pic2, pic2id, ref, refid,ncr,reqDate,request,user.getLocale());
 		}
 		else if(action.equals("delete")){
-			service.deletePartnerClaim(approvalNo,partner,user.getLocale()); 
-			logger.info("사용자:"+user.getUsername()+" 이(가) 품질문제 처리 내역에 등록된 업체 클래임 내용을 삭제합니다. 처리번호:"+approvalNo+", 협력사:"+partner);
+			service.deletePartnerTempClaim(approvalNo,partner,user.getLocale()); 
 		}
 		else
 		{
 			; //do nothing.
 		}
-		IssueApproval approval = service.getApproval(approvalNo, user.getLocale());
+		IssueApproval approval = service.getTempApproval(approvalNo, user.getLocale());
 		Map<String,Object> details = service.getIssueDetails(regNo, user.getLocale());
 		String originCode =(String)details.get("originCode");
 		Map<String,String> methods = getHandleMethods(originCode,locale);
@@ -276,18 +230,14 @@ public class IssueAcceptController {
 		model.addAttribute("approval",approval);
 		model.addAttribute("partners",partnerService.getCustOption(user.getLocale(), "qisall", ""));
 		model.addAttribute("suppliers",suppliers);
-		return "qualityDivision/qualityIssue/acceptIssues";
+		return "qualityDivision/qualityIssue/readyApproval";
 	}
-	 
-	@RequestMapping("/acceptIssues/downloadClaimRef")
-	public void downloadClaimRef(@RequestParam("id") String id,HttpServletRequest req,HttpServletResponse res,Authentication auth){
-		HanaroUser user = (HanaroUser)auth.getPrincipal();
-		
-		Map<String,Object> attach = service.getClaimAttachment(id);
+	
+	@RequestMapping("/readyApproval/downloadClaimRef")
+	public void downloadClaimRef(@RequestParam("id") String id,HttpServletRequest req,HttpServletResponse res){
+		Map<String,Object> attach = service.getTempClaimAttachment(id);
 		String name = (String)attach.get("fileName");
 		String contentType=(String)attach.get("contentType");
-		
-		logger.info("사용자:"+user.getUsername()+" 이(가) 업체 클래임 내역에 등록된 첨부파일("+id+") "+name+" 을 다운받습니다.");
 		byte[] binary = (byte[])attach.get("binary");
 		try{
 			name = ClientFileNameEncoder.encodeFileName(name, req.getHeader("User-Agent"));
@@ -301,5 +251,14 @@ public class IssueAcceptController {
 			logger.error("파일 다운로드 중 다음 에러 발생:"+ex.getMessage());
 		}
 	}
-
+ 	
+	@RequestMapping(value="/persistApproval",method=RequestMethod.POST )
+	public String updateClaim(@RequestParam("approvalNo") String approvalNo,@RequestParam("regNo") String regNo,
+			Authentication auth,Locale locale){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		service.persistApproval(regNo,approvalNo,user.getUsername(),user.getLocale());
+		logger.info("사용자:"+user.getUsername()+" 이(가) 품질문제(등록번호:"+regNo+") 를 처리하였습니다. 처리번호 :"+approvalNo);
+		return "redirect:/qualityDivision/qualityIssue/list";
+	}
+	
 }
