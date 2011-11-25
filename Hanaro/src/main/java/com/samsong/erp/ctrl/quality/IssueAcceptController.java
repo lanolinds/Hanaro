@@ -50,6 +50,7 @@ public class IssueAcceptController {
 		HanaroUser user = (HanaroUser)auth.getPrincipal();		
 		service.cancelApproval(approvalNo,user.getLocale());
 		
+		logger.info("사용자:"+user.getUsername()+" 이(가) 품질문제(등록번호:"+regNo+")의 전체 처리내역을 취소합니다. 등록된 품질 문제는 등록 시점으로 복귀됩니다.");
 		return "redirect:/qualityDivision/qualityIssue/list";
 	}
 	
@@ -84,13 +85,6 @@ public class IssueAcceptController {
 		model.addAttribute("suppliers",suppliers);
 		return "qualityDivision/qualityIssue/acceptIssues";
 	}
-	@RequestMapping("/issueDetailCallback")
-	public @ResponseBody Map<String,Object> getIssueDetails(@RequestParam("no") String regNo,Authentication auth){
-		HanaroUser user = (HanaroUser)auth.getPrincipal();
-		return service.getIssueDetails(regNo, user.getLocale());
-	}
-	
-	
 	private Map<String,String> getHandleMethods(String code,Locale locale){
 		Map<String,String> m = new LinkedHashMap<String,String>();
 		if(code.equalsIgnoreCase("CD")){
@@ -112,6 +106,9 @@ public class IssueAcceptController {
 		try{
 			name = ClientFileNameEncoder.encodeFileName(name, req.getHeader("User-Agent"));
 			byte[] binary =service.getQualityIssueFile(user.getLocale(), regNo, Integer.toString(seq));
+			
+			logger.info("사용자:"+user.getUsername()+" 이(가) 품질문제(등록번호:"+regNo+")의 첨부파일(이름:"+name+")을 다운받습니다.");
+			
 			res.setHeader("Content-Disposition", "inline;filename=" + name);
 			res.setContentType("application/octet-stream");
 			res.setContentLength(binary.length);
@@ -204,7 +201,7 @@ public class IssueAcceptController {
 		
 		//처리내역 변경 사항을 업데이트한다.
 		approval =service.updateApproval(approval,user.getLocale()); 
-		logger.info(approval);
+		logger.info("사용자:"+user.getUsername()+" 이(가) 품질문제 처리 내역을 다음과 같이 수정합니다. "+approval);
 		
 		Map<String,Object> details = service.getIssueDetails(regNo, user.getLocale());
 		String originCode =(String)details.get("originCode");
@@ -250,13 +247,18 @@ public class IssueAcceptController {
 		
 		if(action.equals("add")){
 			service.addClaim(approvalNo,partner,rate,item,lot,reason1,reason2,reason3,remark,pic1,pic2,ref,ncr,reqDate,request,user.getLocale());
+			logger.info("사용자:"+user.getUsername()+" 이(가) 품질문제 처리 내역에 클래임 업체를 추가합니다. 처리번호:"+approvalNo+", 협력사:"+partner+", 분담율:"+rate+"%,귀책품번:"+item);
 		}
 		else if (action.equals("edit")){
 			//service.updateClaim(approvalNo,partner,rate,item,lot,reason1,reason2,reason3,remark,pic1,pic1id,pic2,pic2id,ref,refid,locale);
 			service.updateClaim(approvalNo, partner, rate, item, lot, reason1, reason2, reason3, remark, pic1, pic1id, pic2, pic2id, ref, refid,ncr,reqDate,request,user.getLocale());
+			logger.info("사용자:"+user.getUsername()+" 이(가) 품질문제 처리 내역에 등록된 업체 클래임 내용을 수정합니다. 처리번호:"+approvalNo+", 협력사:"+partner
+					+", 분담율:"+rate+"%,귀책품번:"+item+",lot:"+lot+",reason1:"+reason1+",reason2:"+reason2+",reason3:"+reason3+",remark:"+remark+",pic1:"+pic1id
+					+",pic2:"+pic2id+",ref:"+refid);
 		}
 		else if(action.equals("delete")){
 			service.deletePartnerClaim(approvalNo,partner,user.getLocale()); 
+			logger.info("사용자:"+user.getUsername()+" 이(가) 품질문제 처리 내역에 등록된 업체 클래임 내용을 삭제합니다. 처리번호:"+approvalNo+", 협력사:"+partner);
 		}
 		else
 		{
@@ -278,10 +280,14 @@ public class IssueAcceptController {
 	}
 	 
 	@RequestMapping("/acceptIssues/downloadClaimRef")
-	public void downloadClaimRef(@RequestParam("id") String id,HttpServletRequest req,HttpServletResponse res){
+	public void downloadClaimRef(@RequestParam("id") String id,HttpServletRequest req,HttpServletResponse res,Authentication auth){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		
 		Map<String,Object> attach = service.getClaimAttachment(id);
 		String name = (String)attach.get("fileName");
 		String contentType=(String)attach.get("contentType");
+		
+		logger.info("사용자:"+user.getUsername()+" 이(가) 업체 클래임 내역에 등록된 첨부파일("+id+") "+name+" 을 다운받습니다.");
 		byte[] binary = (byte[])attach.get("binary");
 		try{
 			name = ClientFileNameEncoder.encodeFileName(name, req.getHeader("User-Agent"));

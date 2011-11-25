@@ -50,13 +50,9 @@ public class ItemLocalPriceController {
 			Authentication auth){
 		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		
-		
-		logger.debug("action:"+action);
-		logger.debug("parter:"+partner);
-		logger.debug("item:"+item);
-		
 		service.updateLocalItemPrice(action,item,partner,price.doubleValue(),currency,enabled,user.getUsername(),user.getLocale());
-		
+		logger.info("사용자:"+user.getUsername()+" 이(가) 지역화 품번의 업체별 단가를 다음과 같이 수정합니다. action:"+action
+				+",item:"+item+",partner:"+partner+",price:"+price+",currency:"+currency+",enabled:"+enabled);
 		
 		return "redirect:/basicDivision/items/localPrice/"+item;
 	}

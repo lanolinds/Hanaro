@@ -58,7 +58,6 @@ public class ItemLocalizationController {
 			@RequestParam("localized") String localized,
 			Authentication auth){
 		Locale locale = ((HanaroUser)auth.getPrincipal()).getLocale();		
-		logger.info("dev의 설정 로케일:"+locale.toString());
 		Map<String,Object> json = new HashMap<String, Object>();
 		List<Map<String,Object>> list =service.getLocalizedItemList(locale, item, cate, localized);
 		if(sortKey!=null){

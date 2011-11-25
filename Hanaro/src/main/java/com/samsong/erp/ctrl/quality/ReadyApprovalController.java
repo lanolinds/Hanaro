@@ -257,6 +257,7 @@ public class ReadyApprovalController {
 			Authentication auth,Locale locale){
 		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		service.persistApproval(regNo,approvalNo,user.getUsername(),user.getLocale());
+		logger.info("사용자:"+user.getUsername()+" 이(가) 품질문제(등록번호:"+regNo+") 를 처리하였습니다. 처리번호 :"+approvalNo);
 		return "redirect:/qualityDivision/qualityIssue/list";
 	}
 	
