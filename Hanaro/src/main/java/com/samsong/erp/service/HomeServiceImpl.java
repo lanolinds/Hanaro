@@ -20,6 +20,11 @@ public class HomeServiceImpl implements HomeService {
 	public void setDataSource(DataSource dataSource){
 		this.jdbc = new JdbcTemplate(dataSource);
 	}
+
+	@Override
+	public int changePassword(String user, String cntPwd, String newPwd) {
+		return dao.changePassword(user, cntPwd, newPwd);
+	}
 	
 
 

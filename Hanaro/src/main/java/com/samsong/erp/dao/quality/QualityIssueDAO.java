@@ -31,7 +31,7 @@ import com.samsong.erp.model.quality.IssueApproval;
 
 import com.samsong.erp.model.quality.NcrInformSheet;
 import com.samsong.erp.model.quality.QualityIssueRegSheet;
-
+ 
 @Repository
 public class QualityIssueDAO {
 

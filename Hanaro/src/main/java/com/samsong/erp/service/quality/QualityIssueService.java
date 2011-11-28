@@ -118,7 +118,7 @@ public interface QualityIssueService {
 			String username);
 
 	public IssueApproval getTempApproval(String tempApprovalNo, Locale locale);
-
+ 
 	public List<Map<String, Object>> getTempClaimList(String approvalNo,
 			Locale locale);
 

@@ -251,7 +251,7 @@ public class ReadyApprovalController {
 			logger.error("파일 다운로드 중 다음 에러 발생:"+ex.getMessage());
 		}
 	}
-	
+ 	
 	@RequestMapping(value="/persistApproval",method=RequestMethod.POST )
 	public String updateClaim(@RequestParam("approvalNo") String approvalNo,@RequestParam("regNo") String regNo,
 			Authentication auth,Locale locale){

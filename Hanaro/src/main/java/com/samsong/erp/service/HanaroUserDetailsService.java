@@ -56,5 +56,7 @@ public class HanaroUserDetailsService implements UserDetailsService {
 		return authList;
 	}
 	
+	
+	
 
 }
