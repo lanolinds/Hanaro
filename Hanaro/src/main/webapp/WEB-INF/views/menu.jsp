@@ -43,6 +43,12 @@
 			<div href='<c:url value="/basicDivision/items/itemLocalization"/>'><fmt:message key="menu.itemLocalization"/></div>
 	</div>
 	</div>
+	<div class="menu-sep"></div>  
+	<div style="white-space: nowrap;"><fmt:message key="menu.globalSupport"/>      	
+	<div style="width:150px;">			
+			<div href='<c:url value="/basicDivision/global/langSupport"/>'><fmt:message key="menu.multiLangSupport"/></div>
+	</div>
+	</div>
 </div>
 
 <!-- 품질부문 서브메뉴 -->
