@@ -27,6 +27,121 @@ function searchFileName(path){
 	return arr[arr.length-1];	
 }
 
+//입력된 파일명의 확장자에 따른 아이콘을 반환한다.
+function fileExtensionIcon(fileName){
+	if(fileName=="" || fileName ==null){
+		return "icon-attach";
+	}
+	var extension = "";
+	var extensionCheck = fileName.split('.')[fileName.split('.').length-1];
+	
+	switch(extensionCheck.toLowerCase()){
+		case '3gp' :extension='3gp';break;
+		case '7zb' :extension='7zb';break;
+		case 'ace' :extension='ace';break;
+		case 'aib' :extension='aib';break;
+		case 'aif' :extension='aif';break;
+		case 'aiff' :extension='aiff';break;
+		case 'amr' :extension='amr';break;
+		case 'asf' :extension='asf';break;
+		case 'asx' :extension='asx';break;
+		case 'bat' :extension='bat';break;
+		case 'bin' :extension='bin';break;
+		case 'bmp' :extension='bmp';break;
+		case 'bup' :extension='bup';break;
+		case 'cab' :extension='cab';break;
+		case 'cbr' :extension='cbr';break;
+		case 'cda' :extension='cda';break;
+		case 'cdl' :extension='cdl';break;
+		case 'cdr' :extension='cdr';break;
+		case 'chm' :extension='chm';break;
+		case 'dat' :extension='dat';break;
+		case 'divx' :extension='divx';break;
+		case 'dll' :extension='dll';break;
+		case 'dmg' :extension='dmg';break;
+		case 'doc' :extension='doc';break;
+		case 'dss' :extension='dss';break;
+		case 'dvf' :extension='dvf';break;
+		case 'dwg' :extension='dwg';break;
+		case 'eml' :extension='eml';break;
+		case 'eps' :extension='eps';break;
+		case 'exe' :extension='exe';break;
+		case 'fla' :extension='fla';break;
+		case 'flv' :extension='flv';break;
+		case 'gif' :extension='gif';break;
+		case 'gzb' :extension='gzb';break;
+		case 'hqx' :extension='hqx';break;
+		case 'htm' :extension='htm';break;
+		case 'html' :extension='html';break;
+		case 'ifo' :extension='ifo';break;
+		case 'indd' :extension='indd';break;
+		case 'iso' :extension='iso';break;
+		case 'jar' :extension='jar';break;
+		case 'jpeg' :extension='jpeg';break;
+		case 'jpg' :extension='jpg';break;
+		case 'lnk' :extension='lnk';break;
+		case 'log' :extension='log';break;
+		case 'm4a' :extension='m4a';break;
+		case 'm4b' :extension='m4b';break;
+		case 'm4p' :extension='m4p';break;
+		case 'm4v' :extension='m4v';break;
+		case 'mcd' :extension='mcd';break;
+		case 'mdb' :extension='mdb';break;
+		case 'mid' :extension='mid';break;
+		case 'mov' :extension='mov';break;
+		case 'mp2' :extension='mp2';break;
+		case 'mp4' :extension='mp4';break;
+		case 'mpeg' :extension='mpeg';break;
+		case 'mpg' :extension='mpg';break;
+		case 'msi' :extension='msi';break;
+		case 'mswm' :extension='mswm';break;
+		case 'ogg' :extension='ogg';break;
+		case 'pdf' :extension='pdf';break;
+		case 'png' :extension='png';break;
+		case 'pps' :extension='pps';break;
+		case 'psb' :extension='psb';break;
+		case 'psd' :extension='psd';break;
+		case 'pst' :extension='pst';break;
+		case 'ptb' :extension='ptb';break;
+		case 'pub' :extension='pub';break;
+		case 'qbb' :extension='qbb';break;
+		case 'qbw' :extension='qbw';break;
+		case 'qxd' :extension='qxd';break;
+		case 'ram' :extension='ram';break;
+		case 'rar' :extension='rar';break;
+		case 'rmb' :extension='rmb';break;
+		case 'rmvb' :extension='rmvb';break;
+		case 'rtf' :extension='rtf';break;
+		case 'sea' :extension='sea';break;
+		case 'ses' :extension='ses';break;
+		case 'sit' :extension='sit';break;
+		case 'sitx' :extension='sitx';break;
+		case 'ssb' :extension='ssb';break;
+		case 'swf' :extension='swf';break;
+		case 'tgz' :extension='tgz';break;
+		case 'thm' :extension='thm';break;
+		case 'tif' :extension='tif';break;
+		case 'tmp' :extension='tmp';break;
+		case 'torr' :extension='torr';break;
+		case 'ttf' :extension='ttf';break;
+		case 'txt' :extension='txt';break;
+		case 'vcd' :extension='vcd';break;
+		case 'vob' :extension='vob';break;
+		case 'wav' :extension='wav';break;
+		case 'wma' :extension='wma';break;
+		case 'wmv' :extension='wmv';break;
+		case 'wps' :extension='wps';break;
+		case 'xls' :extension='xls';break;
+		case 'xpi' :extension='xpi';break;
+		case 'zip' :extension='zip';break;
+	}
+	if(extension!="")
+		return "icon-file-extension-"+extension;
+	else
+		return "icon-attach";
+		
+}
+
 
 	
 

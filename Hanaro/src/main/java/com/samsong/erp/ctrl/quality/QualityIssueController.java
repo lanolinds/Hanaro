@@ -4,7 +4,9 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.security.Principal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -53,13 +55,18 @@ public class QualityIssueController {
 	 
 	//품질문제등록 메뉴이동
 	@RequestMapping(value="/qualityIssueReg", method=RequestMethod.GET)
-	public String menuQualityIssueReg(Model model,Authentication auth, LocalDate date,Locale locale){
+	public String menuQualityIssueReg(Model model,Authentication auth,Locale locale){
 		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		Map<String,Object> defects = service.getCodeDefectSource(user.getLocale(), "");
 		Map<String,Object> defectc = service.getCodeDefect(user.getLocale(), 0, "");		
 	    model.addAttribute("defectSource",defects);
 		model.addAttribute("defectCode", defectc);
-		model.addAttribute("today",date);
+		
+		Calendar cal = Calendar.getInstance();
+		SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
+		model.addAttribute("endDt", sf.format(cal.getTime()));
+		cal.add(Calendar.DATE, -7);
+		model.addAttribute("stdDt", sf.format(cal.getTime()));
 		QualityIssueRegSheet sheet = new QualityIssueRegSheet();
 		sheet.setRegNo(message.getMessage("ui.label.AutoCreate",null,locale));
 		model.addAttribute("qualityIssueRegSheet",sheet);

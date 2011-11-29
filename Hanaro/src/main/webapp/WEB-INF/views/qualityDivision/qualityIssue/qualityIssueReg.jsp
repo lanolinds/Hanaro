@@ -200,7 +200,7 @@
 		var regNo = rowData.DATA0;				
 		var format = "";		
 		if(value !="")
-			format = "<a  href='getQualityIssueFile?regNo="+regNo+"&fileName="+encodeURIComponent(value)+"&fileSeq=1'  class='icon-disk' style='padding:2px 12px;cursor:pointer;'>&nbsp;</a>";
+			format = "<a  href='getQualityIssueFile?regNo="+regNo+"&fileName="+encodeURIComponent(value)+"&fileSeq=1'  class='"+fileExtensionIcon(value)+"' style='padding:2px 12px;cursor:pointer;'>&nbsp;</a>";
 		
 		return format;
 		
@@ -210,7 +210,7 @@
 		var regNo = rowData.DATA0;				
 		var format = "";		
 		if(value !="")
-			format = "<a  href='getQualityIssueFile?regNo="+regNo+"&fileName="+encodeURIComponent(value)+"&fileSeq=2'  class='icon-disk' style='padding:2px 12px;cursor:pointer;'>&nbsp;</a>";
+			format = "<a  href='getQualityIssueFile?regNo="+regNo+"&fileName="+encodeURIComponent(value)+"&fileSeq=2'  class='"+fileExtensionIcon(value)+"' style='padding:2px 12px;cursor:pointer;'>&nbsp;</a>";
 		
 		return format;
 		
@@ -550,8 +550,8 @@
 				<option value=''><fmt:message key="ui.element.All"/></option>
 		</select>
 		 <fmt:message key="ui.label.SearchDate"/>
-		<input id="searchStdDt" class="easyui-datebox" style="width:90px;"  value="${today}"  /><span style="margin: 0em .3em;">~</span>
-		<input id="searchEndDt" class="easyui-datebox" style="width:90px;"  value="${today}"  />
+		<input id="searchStdDt" class="easyui-datebox" style="width:90px;"  value="${stdDt}"  /><span style="margin: 0em .3em;">~</span>
+		<input id="searchEndDt" class="easyui-datebox" style="width:90px;"  value="${endDt}"  />
 		<a  href="#" class="easyui-linkbutton" iconCls="icon-search" onclick="javascript:searchList();"><fmt:message key="ui.button.Search"/></a>		
 		  
      </div>

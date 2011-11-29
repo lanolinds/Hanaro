@@ -10,17 +10,15 @@
 			<div style="white-space: nowrap;"><!-- 좌측상단 메인 메뉴 -->
 				<a href="#" class="easyui-menubutton" menu="#basicDivision" iconCls="icon-database-edit"><fmt:message key="menu.basicDivision"/></a>
 				<a href="#" class="easyui-menubutton" menu="#qualityDivision" iconCls="icon-candlestickchart"><fmt:message key="menu.qualityDivision"/></a>
-			    <a href="#" class="easyui-menubutton" menu="#humanMgmt" iconCls="icon-candlestickchart"><fmt:message key="menu.employeeDivision"/></a>
-			    <a href="#" class="easyui-menubutton" menu="#custMgmt" iconCls="icon-candlestickchart"><fmt:message key="menu.custDivision"/></a>
+			    <a href="#" class="easyui-menubutton" menu="#humanMgmt" iconCls="icon-group"><fmt:message key="menu.employeeDivision"/></a>
+			    <a href="#" class="easyui-menubutton" menu="#custMgmt" iconCls="icon-lorry"><fmt:message key="menu.custDivision"/></a>
 			</div>
 		</td>
 		<td style="text-align:right;">
 			<div style="white-space: nowrap;"><!-- 우측 상단. 제어판 기능. (홈버튼,언어선택, 개인설정, 로그아웃) -->
 				<a href="?locale=ko_KR" class="easyui-linkbutton" iconCls="icon-flag-kr" plain="true"></a>
 				<a href="?locale=zh_CN" class="easyui-linkbutton" iconCls="icon-flag-cn" plain="true"></a>
-				<a href="?locale=en_IN" class="easyui-linkbutton" iconCls="icon-flag-in" plain="true"></a>
-				<a href="?locale=en_CZ" class="easyui-linkbutton" iconCls="icon-flag-cz" plain="true"></a>
-				<a href="?locale=en_BR" class="easyui-linkbutton" iconCls="icon-flag-br" plain="true"></a>
+				<a href="?locale=en_US" class="easyui-linkbutton" iconCls="icon-flag-en" plain="true"></a>				
 			    <a href="#" class="easyui-splitbutton" menu="#userDetails" iconCls="icon-user-gray">${pageContext.request.userPrincipal.name}</a>  
 			    <a href='<c:url value="/home"/>' class="easyui-linkbutton" iconCls="icon-house" plain="true"></a>
 			    <a href='<c:url value="/j_spring_security_logout" />' class="easyui-linkbutton" iconCls="icon-door-out" plain="true"><fmt:message key="system.logout"/></a> 
@@ -42,6 +40,11 @@
 	<div style="width:150px;">			
 			<div href='<c:url value="/basicDivision/items/itemLocalization"/>'><fmt:message key="menu.itemLocalization"/></div>
 	</div>
+	</div>	
+	<div style="white-space: nowrap;"><fmt:message key="menu.line"/>
+	<div style="width:150px;">			
+			<div href='<c:url value="/basicDivision/line/lineProcConfigure"/>'><fmt:message key="menu.lineProcConfigure"/></div>
+	</div>	
 	</div>
 </div>
 

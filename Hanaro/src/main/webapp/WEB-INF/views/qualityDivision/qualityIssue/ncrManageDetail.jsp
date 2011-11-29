@@ -101,7 +101,7 @@
 		else if(value!=""){
 			var fileName = value.split('?')[0];
 			var fileSeq = value.split('?')[1];
-			return "<a  class='fileDown' href='getNcrMeasureReasonFile?ncrNo=${ncrInForm.ncrNo}&fileName="+encodeURIComponent(fileName)+"&fileSeq="+fileSeq+"' ><span class='icon-attach' style='width:16px;'' >&nbsp;</span>"+fileName+"</a>";
+			return "<a  class='fileDown' href='getNcrMeasureReasonFile?ncrNo=${ncrInForm.ncrNo}&fileName="+encodeURIComponent(fileName)+"&fileSeq="+fileSeq+"' ><span class='"+fileExtensionIcon(fileName)+"' style='width:16px;'' >&nbsp;</span>"+fileName+"</a>";
 		}else
 			return "";		
 	}
@@ -225,7 +225,7 @@
 		else if(value!=""){
 			var fileName = value.split('?')[0];
 			var fileSeq = value.split('?')[1];
-			return "<a  class='fileDown' href='getNcrMeasureStandardFile?ncrNo=${ncrInForm.ncrNo}&fileName="+encodeURIComponent(fileName)+"&fileSeq="+fileSeq+"' ><span class='icon-attach' style='width:16px;'' >&nbsp;</span><fmt:message key='ui.label.down' /></a>";
+			return "<a  class='fileDown' href='getNcrMeasureStandardFile?ncrNo=${ncrInForm.ncrNo}&fileName="+encodeURIComponent(fileName)+"&fileSeq="+fileSeq+"' ><span class='"+fileExtensionIcon(fileName)+"' style='width:16px;'' >&nbsp;</span><fmt:message key='ui.label.down' /></a>";
 		}else
 			return "";
 	}

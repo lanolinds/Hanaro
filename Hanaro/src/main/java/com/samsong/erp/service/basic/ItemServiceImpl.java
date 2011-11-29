@@ -51,5 +51,34 @@ public class ItemServiceImpl implements ItemService {
 		dao.updateLocalItemPrice(action,item,partner,price,currency,enabled,username,locale);
 		
 	}
+
+
+	@Override
+	public List<Map<String, Object>> getLineProcConfiguration(Locale locale,
+			String custCode, String lineCode) {
+		return dao.getLineProcConfiguration(locale, custCode, lineCode);
+	}
+
+
+	@Override
+	public String getCheckUnique(Locale locale, String checkItem,
+			String checkKey, String checkKey2) {
+		return dao.getCheckUnique(locale, checkItem, checkKey, checkKey2);
+	}
+
+
+	@Override
+	public void updateLineProcConfiguration(Locale locale, String procCate,
+			String procType, String custCode, String lineCode, String procCode,
+			String procSeq, String useYn, String user) {
+		dao.updateLineProcConfiguration(locale, procCate, procType, custCode, lineCode, procCode, procSeq, useYn, user);
+		
+	}
+
+
+	@Override
+	public List<Map<String, Object>> getProcOption(Locale locale) {
+		return dao.getProcOption(locale);
+	}
 	
 }

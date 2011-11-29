@@ -1,9 +1,10 @@
 package com.samsong.erp.ctrl;
 
-import java.util.Locale;
 
+import java.util.Locale;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.samsong.erp.dao.HomeDAO;
 import com.samsong.erp.model.HanaroUser;
+import com.samsong.erp.service.HanaroUserDetailsService;
 import com.samsong.erp.service.quality.QualityIssueService;
 
 
@@ -65,7 +67,7 @@ public class HomeController {
 		HanaroUser user = (HanaroUser)auth.getPrincipal();		
 		model.addAttribute("uid",user.getUsername());		
 		return "changePassword";
-	}	
+	}	 
 	@RequestMapping(value="/changePassword", method=RequestMethod.POST)
 	public String changePasswordPOST(Authentication auth,Model model,@RequestParam("cntPwd") String cntPwd, @RequestParam("newPwd") String newPwd){
 		Md5PasswordEncoder encoder = new Md5PasswordEncoder();
@@ -81,5 +83,5 @@ public class HomeController {
 		else
 			model.addAttribute("fail","fail");
 		return "changePassword";
-	}		
+	}
 }
