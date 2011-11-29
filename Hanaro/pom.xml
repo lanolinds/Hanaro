@@ -218,6 +218,11 @@
 		    <version>3.7</version>
 		</dependency>
 		
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.synyx</groupId> -->
+<!-- 			<artifactId>messagesource</artifactId> -->
+<!-- 			<version>0.6.1</version> -->
+<!-- 		</dependency> -->
 		
 	</dependencies>
 	<repositories>
@@ -236,6 +241,12 @@
 			<url>http://maven.springframework.org/milestone</url>
 			<snapshots><enabled>false</enabled></snapshots>
 		</repository>
+		
+<!-- 		<repository> -->
+<!-- 		<id>nexus.synyx.org</id> -->
+<!-- 		<name>Synyx OpenSource Repository</name> -->
+<!-- 		<url>http://repo.synyx.org</url> -->
+<!-- 		</repository> -->
 	</repositories>
 	<build>
 		<plugins>

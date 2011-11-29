@@ -30,13 +30,22 @@
 	<!-- locale 리졸버 설정 (쿠키사용)-->
 	<beans:bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver"></beans:bean>
 	
-	<!-- 메시지 번들 사용 -->
-	<beans:bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
-	<beans:property name="basename" value="/WEB-INF/messages/messages"></beans:property>
-	<beans:property name="cacheSeconds" value="0"></beans:property>
-	<beans:property name="defaultEncoding" value="UTF-8"></beans:property>
-	</beans:bean>
+	<!-- 메시지 번들 사용 (File based) -->
+<!-- 	<beans:bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource"> -->
+<!-- 	<beans:property name="basename" value="/WEB-INF/messages/messages"></beans:property> -->
+<!-- 	<beans:property name="cacheSeconds" value="0"></beans:property>  production 모드에서는 성능에 치명적임. default : -1(caching forever) 로 적용. -->
+<!-- 	<beans:property name="defaultEncoding" value="UTF-8"></beans:property> -->
+<!-- 	</beans:bean> -->
 	
+<!-- 메시지 번들 사용 (jdbc based)-->
+	<beans:bean id="messageSource" class ="com.samsong.erp.util.message.JdbcMessageSource">
+		<beans:property name="basename" value="hanaro"/>
+		<beans:property name="messageProvider">
+			<beans:bean class="com.samsong.erp.util.message.JdbcMessageProvider">
+				<beans:property name="dataSource" ref="dataSource"/>
+			</beans:bean>
+		</beans:property>
+	</beans:bean>
 	
 	
 	<!-- 뷰 리졸버 설정 .jsp -->
