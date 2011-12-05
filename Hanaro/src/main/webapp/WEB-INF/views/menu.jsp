@@ -44,6 +44,7 @@
 	<div style="white-space: nowrap;"><fmt:message key="menu.line"/>
 	<div style="width:150px;">			
 			<div href='<c:url value="/basicDivision/line/lineProcConfigure"/>'><fmt:message key="menu.lineProcConfigure"/></div>
+			<div href='<c:url value="/basicDivision/line/processMaster"/>'><fmt:message key="menu.processMaster"/></div>
 	</div>	
 	</div>
 	<div class="menu-sep"></div>  

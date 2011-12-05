@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.samsong.erp.model.HanaroUser;
 import com.samsong.erp.service.basic.ItemService;
+import com.samsong.erp.service.basic.LineService;
 import com.samsong.erp.service.cust.CustManagementService;
 
 @Controller
@@ -25,7 +26,7 @@ public class LineProcConfigureController {
 	private String prefix = "/basicDivision/line";
 	
 	@Autowired
-	ItemService service;
+	LineService service;
 	
 	@Autowired
 	CustManagementService serviceCust;

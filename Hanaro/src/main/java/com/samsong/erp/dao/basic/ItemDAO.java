@@ -63,57 +63,7 @@ public class ItemDAO {
 		jdbc.update(sql, action,item,partner,price,currency,enabled,username,country);
 	}
 	
-	public List<Map<String,Object>> getLineProcConfiguration(Locale locale,String custCode,String lineCode){
-		String query = "exec ItemDAO_getLineProcConfiguration ?,?,?";
-		return jdbc.queryForList(query,new Object[]{locale.getCountry(),custCode,lineCode});
-	}
-	
-	public String getCheckUnique(Locale locale, String checkItem, String checkKey, String checkKey2){
-		String query = "";
-		if(checkItem.equals("line")){
-			query = "if exists (select line_code from master_link_cust_line where locale = ? and line_code = ?)select 'Y' else select 'N';";
-			return jdbc.queryForObject(query, new Object[]{locale.getCountry(),checkKey},String.class);
-		}
-		else{
-			query = "if exists (select proc_cd from master_link_line_proc where locale = ? and proc_cd = ? and line_code = ?)select 'Y'else select  'N';";
-			return jdbc.queryForObject(query, new Object[]{locale.getCountry(),checkKey,checkKey2},String.class);
-		}
-		
-		 
-	}
-	
-	public void updateLineProcConfiguration(Locale locale,String procCate,String procType,String custCode,
-			String lineCode,String procCode, String procSeq, String useYn, String user){
-		SqlParameterSource param = new MapSqlParameterSource()
-			.addValue("locale",locale.getCountry())
-			.addValue("procCate",procCate)
-			.addValue("proctype",procType)
-			.addValue("custCode",custCode)
-			.addValue("lineCode",lineCode)
-			.addValue("procCode",procCode)
-			.addValue("procSeq",procSeq)
-			.addValue("useYn",useYn)
-			.addValue("user",user);
-		sp = new SimpleJdbcCall(jdbc).withProcedureName("ItemDAO_updateLineProcConfiguration");
-		sp.execute(param);
-	}
-	
-	public List<Map<String,Object>> getProcOption(Locale locale){
-		String query = "select proc_cd,proc_nm,proc_remark from union_master_process where locale = ? and use_yn = 'Y' order by proc_nm;";
-		return jdbc.query(query,new Object[]{locale.getCountry()},new RowMapper<Map<String,Object>>(){
 
-			@Override
-			public Map<String, Object> mapRow(ResultSet rs, int arg1)
-					throws SQLException {
-				Map<String,Object> m = new LinkedHashMap<String,Object>();
-				m.put("procCode",rs.getString(1));
-				m.put("procName",rs.getString(2));
-				m.put("procRemark",rs.getString(3));
-				return m;
-			}
-			
-		});
-	}
 	
 	
 	
