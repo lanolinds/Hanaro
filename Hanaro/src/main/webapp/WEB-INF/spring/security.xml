@@ -15,6 +15,10 @@
  		<intercept-url pattern="/changePassword" access="hasAnyRole('ROLE_USER','ROLE_CUST')"/><!-- 기본 사용자 역할 -->
  		<intercept-url pattern="/basicDivision/**" access="hasAnyRole('ROLE_USER')"/><!-- 기본 사용자 역할 -->
  		<intercept-url pattern="/basicDivision/**"  access="hasAnyRole('ROLE_USER')"/> <!-- 기본 사용자 역할 -->
+ 		<intercept-url pattern="/productDivision/**" access="hasAnyRole('ROLE_USER')"/><!-- 기본 사용자 역할 -->
+ 		<intercept-url pattern="/productDivision/**"  access="hasAnyRole('ROLE_USER')"/> <!-- 기본 사용자 역할 -->
+ 		<intercept-url pattern="/materialDivision/**" access="hasAnyRole('ROLE_USER')"/><!-- 기본 사용자 역할 -->
+ 		<intercept-url pattern="/materialDivision/**"  access="hasAnyRole('ROLE_USER')"/> <!-- 기본 사용자 역할 -->
  		<intercept-url pattern="/qualityDivision/qualityIssue/list" access="hasAnyRole('ROLE_USER')"/><!--  		삼송직원만 출입가능 -->
  		<intercept-url pattern="/qualityDivision/qualityIssue/ncrStatus" access="hasAnyRole('ROLE_USER')"/><!--  		삼송직원만 출입가능 --> 		 		
  		<intercept-url pattern="/qualityDivision/**" access="hasAnyRole('ROLE_USER','ROLE_CUST')"/><!--  		기본 사용자 역할 -->

@@ -10,6 +10,8 @@
 			<div style="white-space: nowrap;"><!-- 좌측상단 메인 메뉴 -->
 				<a href="#" class="easyui-menubutton" menu="#basicDivision" iconCls="icon-database-edit"><fmt:message key="menu.basicDivision"/></a>
 				<a href="#" class="easyui-menubutton" menu="#qualityDivision" iconCls="icon-candlestickchart"><fmt:message key="menu.qualityDivision"/></a>
+				<a href="#" class="easyui-menubutton" menu="#productMgmt" iconCls="icon-brick"><fmt:message key="menu.productDivision"/></a>
+				<a href="#" class="easyui-menubutton" menu="#materialMgmt" iconCls="icon-basket"><fmt:message key="menu.materialDivision"/></a>
 			    <a href="#" class="easyui-menubutton" menu="#humanMgmt" iconCls="icon-group"><fmt:message key="menu.employeeDivision"/></a>
 			    <a href="#" class="easyui-menubutton" menu="#custMgmt" iconCls="icon-lorry"><fmt:message key="menu.custDivision"/></a>
 			</div>
@@ -85,3 +87,24 @@
 	</div>
 	</div>
 </div>
+
+<!-- 생산부문 서브메뉴 -->
+<div id="productMgmt" style="width:150px;">
+	<div style="white-space: nowrap;"><fmt:message key="menu.stockMgmt"/>      	
+	<div style="width:150px;">			
+			<div href='<c:url value="/productDivision/stock/inoutManagement"/>'><fmt:message key="menu.productInoutMgmt"/></div>			
+	</div>
+	</div>
+</div>
+
+<!-- 생산부문 서브메뉴 -->
+<div id="materialMgmt" style="width:150px;">
+	<div style="white-space: nowrap;"><fmt:message key="menu.stockMgmt"/>      	
+	<div style="width:150px;">			
+			<div href='<c:url value="/materialDivision/stock/inoutManagement"/>'><fmt:message key="menu.materInoutMgmt"/></div>			
+	</div>
+	</div>
+</div>
+
+
+
