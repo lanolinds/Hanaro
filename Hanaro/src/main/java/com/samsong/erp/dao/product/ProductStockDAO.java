@@ -14,8 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
+
+import com.samsong.erp.model.product.StockInOutSheet;
 
 @Repository
 public class ProductStockDAO {
@@ -69,6 +73,42 @@ public class ProductStockDAO {
 				return null;
 			}		
 		});
+		return list;
+	}
+	
+	public void prodIncomeOutgoList(Locale locale, String category, String pType,StockInOutSheet sheet,String user){
+		SqlParameterSource param = new MapSqlParameterSource()
+		.addValue("locate",locale.getCountry())
+		.addValue("category",category)
+		.addValue("pType",pType)
+		.addValue("p1",sheet.getStdDt()).addValue("p2",sheet.getInoutType()).addValue("p3",sheet.getFromTo()).addValue("p4",sheet.getPartCode())
+		.addValue("p5",sheet.getLotNo()).addValue("p6",sheet.getAmount()).addValue("p7",sheet.getComment()).addValue("seq",sheet.getSeq())
+		.addValue("user",user);		
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("ProductStockDAO_prodIncomeOutgoList");
+		sp.execute(param);		
+	}
+	
+	public List<Map<String,Object>> getIncomeOutgoList(Locale locale, String category, String stdDt, String endDt){
+		SqlParameterSource params = new MapSqlParameterSource()
+		.addValue("locale",locale.getCountry())
+		.addValue("category",category)
+		.addValue("stdDt",stdDt)
+		.addValue("endDt",endDt);
+		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("ProductStockDAO_getIncomeOutgoList").returningResultSet("incomeList",new RowMapper<Map<String,Object>>() {
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int idx)
+					throws SQLException {
+				Map<String,Object> m = new LinkedHashMap<String,Object>();
+				for(int i = 0 ;i<rs.getMetaData().getColumnCount();i++){
+					m.put("DATA"+i,rs.getString(i+1));					
+				}
+				list.add(m);
+				return null;
+			}
+		});
+		sp.execute(params);
 		return list;
 	}
 	

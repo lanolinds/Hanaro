@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.samsong.erp.dao.product.ProductStockDAO;
+import com.samsong.erp.model.product.StockInOutSheet;
 
 
 
@@ -21,7 +22,7 @@ public class ProductStockServiceImpl implements ProductStockService{
 	
 	@Override
 	public Map<String, Object> getComponentTypeOption(Locale locale, String type) {
-		return dao.getComponentTypeOption(locale, type);
+		return dao.getComponentTypeOption(locale, type); 
 	}
 
 	@Override
@@ -32,6 +33,19 @@ public class ProductStockServiceImpl implements ProductStockService{
 	@Override
 	public List<Map<String, Object>> getPartList(Locale locale, String type,String term) {
 		return dao.getPartList(locale, type,term);
+	}
+
+	@Override
+	public void prodIncomeOutgoList(Locale locale, String category,
+			String pType, StockInOutSheet sheet, String user) {
+		dao.prodIncomeOutgoList(locale, category, pType, sheet,  user);
+		
+	}
+
+	@Override
+	public List<Map<String, Object>> getIncomeOutgoList(Locale locale,
+			String category, String stdDt, String endDt) {
+		return dao.getIncomeOutgoList(locale, category, stdDt, endDt);
 	}
 	
 	

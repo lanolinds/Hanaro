@@ -1,22 +1,23 @@
 package com.samsong.erp.model.product;
 
-public class StockOutgoSheet {
-	
+public class StockInOutSheet {
+
 	private int seq;
 	private String stdDt;
 	private String inoutType;
-	private String toCust;
+	private String fromTo;
 	private String partCode;
 	private String lotNo;
 	private int amount = 0;
 	private String comment;
-		
 	
 	
+	
+
 	@Override
 	public String toString() {
-		return "StockOutgoSheet [seq=" + seq + ", stdDt=" + stdDt
-				+ ", inoutType=" + inoutType + ", toCust=" + toCust
+		return "StockInOutSheet [seq=" + seq + ", stdDt=" + stdDt
+				+ ", inoutType=" + inoutType + ", fromTo=" + fromTo
 				+ ", partCode=" + partCode + ", lotNo=" + lotNo + ", amount="
 				+ amount + ", comment=" + comment + "]";
 	}
@@ -38,11 +39,12 @@ public class StockOutgoSheet {
 	public void setInoutType(String inoutType) {
 		this.inoutType = inoutType;
 	}
-	public String getToCust() {
-		return toCust;
+
+	public String getFromTo() {
+		return fromTo;
 	}
-	public void setToCust(String toCust) {
-		this.toCust = toCust;
+	public void setFromTo(String fromTo) {
+		this.fromTo = fromTo;
 	}
 	public String getPartCode() {
 		return partCode;
@@ -67,10 +69,6 @@ public class StockOutgoSheet {
 	}
 	public void setComment(String comment) {
 		this.comment = comment;
-	}
-
+	}	
 	
-	
-	
-
 }
