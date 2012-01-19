@@ -1,5 +1,6 @@
 package com.samsong.erp.dao.product;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
@@ -45,16 +47,23 @@ public class ProductStockDAO {
 		return map;
 	}
 	
-	public Map<String,Object> getLineCode(Locale locale){
-		final Map<String,Object> map = new LinkedHashMap<String,Object>();
-		String query = "select line_code from dbo.master_link_cust_line where locale = ? and use_yn = 'Y';";
-		jdbc.query(query, new Object[]{locale.getCountry()},new RowCallbackHandler() {			
+	public List<Map<String,Object>> getSubOptionByInoutComponent(Locale locale, String code){
+		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		SqlParameterSource param = new MapSqlParameterSource().addValue("locale",locale.getCountry()).addValue("code",code);
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("ProductStockDAO_getSubOptionByInoutComponent").returningResultSet("subOptions",new RowMapper<Map<String,Object>>() {
 			@Override
-			public void processRow(ResultSet rs) throws SQLException {
-				map.put(rs.getString(1), rs.getString(1));
+			public Map<String, Object> mapRow(ResultSet rs, int idx)
+					throws SQLException {
+				Map<String,Object> m = new LinkedHashMap<String,Object>();
+				m.put("code",rs.getString(1));
+				m.put("name",rs.getString(2));
+				list.add(m);
+				return null;
 			}
+			
 		});
-		return map;
+		sp.execute(param);
+		return list;
 	}
 	
 	public List<Map<String,Object>> getPartList(Locale locale, String type, String term){
@@ -76,16 +85,74 @@ public class ProductStockDAO {
 		return list;
 	}
 	
-	public void prodIncomeOutgoList(Locale locale, String category, String pType,StockInOutSheet sheet,String user){
-		SqlParameterSource param = new MapSqlParameterSource()
-		.addValue("locate",locale.getCountry())
-		.addValue("category",category)
-		.addValue("pType",pType)
-		.addValue("p1",sheet.getStdDt()).addValue("p2",sheet.getInoutType()).addValue("p3",sheet.getFromTo()).addValue("p4",sheet.getPartCode())
-		.addValue("p5",sheet.getLotNo()).addValue("p6",sheet.getAmount()).addValue("p7",sheet.getComment()).addValue("seq",sheet.getSeq())
-		.addValue("user",user);		
-		sp = new SimpleJdbcCall(jdbc).withProcedureName("ProductStockDAO_prodIncomeOutgoList");
-		sp.execute(param);		
+	public void prodIncomeOutgoList(final Locale locale, String category
+			,final String[] DATA0,final String[] DATA1,final String[] DATA2,final String[] DATA3,final String[] DATA4
+			,final String[] DATA5,final String[] DATA6,final String[] DATA7,final String[] DATA8,final String[] DATA9
+			,final String[] DATA10,final String[] DATA11,final String[] DATA12,final String user){
+		
+		if (category.equals("income")){
+			if(DATA0!=null){
+				String sqlDelete = "delete from [product_stock_income] WHERE seq = ?";			
+				jdbc.batchUpdate(sqlDelete, new BatchPreparedStatementSetter() {
+					@Override
+					public void setValues(PreparedStatement ps, int i)
+							throws SQLException {
+						ps.setString(1, DATA0[i]);					
+					}
+	
+					@Override
+					public int getBatchSize() {
+						return DATA0.length;
+					}
+				});
+				String sqlInsert = "INSERT INTO [product_stock_income]";
+				sqlInsert+="  ([locale],[stdDt],[inoutType],[fromLine],[partCode],[lotNo],[amount],[comment],[inputBy],[inputDt],[deleted])";
+				sqlInsert+=" VALUES(?,?,?,?,?,?,?,?,?,getdate(),'N')";
+				for(int i=0;i<DATA1.length;i++){
+				if (DATA9[i].equals("DELETE"))
+					continue;
+				jdbc.update(
+						sqlInsert,
+						new Object[] { locale.getCountry(),  DATA1[i],DATA11[i],DATA3[i],
+								DATA4[i],(DATA6.length==0)?"":DATA6[i],DATA7[i],(DATA8.length==0)?"":DATA8[i],user});
+				}
+				
+				
+			}
+		}else if(category.equals("outgo")){
+			
+			if(DATA0!=null){
+				String sqlDelete = "delete from [product_stock_outgo] WHERE seq = ?";			
+				jdbc.batchUpdate(sqlDelete, new BatchPreparedStatementSetter() {
+					@Override
+					public void setValues(PreparedStatement ps, int i)
+							throws SQLException {
+						ps.setString(1, DATA0[i]);					
+					}
+	
+					@Override
+					public int getBatchSize() {
+						return DATA0.length;
+					}
+				});
+				
+				String sqlInsert = "INSERT INTO [product_stock_outgo]";
+				sqlInsert+="  ([locale],[stdDt],[inoutType],[toCust],[partCode],[lotNo],[amount],[comment],[inputBy],[inputDt],[deleted])";
+				sqlInsert+=" VALUES(?,?,?,?,?,?,?,?,?,getdate(),'N')";
+				
+				for(int i=0;i<DATA1.length;i++){
+				if (DATA9[i].equals("DELETE"))
+					continue;
+				
+				jdbc.update(
+						sqlInsert,
+						new Object[] { locale.getCountry(),  DATA1[i],DATA12[i],DATA11[i],
+								DATA4[i], (DATA6.length==0)?"":DATA6[i],DATA7[i],(DATA8.length==0)?"":DATA8[i],user});
+				
+				}
+									
+			}			
+		}
 	}
 	
 	public List<Map<String,Object>> getIncomeOutgoList(Locale locale, String category, String stdDt, String endDt){
@@ -102,7 +169,10 @@ public class ProductStockDAO {
 					throws SQLException {
 				Map<String,Object> m = new LinkedHashMap<String,Object>();
 				for(int i = 0 ;i<rs.getMetaData().getColumnCount();i++){
-					m.put("DATA"+i,rs.getString(i+1));					
+					if(i==7)
+						m.put("DATA"+i,rs.getLong(i+1));
+					else
+						m.put("DATA"+i,rs.getString(i+1));					
 				}
 				list.add(m);
 				return null;
@@ -111,5 +181,37 @@ public class ProductStockDAO {
 		sp.execute(params);
 		return list;
 	}
+	
+	public List<Map<String,Object>> getIncomeOutgoState(Locale locale,String partCode,String stdDt,String endDt,String inoutYn,String fromToYn){
+		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		SqlParameterSource params = new MapSqlParameterSource()
+		.addValue("locale",locale.getCountry())
+		.addValue("partCode",partCode)
+		.addValue("stdDt",stdDt)
+		.addValue("endDt",endDt)
+		.addValue("inOutYn",inoutYn)
+		.addValue("fromToYn",fromToYn);
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("ProductStockDAO_getIncomeOutgoState").returningResultSet("productinoutState",new RowMapper<Map<String,Object>>() {
+
+		int crtAmount = 0;
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int idx)
+					throws SQLException {
+				Map<String,Object> m = new LinkedHashMap<String,Object>();
+				for(int i=0;i<rs.getMetaData().getColumnCount();i++)
+					m.put("DATA"+i,rs.getString(1+i));
+				crtAmount = crtAmount+rs.getInt(rs.getMetaData().getColumnCount());
+				m.put("DATA"+rs.getMetaData().getColumnCount(),crtAmount);
+				list.add(m);
+				return null;
+			}
+			
+		});
+		
+		sp.execute(params);
+		return list;
+	}
+	
+	
 	
 }
