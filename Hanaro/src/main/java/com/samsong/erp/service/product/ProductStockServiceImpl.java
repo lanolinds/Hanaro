@@ -51,15 +51,37 @@ public class ProductStockServiceImpl implements ProductStockService{
 		return dao.getIncomeOutgoState(locale, partCode, stdDt, endDt, inoutYn, fromToYn);
 	}
 
-
-
 	@Override
 	public List<Map<String, Object>> getSubOptionByInoutComponent(
 			Locale locale, String code) {
 		return dao.getSubOptionByInoutComponent(locale, code);
 	}
 
+	@Override
+	public List<Map<String, Object>> getComponentHead(Locale locale, String type) {
+		return dao.getComponentHead(locale, type);
+	}
 
-	
-	
+	@Override
+	public String getCheckPreCloseData(Locale locale, String year, String month) {
+		return dao.getCheckPreCloseData(locale, year, month);
+	}
+
+	@Override
+	public String getCheckThisCloseData(Locale locale, String year, String month) {
+		return dao.getCheckThisCloseData(locale, year, month);
+	}
+
+	@Override
+	public List<Map<String, Object>> prodApplyCloseData(Locale locale,
+			String type, String year, String month, String user) {
+		return dao.prodApplyCloseData(locale, type, year, month, user);
+	}
+
+	@Override
+	public void prodApplyActualData(Locale locale, String[] stdDt,
+			String[] partCode, String[] amount, String user) {
+		dao.prodApplyActualData(locale, stdDt, partCode, amount, user);
+		
+	}
 }

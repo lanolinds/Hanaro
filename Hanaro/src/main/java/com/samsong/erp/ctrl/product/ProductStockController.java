@@ -40,13 +40,17 @@ public class ProductStockController {
 	public String menuInoutManagement(Authentication auth,LocalDate date, Model model,StockInOutSheet inOutSheet){
 		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		Map<String,Object> incomeType = service.getComponentTypeOption(user.getLocale(),"PR");
-		Map<String,Object> outgoType = service.getComponentTypeOption(user.getLocale(),"PI");
+		Map<String,Object> outgoType = service.getComponentTypeOption(user.getLocale(),"PI");		
+		List<Map<String,Object>> closeTableHead = service.getComponentHead(user.getLocale(),"P");
 		
 		model.addAttribute("today",date);
+		model.addAttribute("thisYear",date.getYear());		
 		model.addAttribute("incomeSheet",inOutSheet);
 		model.addAttribute("outgoSheet",inOutSheet);
 		model.addAttribute("incomeType",incomeType);
 		model.addAttribute("outgoType",outgoType);		
+		model.addAttribute("closeHead",closeTableHead);
+		
 		return prefix+"/inoutManagement";
 	} 
 	
@@ -58,23 +62,31 @@ public class ProductStockController {
 	
 	@RequestMapping(value="/inoutManagement",method=RequestMethod.POST)
 	public String inoutManagement(Authentication auth,
-			@RequestParam("DATA0") String[] DATA0,
-			@RequestParam("DATA1") String[] DATA1,
-			@RequestParam("DATA2") String[] DATA2,
-			@RequestParam("DATA3") String[] DATA3,
-			@RequestParam("DATA4") String[] DATA4,
-			@RequestParam("DATA5") String[] DATA5,
-			@RequestParam("DATA6") String[] DATA6,
-			@RequestParam("DATA7") String[] DATA7,
-			@RequestParam("DATA8") String[] DATA8,
-			@RequestParam("DATA9") String[] DATA9,
-			@RequestParam("DATA10") String[] DATA10,
-			@RequestParam("DATA11") String[] DATA11,
+			@RequestParam(value="DATA0",required=false) String[] DATA0,
+			@RequestParam(value="DATA1",required=false) String[] DATA1,
+			@RequestParam(value="DATA2",required=false) String[] DATA2,
+			@RequestParam(value="DATA3",required=false) String[] DATA3,
+			@RequestParam(value="DATA4",required=false) String[] DATA4,
+			@RequestParam(value="DATA5",required=false) String[] DATA5,
+			@RequestParam(value="DATA6",required=false) String[] DATA6,
+			@RequestParam(value="DATA7",required=false) String[] DATA7,
+			@RequestParam(value="DATA8",required=false) String[] DATA8,
+			@RequestParam(value="DATA9",required=false) String[] DATA9,
+			@RequestParam(value="DATA10",required=false) String[] DATA10,
+			@RequestParam(value="DATA11",required=false) String[] DATA11,
 			@RequestParam(value="DATA12",required=false) String[] DATA12,
-			@RequestParam("category") String category
+			@RequestParam(value="category",required=false) String category,
+			@RequestParam(value="actStdDt", required=false) String[] actStdDt,
+			@RequestParam(value="actPartCode", required=false) String[] actPartCode,
+			@RequestParam(value="actAmount", required=false) String[] actAmount			
 			){		
 		HanaroUser user = (HanaroUser)auth.getPrincipal();
-		service.prodIncomeOutgoList(user.getLocale(), category, DATA0, DATA1, DATA2, DATA3, DATA4, DATA5, DATA6, DATA7, DATA8, DATA9, DATA10, DATA11, DATA12, user.getUsername());
+		if(actStdDt==null){
+			service.prodIncomeOutgoList(user.getLocale(), category, DATA0, DATA1, DATA2, DATA3, DATA4, DATA5, DATA6, DATA7, DATA8, DATA9, DATA10, DATA11, DATA12, user.getUsername());
+		}else{
+			service.prodApplyActualData(user.getLocale(), actStdDt, actPartCode, actAmount, user.getUsername());
+		}
+			
 		logger.info("사용자("+user.getUsername()+")가 완성품입고를 처리합니다");
 		return "redirect:"+prefix+"/inoutManagement";
 	}
@@ -110,6 +122,39 @@ public class ProductStockController {
 	public @ResponseBody List<Map<String,Object>> getSubOptionByInoutComponent(@RequestParam("code") String code,Authentication auth){
 		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		return service.getSubOptionByInoutComponent(user.getLocale(), code);
+	}
+	
+	@RequestMapping(value="/getCheckPreCloseData",method=RequestMethod.GET)
+	public @ResponseBody String getCheckPreCloseData(Authentication auth, String year, String month){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();		
+		return service.getCheckPreCloseData(user.getLocale(), year, month);
+	}
+	
+	@RequestMapping(value="/getCheckThisCloseData",method=RequestMethod.GET)
+	public @ResponseBody String getCheckThisCloseData(Authentication auth, String year, String month){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();		
+		return service.getCheckThisCloseData(user.getLocale(), year, month);
+	}
+	
+	@RequestMapping(value="/prodApplyCloseData",method=RequestMethod.POST)
+	public @ResponseBody Map<String,Object> prodApplyCloseData(Authentication auth
+			,@RequestParam(value="type",required=false) String type
+			, @RequestParam(value="year",required=false) String year
+			, @RequestParam(value="month",required=false) String month
+			,@RequestParam(value="sort",required=false) String sortKey,@RequestParam(value="order",required=false) String order){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		Map<String,Object> table = new LinkedHashMap<String,Object>();
+		List<Map<String,Object>> resultList = service.prodApplyCloseData(user.getLocale(), type, year, month, user.getUsername());
+		if(resultList!=null){			
+			if(sortKey!=null){
+				Collections.sort(resultList,new HashMapComparator(sortKey, order.equalsIgnoreCase("asc")));
+			}			
+			table.put("total",resultList.size());			
+			table.put("rows",resultList);
+		}else{
+			table.put("total",0);
+		}
+		return table;		
 	}
 	
 }

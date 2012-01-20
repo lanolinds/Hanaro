@@ -92,7 +92,7 @@
 <div id="productMgmt" style="width:150px;">
 	<div style="white-space: nowrap;"><fmt:message key="menu.stockMgmt"/>      	
 	<div style="width:150px;">			
-			<div href='<c:url value="/productDivision/stock/inoutManagement"/>'><fmt:message key="menu.productInoutMgmt"/></div>			
+			<div href='<c:url value="/productDivision/stock/inoutManagement"/>'><fmt:message key="menu.productInoutMgmt"/></div>									
 	</div>
 	</div>
 </div>

@@ -478,10 +478,136 @@
 			$("#"+idName).empty().append(txt);
 		});
 	}
-		   
+	
+	function getCheckPreCloseData(){
+		var year = $("#closeYear").val();
+		var month = $("#closeMonth").val();
+		$.get("getCheckPreCloseData",{year:year,month:month,t:new Date().getTime()},function(result){
+			if($.trim(result)=="YES")
+				getCheckThisCloseData();
+			else
+				$.messager.alert("<fmt:message key='warn.infoWarn' />","<fmt:message key='warn.cannotActionCloseData' />");
+		});
+	}
+	function getCheckThisCloseData(){		
+		var year = $("#closeYear").val();
+		var month = $("#closeMonth").val();
+		$.get("getCheckThisCloseData",{year:year,month:month,t:new Date().getTime()},function(result){
+			if($.trim(result)=="YES"){
+				$.messager.confirm("<fmt:message key='info.confirm' />","<fmt:message key='ask.existsCloseData' />",function(r){  
+				    if (r){
+				    	getCloseActionList("action");
+				    }else{
+				    	getCloseActionList("search");	
+				    }
+				});
+			}	
+			else
+				getCloseActionList("search");
+		});		
+	}
+	
+	function getCloseActionList(typeAction){				
+		var params = {};
+		params.type= typeAction;		 
+		params.year = $("#closeYear").val();
+		params.month = $("#closeMonth").val();
+		$("#closeActualList").datagrid("load",params);
+	}	
+	
+	function addCloseData(){
+		$("#closeProdType").val("insert");
+		$("#closePartCode").combogrid("enable");
+	    $('#dialogClose').dialog({modal:true});  	
+	}
+	
+	function editCloseData(){
+		var record = $("#closeActualList").datagrid("getSelected");
+		if(record ==null){
+			$.messager.alert("<fmt:message key='warn.infoWarn' />","<fmt:message key='warn.notSelectedItem' />");
+			return;
+		}
+		
+		var rowIdx = $("#closeActualList").datagrid("getRowIndex",record);
+		$("#closePartCode").combogrid("setValue",record.DATA0);
+		$("#closePartCode").combogrid("disable");
+		$("#closeAmount").numberspinner("setValue",record.DATA13);
+		$("#closeRowId").val(rowIdx);
+		$("#closeProdType").val("update");
+		$('#dialogClose').dialog({modal:true});
+	}
+	
+
+	function changeActualCount(){
+		if($("#formCloseEdit").form("validate")){
+			var newRow  ={};
+			if($("#closeProdType").val()=="insert"){
+				
+				var sameRowIdx = -1;				
+				var data = $("#closeActualList").datagrid("getData");
+				for(var x =0;x<data.rows.length;x++){					
+					if(data.rows[x].DATA0==$("#closePartCode").combogrid("getValue")){
+						sameRowIdx = $("#closeActualList").datagrid("getRowIndex",data.rows[x]);						
+					}
+				}
+				if(sameRowIdx<0){					
+					newRow.DATA0 = $("#closePartCode").combogrid("getValue");
+					for(var x=1;x<13;x++)
+						newRow["DATA"+x] = "0";	
+					newRow.DATA13 = $("#closeAmount").numberspinner("getValue");
+					$("#closeActualList").datagrid("appendRow",newRow);
+				}else{				
+					$.messager.alert("<fmt:message key='info.confirm' />","<fmt:message key='info.cannotInsertExists' />");
+					return;
+				}				
+			}else{
+				newRow.DATA13 = $("#closeAmount").numberspinner("getValue");
+				var rowI = $("#closeRowId").val();
+				$("#closeActualList").datagrid("updateRow",{index:rowI,row:newRow});				
+			}
+			$('form')[2].reset();
+			$('#dialogClose').dialog("close");
+			
+				
+		}else{
+			return false;	
+		}
+	}
+	
+	
+	
+	function saveActualData(){
+		
+		$.messager.confirm("<fmt:message key='info.confirm' />","<fmt:message key='ask.applyActualData' />",function(r){  
+		    if (r){
+		
+				var frm = document.actualDataForm;
+				var data = $("#closeActualList").datagrid("getData");
+				if(data.rows.length==0){
+					$.messager.alert("<fmt:message key='warn.infoWarn' />","<fmt:message key='warn.noUpdateItem' />");
+					return;
+				}		
+				var data0 =[];
+				var data1 =[];
+				var data2 =[];			
+				
+				for(var x=0;x<data.rows.length;x++){		
+					data0.push(data.rows[x].DATA14);
+					data1.push(data.rows[x].DATA0);
+					data2.push(data.rows[x].DATA13);			
+				}
+				
+				frm.actStdDt.value = data0;
+				frm.actPartCode.value = data1;
+				frm.actAmount.value = data2;
+				frm.submit();
+		    }
+		});
+	}
 	
 		$(document).ready(function(){			
-			 
+
+			
 
 		    $('#inPartCode').combogrid({
 		    	panelWidth:400,
@@ -521,7 +647,18 @@
 		        idField:'partCode',  
 		        textField:'partCode',
 		        mode:'remote'
-		     });	
+		     });
+		    $('#closePartCode').combogrid({
+		    	panelWidth:400,
+		        url : 'getPartListCallBak?type=1001',
+		        columns:[[  
+		                  {field:'partCode',title:'<fmt:message key="ui.label.PartNo"/>',width:120},  
+		                  {field:'partName',title:'<fmt:message key="ui.label.PartName"/>',width:255}
+		              ]],
+		        idField:'partCode',  
+		        textField:'partCode',
+		        mode:'remote'
+		     });		   
 		    
 		    
 		    $("#inInoutType").change(function(event,data){		    	
@@ -543,8 +680,8 @@
 <%@ include file="/WEB-INF/views/menu.jsp" %>
 </div>
 <div region="center" style="padding:10px;">
-    <div class="easyui-tabs" style="width:1180px;height:720px;">
-        <div title="<fmt:message key='menu.incomeMgmt' />" iconCls="icon-brick-add" >
+    <div class="easyui-tabs" style="width:1180px;height:720px;" >
+        <div title="<fmt:message key='menu.incomeMgmt' />" iconCls="icon-brick-add"  >
         <table>
         	<tr>
         		<td style="width:830px;height:660px;">
@@ -647,7 +784,7 @@
 								<th field="DATA0" hidden="true"></th>
 								<th field="DATA1" width="80" sortable="true"><fmt:message key="ui.label.outgoDate"/></th>
 								<th field="DATA2" width="150" sortable="true"><fmt:message key="ui.label.outgoType"/></th> 
-								<th field="DATA3" width="100" sortable="true"><fmt:message key="ui.label.supplyPlace"/></th>
+								<th field="DATA3" width="100" sortable="true"><fmt:message key="ui.label.customer"/></th>
 								<th field="DATA4" width="150" sortable="true"><fmt:message key="ui.label.PartNo"/></th>
 								<th field="DATA5" width="250" sortable="true"><fmt:message key="ui.label.PartName"/></th>
 								<th field="DATA6" width="100" sortable="true"><fmt:message key="ui.label.LotNo"/></th>
@@ -709,7 +846,7 @@
 					    		</tr>    	    		
 					    		<tr>
 					    			<th><span  class="label-Leader-black"><fmt:message key="ui.label.count"/></span></th>
-									<td><form:input path="amount" class="easyui-numberspinner"  id="outAmount" /></td>
+									<td><form:input path="amount" class="easyui-numberspinner"  id="outAmount"  min="0"/></td>
 					    		</tr>    	
 					    		<tr>
 					    			<th><span  class="label-Leader-black"><fmt:message key="ui.label.remark"/></span></th>
@@ -775,9 +912,27 @@
 				</table>
 			</div>  
         </div>
-        <div title="<fmt:message key='menu.currentStock' />" iconCls="icon-text-align-justity">  
-            tab3  
-        </div>                      
+        <div title="<fmt:message key='menu.currentStock' />" iconCls="icon-text-align-justity">
+            
+        </div>
+        <div title="<fmt:message key='menu.closeActualMgmt' />" iconCls="icon-book-keeping" style="padding:2px;">          
+            <table class="easyui-datagrid" id="closeActualList" pagination="false"   border="false"
+						fit="true"  idField="DATA0"  toolbar="#toolCloseActual"  singleSelect="true"  url="prodApplyCloseData">			
+				<thead>
+					<tr>						
+						<th field="DATA0" width="150" sortable="true"><fmt:message key="ui.label.PartNo"/></th>
+						<th field="DATA1" width="100" sortable="true"  align="right"  formatter="numeric"><fmt:message key="ui.label.preMonthStock"/></th>
+						<c:forEach begin="2" end="11" step="1" varStatus="item" >							
+							<th field="DATA${item.index}" width="120" sortable="true"  align="right"  formatter="numeric">${closeHead[item.index-2].name}</th>
+						</c:forEach>
+						<th field="DATA12" width="100" sortable="true"  align="right"  formatter="numeric"><fmt:message key="ui.label.closeAmount"/></th>
+						<th field="DATA13" width="100" sortable="true"  align="right"  formatter="numeric"><fmt:message key="ui.label.actualStockAmount"/></th>
+						<th field="DATA14" hidden="true"></th>
+												
+					</tr>	
+				</thead>
+			</table>             
+        </div>                              
     </div> 
 </div>
  
@@ -814,6 +969,60 @@
 	         <a href="#" class="easyui-linkbutton" iconCls="icon-delete" plain="true" onclick="javascript:deleteOutgoList();"><fmt:message key="ui.button.Delete"/></a>
 	</div>
 </div>
+
+<!-- 툴바 -->
+<div  id="toolCloseActual" style="padding:5px;height:auto;">
+	<div style="margin-top:.5em;">
+		<span style="margin-right:.5em"><fmt:message key="ui.label.closeDate"/></span>
+	 	<select id="closeYear">
+	 		<c:forEach begin="0" end="9" step="1" varStatus="pnt">
+	 			<option value="${thisYear-pnt.index}">${thisYear-pnt.index}</option>
+	 		</c:forEach>
+	 	</select>년
+	 	<select id="closeMonth">
+	 		<c:forEach begin="1" end="12" step="1" varStatus="pnt">
+	 			<option value="${pnt.index}">${pnt.index}</option>
+	 		</c:forEach>
+	 	</select>월
+	 	<span style="margin-left:2em;"><a href="javascript:getCheckPreCloseData()" class="easyui-linkbutton" iconCls="icon-book-edit"><fmt:message key="ui.button.actionClose"/></a></span>
+	 	<span style="margin-left:0em;"><a href="javascript:saveActualData()" class="easyui-linkbutton" iconCls="icon-book-go"><fmt:message key="ui.button.applyActualStock"/></a></span>	 		 	
+	</div>
+	<div style="text-align:right;">
+	         <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true"  onclick="javascript:addCloseData();"><fmt:message key="ui.button.Add"/></a>  
+	         <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true"  onclick="javascript:editCloseData();"><fmt:message key="ui.button.Edit"/></a>
+	</div>
+</div>
+
+<div id="dialogClose" buttons="#dialButton" title ="<fmt:message key='ui.button.applyActualStock'/>">
+	<form id="formCloseEdit">
+		<table style="margin:10px;">
+			<tr>
+				<th><fmt:message key="ui.label.PartNo"/></th>
+				<td>
+					<input type="text" id="closePartCode" required="false" />
+					<input type="hidden" id="closeProdType"/>
+					<input type="hidden" id="closeRowId"/>
+				</td>				
+			</tr>
+			<tr>
+				<th><fmt:message key="ui.label.PartNo"/></th>
+				<td><input type="text" id="closeAmount"  class="easyui-numberspinner"   min="0" value="0"/></td>				
+			</tr>		
+		</table>
+	</form>
+</div>
+<div id="dialButton" align="center">				
+	<a href="#" onclick="javascript:changeActualCount();"  class="easyui-linkbutton" iconCls="icon-accept" id="btCloseButton"><fmt:message key="ui.button.apply"/></a>
+</div>
+<div>
+<form action="inoutManagement"method="POST" name="actualDataForm" >
+	<input type="hidden" name="actStdDt">
+	<input type="hidden" name="actPartCode">
+	<input type="hidden" name="actAmount">	
+</form>
+</div>
+
+
 
 
 </body>

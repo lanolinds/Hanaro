@@ -212,6 +212,105 @@ public class ProductStockDAO {
 		return list;
 	}
 	
+	public List<Map<String,Object>> getComponentHead(Locale locale,String type){
+		String query = "select code,name from code_component_inout where locale = ? and left(inoutType,1) = ? order by inoutType desc,right(code,2) asc;";
+		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();		
+		jdbc.query(query,new Object[]{locale.getCountry(),type},new RowMapper<Map<String,Object>>(){
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int idx)
+					throws SQLException {
+				Map<String,Object> m = new LinkedHashMap<String,Object>();
+				m.put("code",rs.getString(1));
+				m.put("name",rs.getString(2));
+				list.add(m);
+				return null;
+			}			
+		});
+		return list;
+		
+	}
+	
+	public String getCheckPreCloseData(Locale locale,String year,String month){
+		String query = "if exists (select * from product_stock_actual where stdDt = convert(nvarchar(10),dateadd(month,-1,?+'-'+right('0'+?,2)+'-01'),121) and locale = ?) select 'YES' else select 'NO';";
+		return jdbc.queryForObject(query, new Object[]{year,month,locale.getCountry()},new RowMapper<String>(){
+			@Override
+			public String mapRow(ResultSet rs, int idx) throws SQLException {
+				return rs.getString(1);
+			}
+		});
+	}
+	
+	public String getCheckThisCloseData(Locale locale,String year,String month){
+		String query = "if exists (select * from product_stock_close where stdDt = ?+'-'+right('0'+?,2)+'-01' and locale = ?) select 'YES' else select 'NO';";
+		return jdbc.queryForObject(query, new Object[]{year,month,locale.getCountry()},new RowMapper<String>(){
+			@Override
+			public String mapRow(ResultSet rs, int idx) throws SQLException {
+				return rs.getString(1);
+			}
+		});
+	}
+	
+	public List<Map<String,Object>> prodApplyCloseData(Locale locale,String type, String year, String month, String user){
+		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		SqlParameterSource params = new MapSqlParameterSource()
+		.addValue("locale",locale.getCountry())
+		.addValue("type",type)
+		.addValue("year",year)
+		.addValue("month",month)
+		.addValue("user",user);		
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("ProductStockDAO_prodApplyCloseData").returningResultSet("closeList",new RowMapper<Map<String,Object>>() {
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int idx)
+					throws SQLException {
+				Map<String,Object> m = new LinkedHashMap<String,Object>();
+				for(int x=0;x<rs.getMetaData().getColumnCount();x++){
+					if (x==0)
+						m.put("DATA"+x,rs.getString(1));
+					else if (x==14)
+						m.put("DATA"+x,rs.getString(15));
+					else
+						m.put("DATA"+x,rs.getLong(x+1));
+				}
+				list.add(m);
+				return null;
+			}
+		});
+		sp.execute(params);
+		return list;
+	}
+	
+	
+	public void prodApplyActualData(final Locale locale,final String[] stdDt,final String[] partCode,final String[] amount, final String user){
+		if(stdDt!=null){
+			String sqlDelete = "delete from [product_stock_actual] WHERE stdDt = ? and locale = ?";
+			jdbc.update(sqlDelete,new Object[]{stdDt[0],locale.getCountry()});
+			System.out.println(stdDt[0]);
+			System.out.println(partCode[0]);
+			System.out.println(amount[0]);
+			
+			String sqlInsert = "insert into product_stock_actual (locale,stdDt,partCode,amount,inputBy,inputDt) values(?,?,?,?,?,getdate());";
+			jdbc.batchUpdate(sqlInsert, new BatchPreparedStatementSetter() {
+				@Override
+				public void setValues(PreparedStatement ps, int i)
+						throws SQLException {
+					ps.setString(1, locale.getCountry());
+					ps.setString(2, stdDt[0]);
+					ps.setString(3, partCode[i]);
+					ps.setString(4, amount[i]);
+					ps.setString(5, user);
+				}
+
+				@Override
+				public int getBatchSize() {
+					return stdDt.length;
+				}
+			});
+		}
+		
+	}
+	
+	
+	
 	
 	
 }
