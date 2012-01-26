@@ -1,4 +1,4 @@
-package com.samsong.erp.dao.product;
+package com.samsong.erp.dao.material;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,11 +21,8 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
 
-import com.samsong.erp.model.product.StockInOutSheet;
-
 @Repository
-public class ProductStockDAO {
-
+public class MaterialStockDAO {
 	private JdbcTemplate jdbc;
 	private SimpleJdbcCall sp;
 
@@ -33,6 +30,7 @@ public class ProductStockDAO {
 	public void init(DataSource ds){
 		jdbc = new JdbcTemplate(ds);
 	}
+	
 	
 	public Map<String,Object> getComponentTypeOption(Locale locale,String type){
 		final Map<String,Object> map =  new LinkedHashMap<String,Object>();
@@ -47,10 +45,11 @@ public class ProductStockDAO {
 		return map;
 	}
 	
+	
 	public List<Map<String,Object>> getSubOptionByInoutComponent(Locale locale, String code){
 		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
 		SqlParameterSource param = new MapSqlParameterSource().addValue("locale",locale.getCountry()).addValue("code",code);
-		sp = new SimpleJdbcCall(jdbc).withProcedureName("ProductStockDAO_getSubOptionByInoutComponent").returningResultSet("subOptions",new RowMapper<Map<String,Object>>() {
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("MaterialStockDAO_getSubOptionByInoutComponent").returningResultSet("subOptions",new RowMapper<Map<String,Object>>() {
 			@Override
 			public Map<String, Object> mapRow(ResultSet rs, int idx)
 					throws SQLException {
@@ -65,6 +64,7 @@ public class ProductStockDAO {
 		sp.execute(param);
 		return list;
 	}
+	
 	
 	public List<Map<String,Object>> getPartList(Locale locale, String type, String term){
 		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
@@ -85,6 +85,8 @@ public class ProductStockDAO {
 		return list;
 	}
 	
+	
+
 	public void prodIncomeOutgoList(final Locale locale, String category
 			,final String[] DATA0,final String[] DATA1,final String[] DATA2,final String[] DATA3,final String[] DATA4
 			,final String[] DATA5,final String[] DATA6,final String[] DATA7,final String[] DATA8,final String[] DATA9
@@ -92,7 +94,20 @@ public class ProductStockDAO {
 		
 		if (category.equals("income")){
 			if(DATA0!=null){
-				String sqlDelete = "delete from [product_stock_income] WHERE seq = ?";			
+				String sqlUpdate = "update [material_stock_income] set deleted = 'Y' WHERE seq = ?";			
+				jdbc.batchUpdate(sqlUpdate, new BatchPreparedStatementSetter() {
+					@Override
+					public void setValues(PreparedStatement ps, int i)
+							throws SQLException {
+						ps.setString(1, DATA0[i]);					
+					}
+	
+					@Override
+					public int getBatchSize() {
+						return DATA0.length;
+					}
+				});				
+				String sqlDelete = "delete from [material_stock_income] WHERE seq = ? and pdaSeq is null";			
 				jdbc.batchUpdate(sqlDelete, new BatchPreparedStatementSetter() {
 					@Override
 					public void setValues(PreparedStatement ps, int i)
@@ -105,8 +120,8 @@ public class ProductStockDAO {
 						return DATA0.length;
 					}
 				});
-				String sqlInsert = "INSERT INTO [product_stock_income]";
-				sqlInsert+="  ([locale],[stdDt],[inoutType],[fromLine],[partCode],[lotNo],[amount],[comment],[inputBy],[inputDt],[deleted])";
+				String sqlInsert = "INSERT INTO [material_stock_income]";
+				sqlInsert+="  ([locale],[stdDt],[inoutType],[fromCust],[partCode],[lotNo],[amount],[comment],[inputBy],[inputDt],[deleted])";
 				sqlInsert+=" VALUES(?,?,?,?,?,?,?,?,?,getdate(),'N')";
 				for(int i=0;i<DATA1.length;i++){
 				if (DATA9[i].equals("DELETE"))
@@ -122,7 +137,22 @@ public class ProductStockDAO {
 		}else if(category.equals("outgo")){
 			
 			if(DATA0!=null){
-				String sqlDelete = "delete from [product_stock_outgo] WHERE seq = ?";			
+				
+				String sqlUpdate = "update [material_stock_outgo] set deleted = 'Y' WHERE seq = ?";			
+				jdbc.batchUpdate(sqlUpdate, new BatchPreparedStatementSetter() {
+					@Override
+					public void setValues(PreparedStatement ps, int i)
+							throws SQLException {
+						ps.setString(1, DATA0[i]);					
+					}
+	
+					@Override
+					public int getBatchSize() {
+						return DATA0.length;
+					}
+				});	
+				
+				String sqlDelete = "delete from [material_stock_outgo] WHERE seq = ? and pdaSeq is null";			
 				jdbc.batchUpdate(sqlDelete, new BatchPreparedStatementSetter() {
 					@Override
 					public void setValues(PreparedStatement ps, int i)
@@ -136,8 +166,8 @@ public class ProductStockDAO {
 					}
 				});
 				
-				String sqlInsert = "INSERT INTO [product_stock_outgo]";
-				sqlInsert+="  ([locale],[stdDt],[inoutType],[toCust],[partCode],[lotNo],[amount],[comment],[inputBy],[inputDt],[deleted])";
+				String sqlInsert = "INSERT INTO [material_stock_outgo]";
+				sqlInsert+="  ([locale],[stdDt],[inoutType],[toLine],[partCode],[lotNo],[amount],[comment],[inputBy],[inputDt],[deleted])";
 				sqlInsert+=" VALUES(?,?,?,?,?,?,?,?,?,getdate(),'N')";
 				
 				for(int i=0;i<DATA1.length;i++){
@@ -155,6 +185,8 @@ public class ProductStockDAO {
 		}
 	}
 	
+	
+
 	public List<Map<String,Object>> getIncomeOutgoList(Locale locale, String category, String stdDt, String endDt){
 		SqlParameterSource params = new MapSqlParameterSource()
 		.addValue("locale",locale.getCountry())
@@ -163,7 +195,7 @@ public class ProductStockDAO {
 		.addValue("endDt",endDt);
 		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
 		
-		sp = new SimpleJdbcCall(jdbc).withProcedureName("ProductStockDAO_getIncomeOutgoList").returningResultSet("incomeList",new RowMapper<Map<String,Object>>() {
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("MaterialStockDAO_getIncomeOutgoList").returningResultSet("incomeList",new RowMapper<Map<String,Object>>() {
 			@Override
 			public Map<String, Object> mapRow(ResultSet rs, int idx)
 					throws SQLException {
@@ -182,6 +214,7 @@ public class ProductStockDAO {
 		return list;
 	}
 	
+
 	public List<Map<String,Object>> getIncomeOutgoState(Locale locale,String partCode,String stdDt,String endDt,String inoutYn,String fromToYn){
 		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
 		SqlParameterSource params = new MapSqlParameterSource()
@@ -191,7 +224,7 @@ public class ProductStockDAO {
 		.addValue("endDt",endDt)
 		.addValue("inOutYn",inoutYn)
 		.addValue("fromToYn",fromToYn);
-		sp = new SimpleJdbcCall(jdbc).withProcedureName("ProductStockDAO_getIncomeOutgoState").returningResultSet("productinoutState",new RowMapper<Map<String,Object>>() {
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("MaterialStockDAO_getIncomeOutgoState").returningResultSet("productinoutState",new RowMapper<Map<String,Object>>() {
 
 		long crtAmount = 0;
 			@Override
@@ -215,6 +248,7 @@ public class ProductStockDAO {
 		return list;
 	}
 	
+
 	public List<Map<String,Object>> getComponentHead(Locale locale,String type){
 		String query = "select code,name from code_component_inout where locale = ? and left(inoutType,1) = ? order by inoutType desc,right(code,2) asc;";
 		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();		
@@ -233,8 +267,9 @@ public class ProductStockDAO {
 		
 	}
 	
+
 	public String getCheckPreCloseData(Locale locale,String year,String month){
-		String query = "if exists (select * from product_stock_actual where stdDt = convert(nvarchar(10),dateadd(month,-1,?+'-'+right('0'+?,2)+'-01'),121) and locale = ?) select 'YES' else select 'NO';";
+		String query = "if exists (select * from material_stock_actual where stdDt = convert(nvarchar(10),dateadd(month,-1,?+'-'+right('0'+?,2)+'-01'),121) and locale = ?) select 'YES' else select 'NO';";
 		return jdbc.queryForObject(query, new Object[]{year,month,locale.getCountry()},new RowMapper<String>(){
 			@Override
 			public String mapRow(ResultSet rs, int idx) throws SQLException {
@@ -243,8 +278,9 @@ public class ProductStockDAO {
 		});
 	}
 	
+
 	public String getCheckThisCloseData(Locale locale,String year,String month){
-		String query = "if exists (select * from product_stock_close where stdDt = ?+'-'+right('0'+?,2)+'-01' and locale = ?) select 'YES' else select 'NO';";
+		String query = "if exists (select * from material_stock_close where stdDt = ?+'-'+right('0'+?,2)+'-01' and locale = ?) select 'YES' else select 'NO';";
 		return jdbc.queryForObject(query, new Object[]{year,month,locale.getCountry()},new RowMapper<String>(){
 			@Override
 			public String mapRow(ResultSet rs, int idx) throws SQLException {
@@ -253,6 +289,7 @@ public class ProductStockDAO {
 		});
 	}
 	
+
 	public List<Map<String,Object>> prodApplyCloseData(Locale locale,String type, String year, String month, String user){
 		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
 		SqlParameterSource params = new MapSqlParameterSource()
@@ -261,7 +298,7 @@ public class ProductStockDAO {
 		.addValue("year",year)
 		.addValue("month",month)
 		.addValue("user",user);		
-		sp = new SimpleJdbcCall(jdbc).withProcedureName("ProductStockDAO_prodApplyCloseData").returningResultSet("closeList",new RowMapper<Map<String,Object>>() {
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("MaterialStockDAO_prodApplyCloseData").returningResultSet("closeList",new RowMapper<Map<String,Object>>() {
 			@Override
 			public Map<String, Object> mapRow(ResultSet rs, int idx)
 					throws SQLException {
@@ -269,8 +306,8 @@ public class ProductStockDAO {
 				for(int x=0;x<rs.getMetaData().getColumnCount();x++){
 					if (x==0)
 						m.put("DATA"+x,rs.getString(1));
-					else if (x==14)
-						m.put("DATA"+x,rs.getString(15));
+					else if (x==9)
+						m.put("DATA"+x,rs.getString(10));
 					else
 						m.put("DATA"+x,rs.getLong(x+1));
 				}
@@ -283,15 +320,17 @@ public class ProductStockDAO {
 	}
 	
 	
+	
+
 	public void prodApplyActualData(final Locale locale,final String[] stdDt,final String[] partCode,final String[] amount, final String user){
 		if(stdDt!=null){
-			String sqlDelete = "delete from [product_stock_actual] WHERE stdDt = ? and locale = ?";
+			String sqlDelete = "delete from [material_stock_actual] WHERE stdDt = ? and locale = ?";
 			jdbc.update(sqlDelete,new Object[]{stdDt[0],locale.getCountry()});
 			System.out.println(stdDt[0]);
 			System.out.println(partCode[0]);
 			System.out.println(amount[0]);
 			
-			String sqlInsert = "insert into product_stock_actual (locale,stdDt,partCode,amount,inputBy,inputDt) values(?,?,?,?,?,getdate());";
+			String sqlInsert = "insert into material_stock_actual (locale,stdDt,partCode,amount,inputBy,inputDt) values(?,?,?,?,?,getdate());";
 			jdbc.batchUpdate(sqlInsert, new BatchPreparedStatementSetter() {
 				@Override
 				public void setValues(PreparedStatement ps, int i)
@@ -312,9 +351,9 @@ public class ProductStockDAO {
 		
 	}
 	
-	
+
 	public String getCheckPreActDate(Locale locale,String stdDt){
-		String query = "if exists (select * from product_stock_actual where stdDt = convert(nvarchar(10),dateadd(month,-1,left(?,7)+'-01'),121) and locale = ?) select 'YES' else select 'NO';";
+		String query = "if exists (select * from material_stock_actual where stdDt = convert(nvarchar(10),dateadd(month,-1,left(?,7)+'-01'),121) and locale = ?) select 'YES' else select 'NO';";
 		return jdbc.queryForObject(query, new Object[]{stdDt,locale.getCountry()},new RowMapper<String>(){
 			@Override
 			public String mapRow(ResultSet rs, int idx) throws SQLException {
@@ -329,7 +368,7 @@ public class ProductStockDAO {
 		SqlParameterSource params = new MapSqlParameterSource()
 		.addValue("locale",locale.getCountry())
 		.addValue("stdDt",stdDt);			
-		sp = new SimpleJdbcCall(jdbc).withProcedureName("ProductStockDAO_getCurrentStock").returningResultSet("currentList",new RowMapper<Map<String,Object>>() {
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("MaterialStockDAO_getCurrentStock").returningResultSet("currentList",new RowMapper<Map<String,Object>>() {
 			@Override
 			public Map<String, Object> mapRow(ResultSet rs, int idx)
 					throws SQLException {
@@ -347,9 +386,5 @@ public class ProductStockDAO {
 		sp.execute(params);
 		return list;
 	}	
-	
-	
-	
-	
-	
+
 }

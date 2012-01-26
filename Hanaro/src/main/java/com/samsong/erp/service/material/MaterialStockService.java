@@ -1,12 +1,11 @@
-package com.samsong.erp.service.product;
+package com.samsong.erp.service.material;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import com.samsong.erp.model.product.StockInOutSheet;
 
-public interface ProductStockService {
+public interface MaterialStockService {
 	public Map<String,Object> getComponentTypeOption(Locale locale,String type);	
 	public List<Map<String,Object>> getPartList(Locale locale, String type,String term);	
 	public void prodIncomeOutgoList(Locale locale, String category
@@ -27,4 +26,5 @@ public interface ProductStockService {
 	public String getCheckPreActDate(Locale locale,String stdDt);
 	
 	public List<Map<String,Object>> getCurrentStock(Locale locale,String stdDt);
+
 }

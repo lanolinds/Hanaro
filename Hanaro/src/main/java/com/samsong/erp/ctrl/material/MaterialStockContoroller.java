@@ -1,8 +1,8 @@
-package com.samsong.erp.ctrl.product;
+package com.samsong.erp.ctrl.material;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List; 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -19,25 +19,25 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.samsong.erp.ctrl.quality.NcrStatusController;
 import com.samsong.erp.model.HanaroUser;
 import com.samsong.erp.model.product.StockInOutSheet;
-import com.samsong.erp.service.product.ProductStockService;
+import com.samsong.erp.service.material.MaterialStockService;
 import com.samsong.erp.util.HashMapComparator;
 
 @Controller
-@RequestMapping("/productDivision/stock")
-public class ProductStockController {
-	private String prefix = "/productDivision/stock";
+@RequestMapping("/materialDivision/stock")
+public class MaterialStockContoroller {
+	private String prefix = "/materialDivision/stock";
 	private static final Logger logger = Logger.getLogger(NcrStatusController.class);
 	
 	@Autowired
-	private ProductStockService service;
+	MaterialStockService service;
+
 	
-	 
 	@RequestMapping(value="/inoutManagement",method=RequestMethod.GET)
 	public String menuInoutManagement(Authentication auth,LocalDate date, Model model,StockInOutSheet inOutSheet){
 		HanaroUser user = (HanaroUser)auth.getPrincipal();
-		Map<String,Object> incomeType = service.getComponentTypeOption(user.getLocale(),"PR");
-		Map<String,Object> outgoType = service.getComponentTypeOption(user.getLocale(),"PI");		
-		List<Map<String,Object>> closeTableHead = service.getComponentHead(user.getLocale(),"P");
+		Map<String,Object> incomeType = service.getComponentTypeOption(user.getLocale(),"MR");
+		Map<String,Object> outgoType = service.getComponentTypeOption(user.getLocale(),"MI");		
+		List<Map<String,Object>> closeTableHead = service.getComponentHead(user.getLocale(),"M");
 		
 		model.addAttribute("today",date);
 		model.addAttribute("thisYear",date.getYear());		
@@ -46,7 +46,6 @@ public class ProductStockController {
 		model.addAttribute("incomeType",incomeType);
 		model.addAttribute("outgoType",outgoType);		
 		model.addAttribute("closeHead",closeTableHead);
-		
 		return prefix+"/inoutManagement";
 	} 
 	
@@ -175,8 +174,6 @@ public class ProductStockController {
 			table.put("total",0);
 		}
 		return table;		
-	}	
-	
-	
+	}		
 	
 }

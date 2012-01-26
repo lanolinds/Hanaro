@@ -1,4 +1,4 @@
-package com.samsong.erp.service.product;
+package com.samsong.erp.service.material;
 
 import java.util.List;
 import java.util.Locale;
@@ -8,15 +8,14 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.samsong.erp.dao.product.ProductStockDAO;
-import com.samsong.erp.model.product.StockInOutSheet;
+import com.samsong.erp.dao.material.MaterialStockDAO;
 
 @Service
-public class ProductStockServiceImpl implements ProductStockService{
+public class MaterialStockServiceImpl implements MaterialStockService{
 	
 	@Autowired
-	ProductStockDAO dao;	
-	private static Logger logger = Logger.getLogger(ProductStockServiceImpl.class);
+	MaterialStockDAO dao;	
+	private static Logger logger = Logger.getLogger(MaterialStockServiceImpl.class);
 	
 	@Override
 	public Map<String, Object> getComponentTypeOption(Locale locale, String type) {

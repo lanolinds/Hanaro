@@ -27,7 +27,8 @@
 		#resultStateTable th {border:1px solid #E5E5E5;background-color: #FAFAFA;height:22px; font-weight:normal; text-align: center; white-space:nowrap;}
 		#resultStateTable td {border:1px dotted silver;}
 		.incomeCls{background-color: #DFF6FE;}
-		.outgoCls{background-color: #FEEEEE;}		
+		.outgoCls{background-color: #FEEEEE;}
+		.actual{background-color: #E5E9EA;}		
 		
 				
 		
@@ -68,7 +69,7 @@
 			return;
 		}		
 		$("#inStdDt").datebox('setValue',record.DATA1);
-		$("#inInoutType").val(record.DATA11).trigger("change",record.DATA3);		
+		$("#inInoutType").val(record.DATA12).trigger("change",record.DATA11);		
 		$("#inPartCode").combogrid("setValue",record.DATA4);
 		$("#inPartName").val(record.DATA5);
 		$("#inLotNo").val(record.DATA6);
@@ -104,6 +105,7 @@
 				newRow.DATA9 = "DELETE";
 				newRow.DATA10 = record.DATA10;
 				newRow.DATA11 = record.DATA11;
+				newRow.DATA12 = record.DATA12;
 				var rowIdx = $("#incomeList").datagrid("getRowIndex",record);				
 		    	$("#incomeList").datagrid("updateRow",{index:rowIdx,row:newRow});
 		    }  
@@ -132,7 +134,7 @@
 			newRow.DATA0 = $("input[name='seq']",$("#incomeForm")).val();
 			newRow.DATA1 = $("#inStdDt").datebox("getValue");
 			newRow.DATA2 = $("#inInoutType option:selected").text();
-			newRow.DATA3 = $("#inFromLine").val();
+			newRow.DATA3 = $("#inFromLine option:selected").text();
 			newRow.DATA4 = $("#inPartCode").combogrid("getValue");
 			newRow.DATA5 = $("#inPartName").val();
 			newRow.DATA6 = $("#inLotNo").val();
@@ -140,7 +142,8 @@
 			newRow.DATA8 = $("#inComment").val();			
 			newRow.DATA9 = "SAVE";
 			newRow.DATA10 = "${today}";
-			newRow.DATA11 = $("#inInoutType").val();			
+			newRow.DATA11 = $("#inFromLine").val();
+			newRow.DATA12 = $("#inInoutType").val();			
 			
 			var type = $("input[name='pType']",$("#incomeForm")).val();
 			if(type=="update"){
@@ -178,6 +181,7 @@
 		var data9 =[];
 		var data10 =[];
 		var data11 =[];
+		var data12 =[];
 				
 		var checkSameDate = "";
 		var checkValue = true;
@@ -202,6 +206,7 @@
 			data9.push(data.rows[x].DATA9);
 			data10.push(data.rows[x].DATA10);
 			data11.push(data.rows[x].DATA11);
+			data12.push(data.rows[x].DATA12);
 			}
 		}
 		if(checkValue){
@@ -217,6 +222,7 @@
 			frm.DATA9.value = data9;
 			frm.DATA10.value = data10;
 			frm.DATA11.value = data11;
+			frm.DATA12.value = data12;
 			frm.submit();
 		}else{
 			$.messager.alert("<fmt:message key='warn.infoWarn' />","<fmt:message key='warn.enableSameDate' />");	
@@ -260,7 +266,7 @@
 		$("input[name='pType']",$("#outgoForm")).val("update");
 		$("input[name='seq']",$("#outgoForm")).val(record.DATA0);		
 		var rowIdx = $("#outgoList").datagrid("getRowIndex",record);		
-		$("input[name='rowIdx']",$("#outgoList")).val(rowIdx);		
+		$("input[name='rowIdx']",$("#outgoForm")).val(rowIdx);		
 				
 	}
 	function deleteOutgoList(){
@@ -309,7 +315,7 @@
 	}		
 	
 	function saveOutgo(){	
-		if($("#outgoForm").form("validate")){
+		if($("#outgoForm").form("validate")){			
 			var newRow  ={};
 			newRow.DATA0 = $("input[name='seq']",$("#outgoForm")).val();
 			newRow.DATA1 = $("#outStdDt").datebox("getValue");
@@ -323,13 +329,12 @@
 			newRow.DATA9 = "SAVE";
 			newRow.DATA10 = "${today}";
 			newRow.DATA11 = $("#outToCust").val();
-			newRow.DATA12 = $("#outInoutType").val();
-			
-			var type = $("input[name='pType']",$("#outgoForm")).val();
+			newRow.DATA12 = $("#outInoutType").val();			
+			var type = $("input[name='pType']",$("#outgoForm")).val();			
 			if(type=="update"){
-				var rowI = $("input[name='rowIdx']",$("#outgoForm")).val();
+				var rowI = $("input[name='rowIdx']",$("#outgoForm")).val();				
 				$("#outgoList").datagrid("updateRow",{index:rowI,row:newRow});
-				resetIncomeForm();
+				resetOutgoForm();
 			}else{
 				$("#outgoList").datagrid("appendRow",newRow);
 				resetOutgoParts();
@@ -439,27 +444,34 @@
 		var txtBody = "";
 		
 		$.getJSON("getInoutState",{partCode:p1,stdDt:p2,endDt:p3,inoutYn:p4,fromToYn:p5,t:new Date().getTime()},function(list){
+			var countAmount = 0;
 			$.each(list,function(i,cell){		
-				if(i!=0){
+				if((i==0 && cell.DATA1=="actual") || cell.DATA1=="pre"){
+					countAmount = Number(countAmount)+Number(cell.DATA8);
+				}else{
+					$("#preStock").empty().append(numeric(countAmount));
 					txtBody+="<tr>";
-					txtBody+="<td align='center'>"+cell.DATA2+"</td>";
+					txtBody+="<td align='center' class='"+cell.DATA1+"'>"+((cell.DATA1=="actual")?"<fmt:message key='ui.button.applyActualStock'/>":cell.DATA2)+"</td>";
 					if(cell.DATA1=="income"){
 						txtBody+="<td align='right' class='incomeCls'>"+numeric(cell.DATA3)+"</td><td>&nbsp;</td>";	
 					}
-					else{
+					else if(cell.DATA1=="outgo"){
 						txtBody+="<td>&nbsp;</td><td  align='right'  class='outgoCls'>"+numeric(cell.DATA3)+"</td>";
 					}
-					txtBody+="<td align='center'>"+cell.DATA6+"</td>";					
+					else if(cell.DATA1=="actual"){
+						txtBody+="<td class='"+cell.DATA1+"'>&nbsp;</td><td class='"+cell.DATA1+"'>&nbsp;</td>";
+					} 
+						
+					txtBody+="<td align='center' class='"+cell.DATA1+"'>"+cell.DATA6+"&nbsp;</td>";					
 					if(p4=="Y")
-						txtBody+= "<td>"+cell.DATA4+"</td>";
+						txtBody+= "<td class='"+cell.DATA1+"'>"+((cell.DATA1=="actual")?"&nbsp;":cell.DATA4)+"</td>";
 					if(p5=="Y")
-						txtBody+= "<td>"+cell.DATA5+"</td>";
-					txtBody+="<td align='right'>"+cell.DATA8+"</td>";
+						txtBody+= "<td class='"+cell.DATA1+"'>"+((cell.DATA1=="actual")?"&nbsp;":cell.DATA5)+"</td>";
+					txtBody+="<td align='right' class='"+cell.DATA1+"'>"+numeric(cell.DATA8)+"</td>";
 
 					txtBody+="</tr>";
-				}else{
-					$("#preStock").empty().append(cell.DATA8);
 				}
+
 			});
 			$("#resultStateTable thead").empty().append(txtHead);
 			$("#resultStateTable tbody").empty().append(txtBody);
@@ -477,6 +489,22 @@
 			});
 			$("#"+idName).empty().append(txt);
 		});
+	}
+	
+	function getCheckPreActDate(){
+		var stdDt = $("#currentSearchDate").datebox("getValue");		
+		$.get("getCheckPreActDate",{stdDt:stdDt,t:new Date().getTime()},function(result){
+			if($.trim(result)=="YES")				
+				searchCurrentStock();
+			else
+				$.messager.alert("<fmt:message key='info.confirm' />","<fmt:message key='info.cannotSearchWithoutPreActual' />");
+		});		
+	}
+	
+	function searchCurrentStock(){
+		var params = {};
+		params.stdDt= $("#currentSearchDate").datebox("getValue");
+		$("#currentList").datagrid("load",params);		
 	}
 	
 	function getCheckPreCloseData(){
@@ -503,7 +531,7 @@
 				});
 			}	
 			else
-				getCloseActionList("search");
+				getCloseActionList("action");
 		});		
 	}
 	
@@ -518,7 +546,8 @@
 	function addCloseData(){
 		$("#closeProdType").val("insert");
 		$("#closePartCode").combogrid("enable");
-	    $('#dialogClose').dialog({modal:true});  	
+	    $('#dialogClose').dialog({modal:true});
+	    $("#closeAmount").numberspinner("setValue",0);
 	}
 	
 	function editCloseData(){
@@ -700,7 +729,8 @@
 								<th field="DATA8" width="200" sortable="false"><fmt:message key="ui.label.remark"/></th>
 								<th field="DATA9" width="120" sortable="false"><fmt:message key="ui.label.inputBy"/></th>
 								<th field="DATA10" width="80" sortable="false"><fmt:message key="ui.label.inputDt"/></th>
-								<th field="DATA11" hidden="true"></th>								
+								<th field="DATA11" hidden="true"></th>
+								<th field="DATA12" hidden="true"></th>								
 							</tr>	
 						</thead>
 					</table>        		
@@ -717,7 +747,7 @@
 					    				<input type="hidden" name="pType" value="insert" />
 					    				<form:input  type="hidden" path="seq" name="seq" value="" />
 					    				<input type="hidden" name="rowIdx" />
-					    				<c:forEach begin="0" end="11" step="1" varStatus="count">
+					    				<c:forEach begin="0" end="12" step="1" varStatus="count">
 					    					<input type="hidden" name="DATA${count.index}">
 					    				</c:forEach>
 					    									    									    				
@@ -913,7 +943,20 @@
 			</div>  
         </div>
         <div title="<fmt:message key='menu.currentStock' />" iconCls="icon-text-align-justity">
-            
+            <table class="easyui-datagrid" id="currentList" pagination="false"   border="false"
+						fit="true"  idField="DATA0"  toolbar="#toolCurrent"  singleSelect="true"  url="getCurrentStock">			
+				<thead>
+					<tr>						
+						<th field="DATA0" width="150" sortable="true"><fmt:message key="ui.label.PartNo"/></th>
+						<th field="DATA1" width="100" sortable="true"  align="right"  formatter="numeric"><fmt:message key="ui.label.preMonthStock"/></th>
+						<th field="DATA12" width="100" sortable="true"  align="right"  formatter="numeric"><fmt:message key="menu.currentStock"/></th>						
+						<c:forEach begin="2" end="11" step="1" varStatus="item" >							
+							<th field="DATA${item.index}" width="120" sortable="true"  align="right"  formatter="numeric">${closeHead[item.index-2].name}</th>
+						</c:forEach>
+												
+					</tr>	
+				</thead>
+			</table>              
         </div>
         <div title="<fmt:message key='menu.closeActualMgmt' />" iconCls="icon-book-keeping" style="padding:2px;">          
             <table class="easyui-datagrid" id="closeActualList" pagination="false"   border="false"
@@ -928,7 +971,6 @@
 						<th field="DATA12" width="100" sortable="true"  align="right"  formatter="numeric"><fmt:message key="ui.label.closeAmount"/></th>
 						<th field="DATA13" width="100" sortable="true"  align="right"  formatter="numeric"><fmt:message key="ui.label.actualStockAmount"/></th>
 						<th field="DATA14" hidden="true"></th>
-												
 					</tr>	
 				</thead>
 			</table>             
@@ -993,6 +1035,15 @@
 	</div>
 </div>
 
+<!-- 툴바 -->
+<div  id="toolCurrent" style="padding:5px;height:auto;">
+	<div style="margin-top:.5em;">
+		<span style="margin-right:.5em"><fmt:message key="ui.label.SearchDate"/></span>
+		<input id="currentSearchDate" class="easyui-datebox" editable="false" value="${today}" style="width:100px;"></input>
+	 	<span style="margin-left:2em;"><a href="javascript:getCheckPreActDate()" class="easyui-linkbutton" iconCls="icon-search"><fmt:message key="ui.button.Search"/></a></span>	 		 		 	
+	</div>	
+</div>
+
 <div id="dialogClose" buttons="#dialButton" title ="<fmt:message key='ui.button.applyActualStock'/>">
 	<form id="formCloseEdit">
 		<table style="margin:10px;">
@@ -1005,8 +1056,8 @@
 				</td>				
 			</tr>
 			<tr>
-				<th><fmt:message key="ui.label.PartNo"/></th>
-				<td><input type="text" id="closeAmount"  class="easyui-numberspinner"   min="0" value="0"/></td>				
+				<th><fmt:message key="ui.label.count"/></th>
+				<td><input type="text" id="closeAmount"  class="easyui-numberspinner"   value="0"/></td>				
 			</tr>		
 		</table>
 	</form>
