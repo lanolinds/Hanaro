@@ -224,7 +224,7 @@ public class MaterialStockDAO {
 		.addValue("endDt",endDt)
 		.addValue("inOutYn",inoutYn)
 		.addValue("fromToYn",fromToYn);
-		sp = new SimpleJdbcCall(jdbc).withProcedureName("MaterialStockDAO_getIncomeOutgoState").returningResultSet("productinoutState",new RowMapper<Map<String,Object>>() {
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("MaterialStockDAO_getIncomeOutgoState").returningResultSet("materialinoutState",new RowMapper<Map<String,Object>>() {
 
 		long crtAmount = 0;
 			@Override

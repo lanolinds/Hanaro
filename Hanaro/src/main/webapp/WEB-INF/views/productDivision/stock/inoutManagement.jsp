@@ -47,6 +47,14 @@
 			return 'color:grey;font-style:italic;';
 	}
 	
+	function pointCell1(){
+		return 'color:#3775CC;';
+	}
+	
+	function pointCell2(){
+		return 'color:#6B1D1D;';
+	}	
+	
 	
 	function resetIncomeForm(){		
 		$('form')[0].reset();		
@@ -949,7 +957,7 @@
 					<tr>						
 						<th field="DATA0" width="150" sortable="true"><fmt:message key="ui.label.PartNo"/></th>
 						<th field="DATA1" width="100" sortable="true"  align="right"  formatter="numeric"><fmt:message key="ui.label.preMonthStock"/></th>
-						<th field="DATA12" width="100" sortable="true"  align="right"  formatter="numeric"><fmt:message key="menu.currentStock"/></th>						
+						<th field="DATA12" width="100" sortable="true"  align="right"  formatter="numeric" styler="pointCell1"><fmt:message key="menu.currentStock"/></th>						
 						<c:forEach begin="2" end="11" step="1" varStatus="item" >							
 							<th field="DATA${item.index}" width="120" sortable="true"  align="right"  formatter="numeric">${closeHead[item.index-2].name}</th>
 						</c:forEach>
@@ -968,8 +976,8 @@
 						<c:forEach begin="2" end="11" step="1" varStatus="item" >							
 							<th field="DATA${item.index}" width="120" sortable="true"  align="right"  formatter="numeric">${closeHead[item.index-2].name}</th>
 						</c:forEach>
-						<th field="DATA12" width="100" sortable="true"  align="right"  formatter="numeric"><fmt:message key="ui.label.closeAmount"/></th>
-						<th field="DATA13" width="100" sortable="true"  align="right"  formatter="numeric"><fmt:message key="ui.label.actualStockAmount"/></th>
+						<th field="DATA12" width="100" sortable="true"  align="right"  styler="pointCell1" formatter="numeric"><fmt:message key="ui.label.closeAmount"/></th>
+						<th field="DATA13" width="100" sortable="true"  align="right"  styler="pointCell2" formatter="numeric"><fmt:message key="ui.label.actualStockAmount"/></th>
 						<th field="DATA14" hidden="true"></th>
 					</tr>	
 				</thead>
