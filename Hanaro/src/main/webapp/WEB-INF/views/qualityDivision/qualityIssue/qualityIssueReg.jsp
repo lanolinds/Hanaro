@@ -261,6 +261,10 @@
 					case 'CD' : partType = "1002"; break;
 					case 'CB' : partType = "1002"; break;
 					case 'CC' : partType = "1001"; break;
+					case 'AA' : partType = "1001"; break;
+					case 'AB' : partType = "1001"; break;
+					case 'AC' : partType = "1001"; break;
+					case 'AD' : partType = "1001"; break;
 					default : partType = "ALL"; break;
 				}
 				occurPartListCallbak(partType);
