@@ -94,7 +94,7 @@
 		<tr> 
 			<th field="key" width="200" sortable="true">key</th>
 			<th field="std" width="350" sortable="true"><fmt:message key="ui.label.indexLang"/></th>
-			<th field="local" width="350"  editor="text"><fmt:message key="ui.label.localLang"/></th>
+			<th field="local" width="350"  editor="textarea"><fmt:message key="ui.label.localLang"/></th>
 			<th field="action" width="100"  formatter="editFormatter" align="center">#</th>
 		</tr>	
 	</thead>

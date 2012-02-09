@@ -178,6 +178,11 @@
 			$.messager.alert("Warnning",'<fmt:message key="warn.notSelectedItem"/>',"warning");
 			return false;
 		}
+		else{
+			$("form[name='claimForm'] input[name='action']").val("delete");
+			$("#claimPartner").combobox("setValue",selected.code); //업체바인딩.
+			$("form[name='claimForm']").submit();
+		}
 	}
 	
 	function validateApprovalForm(){
@@ -214,6 +219,11 @@
 			var claimItem = $.trim($("#claimItem").val());
 			if(claimItem==""){
 				$.messager.alert("Warnning",'<fmt:message key="warn.enterFaultItem"/>',"warning");
+				return false;
+			}
+			var claim4m = $.trim($("#claim4mLabels").text());
+			if(claim4m==""){
+				$.messager.alert("Warnning",'<fmt:message key="warn.enter4m"/>',"warning");
 				return false;
 			}
 		}

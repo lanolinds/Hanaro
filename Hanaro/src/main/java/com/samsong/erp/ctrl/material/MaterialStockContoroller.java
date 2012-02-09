@@ -81,8 +81,9 @@ public class MaterialStockContoroller {
 		}else{
 			service.prodApplyActualData(user.getLocale(), actStdDt, actPartCode, actAmount, user.getUsername());
 		}
-			
-		logger.info("사용자("+user.getUsername()+")가 완성품입고를 처리합니다");
+		
+		logger.info("사용자("+user.getUsername()+")가 자재입고를 처리합니다");
+		
 		return "redirect:"+prefix+"/inoutManagement";
 	}
 	

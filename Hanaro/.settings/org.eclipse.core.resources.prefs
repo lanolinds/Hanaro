@@ -1,4 +1,4 @@
-#Mon Nov 21 19:21:30 KST 2011
+#Thu Feb 09 09:50:50 KST 2012
 eclipse.preferences.version=1
 encoding//src/main/webapp/WEB-INF/classes/log4j.properties=UTF-8
 encoding//src/main/webapp/WEB-INF/classes/views.properties=UTF-8
@@ -6,4 +6,5 @@ encoding//src/main/webapp/WEB-INF/messages/messages.properties=UTF-8
 encoding//src/main/webapp/WEB-INF/messages/messages_en.properties=UTF-8
 encoding//src/main/webapp/WEB-INF/messages/messages_zh.properties=UTF-8
 encoding//src/main/webapp/WEB-INF/views/menu.jsp=UTF-8
+encoding/<project>=UTF-8
 encoding/src=UTF-8

@@ -15,6 +15,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -179,25 +180,25 @@ public class ReadyApprovalController {
 	
 	@RequestMapping(value="/updateTempClaim",method=RequestMethod.POST )
 	public String updateClaim(@RequestParam("action") String action,
-			@RequestParam("regNo") String regNo,
-			@RequestParam("approvalNo") String approvalNo,
-			@RequestParam("claimPartner") String partner,
-			@RequestParam("claimRate") double rate,
-			@RequestParam("claimItem") String item,
-			@RequestParam("claimLot") String lot,
-			@RequestParam("reason1") String reason1,
-			@RequestParam("reason2") String reason2,
-			@RequestParam("claim4m") String reason3,
-			@RequestParam("claimRemark") String remark,
-			@RequestParam("pic1") MultipartFile pic1,
-			@RequestParam("pic1id") String pic1id,
-			@RequestParam("pic2") MultipartFile pic2,
-			@RequestParam("pic2id") String pic2id,
-			@RequestParam("ref") MultipartFile ref,
-			@RequestParam("refid") String refid,
-			@RequestParam("ncr") String ncr,
-			@RequestParam("reqDate") String reqDate,
-			@RequestParam("request") String request,
+			@RequestParam(value="regNo") String regNo, 
+			@RequestParam(value="approvalNo") String approvalNo,
+			@RequestParam(value="claimPartner") String partner,
+			@RequestParam(value="claimRate") double rate,
+			@RequestParam(value="claimItem") String item,
+			@RequestParam(value="claimLot",required=false,defaultValue="") String lot,
+			@RequestParam(value="reason1",required=false,defaultValue="") String reason1,
+			@RequestParam(value="reason2",required=false,defaultValue="") String reason2,
+			@RequestParam(value="claim4m",required=false,defaultValue="") String reason3,
+			@RequestParam(value="claimRemark",required=false,defaultValue="") String remark,
+			@RequestParam(value="pic1") MultipartFile pic1,
+			@RequestParam(value="pic1id") String pic1id,
+			@RequestParam(value="pic2") MultipartFile pic2,
+			@RequestParam(value="pic2id") String pic2id,
+			@RequestParam(value="ref") MultipartFile ref,
+			@RequestParam(value="refid") String refid,
+			@RequestParam(value="ncr") String ncr,
+			@RequestParam(value="reqDate") String reqDate,
+			@RequestParam(value="request") String request,
 			Model model,Authentication auth,Locale locale){
 		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		pic1id = pic1id.trim().length()==0?null:pic1id;
