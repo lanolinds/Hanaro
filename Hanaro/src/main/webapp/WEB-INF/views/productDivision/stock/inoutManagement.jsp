@@ -28,12 +28,7 @@
 		#resultStateTable td {border:1px dotted silver;}
 		.incomeCls{background-color: #DFF6FE;}
 		.outgoCls{background-color: #FEEEEE;}
-		.actual{background-color: #E5E9EA;}		
-		
-				
-		
-		
-		
+		.actual{background-color: #E5E9EA;}
 	</style>
 		
 	<script type="text/javascript" src='<c:url value="/resources/scripts/jquery/jquery.latest.js"/>'></script>

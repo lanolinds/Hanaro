@@ -539,5 +539,37 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 		
 	}
 
+	@Override
+	public List<Map<String, Object>> getIssueSummary(String occurSite,
+			String searchType, String stdYear, String stdMonth, String stdDay,
+			String endYear, String endMonth, String endDay,String searchLocale, Locale locale) {
+		return dao.getIssueSummary(occurSite, searchType, stdYear, stdMonth, stdDay, endYear, endMonth, endDay,searchLocale, locale);
+	}
+
+	@Override
+	public Integer getWeekOfYear(String date) {
+		return dao.getWeekOfYear(date);
+	}
+
+	@Override
+	public List<Map<String, Object>> getIssueSummaryDetail(String dateType,
+			String stdYear, String stdMonth, String stdDay, String type,
+			String machineType, String searchLocale, Locale locale) {
+		return dao.getIssueSummaryDetail(dateType, stdYear, stdMonth, stdDay, type, machineType, searchLocale, locale);
+	}
+
+	@Override
+	public Map<String, Object> getCodeMachineType() {
+		return dao.getCodeMachineType();
+	}
+
+	@Override
+	public List<Map<String, Object>> getIssueSummaryDetailPOP(String dateType,
+			String stdYear, String stdMonth, String endYear, String endMonth,
+			String machineType, String errorType, String partNo,
+			String custCode, String searchLocale, Locale locale) {
+		return dao.getIssueSummaryDetailPOP(dateType, stdYear, stdMonth, endYear, endMonth, machineType, errorType, partNo, custCode, searchLocale, locale);
+	}
+
 
 }

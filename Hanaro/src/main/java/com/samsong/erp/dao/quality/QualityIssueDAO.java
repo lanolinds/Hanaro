@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -1547,5 +1548,167 @@ public class QualityIssueDAO {
 		jdbc.update(sql,regNo, approvalNo,username,locale.getCountry());
 		
 	}
+	
+	public List<Map<String,Object>> getIssueSummary(String occurSite,String searchType,String stdYear,String stdMonth,String stdDay,String endYear,String endMonth,String endDay,String searchLocale,Locale locale){
+		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		String query = "QualityIssueDAO_getIssueSummary";
+		if(occurSite.equals("aa"))
+			query += "PRECHECK";
+		else if(occurSite.equals("ab"))
+			query += "CUSTIN";
+		else if(occurSite.equals("ac"))
+			query += "CKD";
+		else if(occurSite.equals("ad"))
+			query += "FIELD";
+		else if(occurSite.equals("ca"))
+			query += "EARLYWARN";
+		else if(occurSite.equals("cb"))
+			query += "INLINE";
+		else if(occurSite.equals("cc"))
+			query += "LINEOUT";
+		else if(occurSite.equals("cd"))
+			query += "ISP";
+		
+		SqlParameterSource params = new MapSqlParameterSource()
+		.addValue("S_TYPE",searchType)
+		.addValue("START_YEAR",stdYear)
+		.addValue("START_MONTH",stdMonth)
+		.addValue("START_DAY",stdDay)
+		.addValue("END_YEAR",endYear)
+		.addValue("END_MONTH",endMonth)
+		.addValue("END_DAY",endDay)
+		.addValue("searchLocale",searchLocale)
+		.addValue("locale",locale.getCountry());
+		
+		sp = new SimpleJdbcCall(jdbc).withProcedureName(query).returningResultSet("IssueSummary",new RowMapper<Map<String,Object>>() {
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int i)
+					throws SQLException {
+				Map<String,Object> m = new LinkedHashMap<String,Object>();
+				m.put("DATA0",rs.getString(1));
+				m.put("DATA1",rs.getString(2));
+				m.put("DATA2",rs.getString(3));
+				m.put("DATA3",rs.getString(4));
+				for(int x=5;x<12;x++)
+					m.put("DATA"+(x-1),rs.getBigDecimal(x));
+				list.add(m);
+				return null;
+			}
+		});
+		sp.execute(params);
+		return list;
+	}
+	
+	public Integer getWeekOfYear(String date){
+		String query = "SELECT WEEK FROM DATE_PICK WHERE DATE = ?;";
+		return jdbc.queryForObject(query,new Object[]{date},new RowMapper<Integer>(){
 
+			@Override
+			public Integer mapRow(ResultSet rs, int arg1) throws SQLException {
+				return rs.getInt(1);
+			}
+		});
+	}
+	
+	public List<Map<String,Object>> getIssueSummaryDetail(String dateType,String stdYear, String stdMonth,String stdDay,String type,String machineType, String searchLocale, Locale locale)
+	{
+		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		SqlParameterSource params = new MapSqlParameterSource()
+		.addValue("DATE_TYPE",dateType)
+		.addValue("START_YEAR",stdYear)
+		.addValue("START_MONTH",stdMonth)
+		.addValue("START_DAY",stdDay)
+		.addValue("TYPE",type)
+		.addValue("MACHINE_TYPE",machineType)
+		.addValue("searchLocale",searchLocale)
+		.addValue("locale",locale.getCountry());
+		
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueDAO_getIssueSummaryDetail").returningResultSet("summaryDetail",new RowMapper<Map<String,Object>>() {
+
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int idx)
+					throws SQLException {
+					Map<String,Object> m = new LinkedHashMap<String,Object>();
+					m.put("DATA0",rs.getString(1));
+					m.put("DATA1",rs.getString(2));
+					m.put("DATA2",rs.getString(3));
+					m.put("DATA3",rs.getString(4));
+					m.put("DATA4",rs.getString(5));
+					m.put("DATA5",rs.getString(6));
+					m.put("DATA6",rs.getLong(7));
+					m.put("DATA7",rs.getLong(8));
+					m.put("DATA8",rs.getString(9));
+					m.put("DATA9",rs.getLong(10));
+					m.put("DATA10",rs.getString(11));
+					m.put("DATA11",rs.getString(12));
+					m.put("DATA12",rs.getString(13));
+					m.put("DATA13",rs.getLong(14));
+					m.put("DATA14",rs.getString(15));
+					m.put("DATA15",rs.getString(16));
+					list.add(m);
+				return null;
+			}
+			
+		});
+		sp.execute(params);
+		return list;		
+	}
+	
+	
+	
+	public Map<String,Object> getCodeMachineType(){
+		final Map<String,Object> m = new LinkedHashMap<String,Object>();
+		jdbc.query("select distinct machine_type from part_master where machine_type <>'' order by machine_type",new Object[]{},new RowCallbackHandler(){
+			@Override
+			public void processRow(ResultSet rs) throws SQLException {
+				m.put(rs.getString(1),rs.getString(1));
+			}
+		});
+		return m;
+	}
+	
+	
+	public List<Map<String,Object>> getIssueSummaryDetailPOP(String dateType,String stdYear,String stdMonth,String endYear, String endMonth, String machineType, String errorType, String partNo, String custCode, String searchLocale,Locale locale){
+		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		SqlParameterSource params = new MapSqlParameterSource()
+		.addValue("DATE_TYPE",dateType)
+		.addValue("START_YEAR",stdYear)
+		.addValue("START_MONTH",stdMonth)
+		.addValue("END_YEAR",endYear)
+		.addValue("END_MONTH",endMonth)
+		.addValue("MACHINE_TYPE",machineType)
+		.addValue("errorType",errorType)
+		.addValue("partNo",partNo)
+		.addValue("custCode",custCode)		
+		.addValue("searchLocale",searchLocale)
+		.addValue("locale",locale.getCountry());
+		
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("QualityIssueDAO_getIssueSummaryDetailPOP").returningResultSet("summaryDetailPOP",new RowMapper<Map<String,Object>>() {
+
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int idx)
+					throws SQLException {
+					Map<String,Object> m = new LinkedHashMap<String,Object>();
+					m.put("DATA0",rs.getString(1));
+					m.put("DATA1",rs.getString(2));
+					m.put("DATA2",rs.getString(3));
+					m.put("DATA3",rs.getString(4));
+					m.put("DATA4",rs.getString(5));
+					m.put("DATA5",rs.getString(6));
+					m.put("DATA6",rs.getLong(7));
+					m.put("DATA7",rs.getLong(8));
+					m.put("DATA8",rs.getString(9));
+					m.put("DATA9",rs.getLong(10));
+					m.put("DATA10",rs.getString(11));
+					m.put("DATA11",rs.getString(12));
+					m.put("DATA12",rs.getString(13));
+					m.put("DATA13",rs.getLong(14));					
+					list.add(m);
+					return null;
+			}
+			
+		});
+		sp.execute(params);
+		return list;			
+	}
 }

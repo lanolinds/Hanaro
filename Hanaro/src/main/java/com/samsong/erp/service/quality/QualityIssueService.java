@@ -143,6 +143,16 @@ public interface QualityIssueService {
 
 
 	public void persistApproval(String regNo,String approvalNo,String username, Locale locale);
+	
+	public List<Map<String,Object>> getIssueSummary(String occurSite,String searchType,String stdYear,String stdMonth,String stdDay,String endYear,String endMonth,String endDay,String searchLocale,Locale locale);
+	
+	public Integer getWeekOfYear(String date);
+	
+	public List<Map<String,Object>> getIssueSummaryDetail(String dateType,String stdYear, String stdMonth,String stdDay,String type,String machineType, String searchLocale, Locale locale);
+	
+	public Map<String,Object> getCodeMachineType();
+	
+	public List<Map<String,Object>> getIssueSummaryDetailPOP(String dateType,String stdYear,String stdMonth,String endYear, String endMonth, String machineType, String errorType, String partNo, String custCode, String searchLocale,Locale locale);	
 
 	
 }
