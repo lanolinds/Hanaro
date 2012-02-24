@@ -13,6 +13,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.joda.time.Months;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.core.Authentication;
@@ -42,8 +43,9 @@ public class IssueListController {
 	@RequestMapping(value="/list",method=RequestMethod.GET)
 	public String list(Model model){
 		Calendar cal = Calendar.getInstance();
-		model.addAttribute("toDate",cal.getTime());
-		cal.add(Calendar.DATE, -7);
+		model.addAttribute("toDate",cal.getTime());				
+		cal.set(Calendar.MONTH,0);
+		cal.set(Calendar.DATE,1);
 		model.addAttribute("fromDate",cal.getTime());
 		return "qualityDivision/qualityIssue/list";
 	}
