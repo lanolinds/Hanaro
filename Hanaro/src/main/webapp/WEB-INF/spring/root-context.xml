@@ -12,7 +12,7 @@
 		<property name="driverClassName" value="net.sourceforge.jtds.jdbc.Driver"></property>
 		<property name="url" value="jdbc:jtds:sqlserver://210.216.217.238:1433/GLOBALPROJECT"></property>
 		<property name="username" value="inside"></property>
-		<property name="password" value="ssong"></property> 
+		<property name="password" value="ssong"></property>				 
 	</bean> 
 	
 	 <!-- 	Spring Security 설정 -->

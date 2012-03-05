@@ -324,7 +324,7 @@
 	}
 	//대책서 반려내용을 확인한다.
 	function checkComment(){
-		$.messager.alert("<fmt:message key='ui.button.checkComment' />","${sheetMap.rejectComment}");	
+		$.messager.alert("<fmt:message key='ui.button.checkComment' />","${sheetMap.rejectComment.trim()}");	
 	}
 	//대책서를 승인한다.
 	function doAgree(){
