@@ -45,6 +45,8 @@ public class ReadyApprovalController {
 	private CustManagementService partnerService;
 	@Autowired
 	private MessageSource message;
+
+	
 	
 	@RequestMapping(value="/readyApproval", method = RequestMethod.POST)
 	public String readyApproval(@RequestParam("regNo") String regNo,Model model, Authentication auth,Locale locale){
