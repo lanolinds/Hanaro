@@ -64,11 +64,16 @@
 			<div href='<c:url value="/qualityDivision/qualityIssue/qualityIssueReg"/>'><fmt:message key="menu.qualityIssueReg"/></div>
 			<div href='<c:url value="/qualityDivision/qualityIssue/list"/>'><fmt:message key="menu.qualityIssueList"/></div>
 			<div href='<c:url value="/qualityDivision/qualityIssue/ncrManageList"/>'><fmt:message key="menu.qualityNcrManagement"/></div>
-			<div href='<c:url value="/qualityDivision/qualityIssue/ncrStatus"/>' ><fmt:message key="menu.qualityNcrStatus"/></div>			
-			<div ><fmt:message key="menu.qualityClaimSearch"/></div>
+			<div href='<c:url value="/qualityDivision/qualityIssue/ncrStatus"/>' ><fmt:message key="menu.qualityNcrStatus"/></div>
 			<div href='<c:url value="/qualityDivision/qualityIssue/issueSummary"/>' ><fmt:message key="menu.qualityIssueSummary"/></div>
 	</div>
 	</div>
+	<div style="white-space: nowrap;"><fmt:message key="menu.qualityClaimManage"/>      	
+	<div style="width:150px;">
+			<div href='<c:url value="/qualityDivision/claimManage/claimManage"/>' ><fmt:message key="menu.qualityClaimManage"/></div>
+			<div ><fmt:message key="menu.qualityClaimSearch"/></div>			
+	</div>
+	</div>	
 </div>
 <!-- 인사부문 서브메뉴 -->
 <div id="humanMgmt" style="width:150px;">

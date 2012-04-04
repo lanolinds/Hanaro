@@ -152,7 +152,9 @@ public interface QualityIssueService {
 	
 	public Map<String,Object> getCodeMachineType();
 	
-	public List<Map<String,Object>> getIssueSummaryDetailPOP(String dateType,String stdYear,String stdMonth,String endYear, String endMonth, String machineType, String errorType, String partNo, String custCode, String searchLocale,Locale locale);	
+	public List<Map<String,Object>> getIssueSummaryDetailPOP(String dateType,String stdYear,String stdMonth,String endYear, String endMonth, String machineType, String errorType, String partNo, String custCode, String searchLocale,Locale locale);
+	
+
 
 	
 }

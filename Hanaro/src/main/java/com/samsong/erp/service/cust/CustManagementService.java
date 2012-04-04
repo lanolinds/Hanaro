@@ -22,4 +22,5 @@ public interface CustManagementService {
 	public void setCustInfo(String setType, Locale locale, CustInfo info, String user);
 	public List<Map<String, Object>> getCusteRegList(Locale locale, String keyfield);
 	public Map<String, Object> getCustView(String custCd, Locale locale);
+	public List<Map<String, Object>> getCustOptionLong(Locale locale, String searchType,String q);
 }

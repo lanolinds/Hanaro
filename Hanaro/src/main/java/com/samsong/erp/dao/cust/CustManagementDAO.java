@@ -70,8 +70,6 @@ public class CustManagementDAO {
 		
 		sp.execute(params);
 		return list;
-				
-		
 	}
 	
 	public Map<String,String> getLineOption(Locale locale, String custCode, String lineCode){
@@ -163,4 +161,27 @@ public class CustManagementDAO {
 		return jdbc.queryForMap("exec CustManagementDAO_getCustView ?,? ",
 				new Object[] { custCd, locale.getCountry() });
 	}
+	
+	public List<Map<String,Object>> getCustOptionLong(Locale locale, String searchType,String q){
+		final List<Map<String,Object>> list  = new ArrayList<Map<String,Object>>();
+		SqlParameterSource params = new MapSqlParameterSource().addValue("locale",locale.getCountry())
+				.addValue("searchType",searchType).addValue("term",q);
+		
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("CustManagementDAO_getCustOption").returningResultSet("custList", new RowMapper <List<Map<String,Object>>>(){
+			@Override
+			public List<Map<String, Object>> mapRow(ResultSet rs, int i)
+					throws SQLException {
+				Map<String, Object> m = new LinkedHashMap<String, Object>();
+				
+				for (int x = 0; x < rs.getMetaData().getColumnCount(); x++) {
+					m.put("DATA" + x, rs.getObject((x + 1)));
+				}
+				list.add(m);
+				return null;
+			}
+		});
+		
+		sp.execute(params);
+		return list;
+	}		
 }

@@ -82,6 +82,8 @@ public class QualityIssueDAO {
 						cell.put("partName", rs.getString(2));
 						cell.put("car", rs.getString(3));
 						cell.put("model", rs.getString(4));
+						cell.put("price", rs.getString(5));
+						cell.put("custCode", rs.getString(6));
 						partList.add(cell);
 						return null;
 					}
@@ -1709,6 +1711,8 @@ public class QualityIssueDAO {
 			
 		});
 		sp.execute(params);
-		return list;			
+		return list;			 
 	}
+	
+
 }

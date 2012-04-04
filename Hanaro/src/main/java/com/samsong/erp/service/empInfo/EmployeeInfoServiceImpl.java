@@ -59,4 +59,6 @@ public class EmployeeInfoServiceImpl implements EmployeeInfoService {
 	public Map<String, Object> getEmployView(String empNo, Locale locale){
 		return dao.getEmployView(empNo, locale);
 	}
+
+
 }

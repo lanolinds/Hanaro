@@ -51,4 +51,8 @@ public class CustManagementServiceImpl implements CustManagementService {
 	public Map<String, Object> getCustView(String custCd, Locale locale){
 		return dao.getCustView(custCd, locale);
 	}
+	
+	public List<Map<String, Object>> getCustOptionLong(Locale locale, String searchType,String q) {
+		return dao.getCustOptionLong(locale, searchType, q);
+	}	
 }

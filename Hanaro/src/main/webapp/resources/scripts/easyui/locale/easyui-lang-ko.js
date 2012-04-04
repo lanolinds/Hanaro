@@ -48,6 +48,7 @@ if ($.fn.datebox){
 	$.fn.datebox.defaults.okText = '확인';
 	$.fn.datebox.defaults.missingMessage = '날짜를 입력하세요.';
 	// 제공되는 인터페이스로는 포맷을 줄 방법이 없음. 만들어 쓰자.(IP-HJW)
+
 	$.fn.datebox.defaults.formatter=function(date){
 		var y = date.getFullYear();
 		var m = date.getMonth()+1;

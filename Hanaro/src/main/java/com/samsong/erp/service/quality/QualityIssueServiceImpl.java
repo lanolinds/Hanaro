@@ -549,7 +549,7 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	@Override
 	public Integer getWeekOfYear(String date) {
 		return dao.getWeekOfYear(date);
-	}
+	} 
 
 	@Override
 	public List<Map<String, Object>> getIssueSummaryDetail(String dateType,
@@ -570,6 +570,7 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 			String custCode, String searchLocale, Locale locale) {
 		return dao.getIssueSummaryDetailPOP(dateType, stdYear, stdMonth, endYear, endMonth, machineType, errorType, partNo, custCode, searchLocale, locale);
 	}
+
 
 
 }
