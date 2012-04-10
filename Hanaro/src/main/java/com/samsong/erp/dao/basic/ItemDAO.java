@@ -63,7 +63,18 @@ public class ItemDAO {
 		jdbc.update(sql, action,item,partner,price,currency,enabled,username,country);
 	}
 	
-
+	public List<Map<String,Object>> getEbomItemList(String type,String partCode,Locale locale,
+			String car,String model){		
+		String query = "exec ItemDAO_getEbomItemList ?,?,?,?,?";
+		return jdbc.queryForList(query,type,partCode,locale.getCountry(),car,model);
+	}
+	
+	public List<Map<String,Object>> getEbom(String partNo,Locale locale){
+		String query = "exec [ItemDAO_getEbom] ?,?";
+		return jdbc.queryForList(query,partNo,locale.getCountry());
+	}
+	
+  
 	
 	
 	

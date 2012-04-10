@@ -53,6 +53,19 @@ public class ItemServiceImpl implements ItemService {
 	}
 
 
+	@Override
+	public List<Map<String, Object>> getEbomItemList(String type,
+			String partCode, Locale locale, String car, String model) {
+		return dao.getEbomItemList(type, partCode, locale, car, model);
+	}
+
+
+	@Override
+	public List<Map<String, Object>> getEbom(String partNo, Locale locale) {
+		return dao.getEbom(partNo, locale);
+	}
+
+
 
 	
 }

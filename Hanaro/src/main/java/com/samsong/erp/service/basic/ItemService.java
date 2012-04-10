@@ -18,6 +18,9 @@ public interface ItemService {
 	public void updateLocalItemPrice(String action, String item,
 			String partner, double doubleValue, String currency,
 			String enabled, String username, Locale locale);
+	public List<Map<String,Object>> getEbomItemList(String type,String partCode,Locale locale,
+			String car,String model);
+	public List<Map<String,Object>> getEbom(String partNo,Locale locale);
 	
 
 }
