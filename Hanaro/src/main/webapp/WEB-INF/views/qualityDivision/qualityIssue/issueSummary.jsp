@@ -392,8 +392,7 @@
     			<th style="width:120px;"><span  class="label-Leader-black"><fmt:message key="ui.label.searchTeam"/></span></th>
 				<td style="width:528px;" align="left">
 					<c:if test="${authLocale eq 'KR' }">						
-					<select id="searchLocale">
-					<option value=""><fmt:message key="ui.element.All"/></option>
+					<select id="searchLocale">					
 					<option value="CN"><fmt:message key="country.china"/></option>
 					<option value="CZ"><fmt:message key="country.czech"/></option>
 					<option value="IN"><fmt:message key="country.india"/></option>

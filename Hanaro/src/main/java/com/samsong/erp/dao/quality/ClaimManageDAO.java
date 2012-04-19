@@ -37,11 +37,12 @@ public class ClaimManageDAO {
 								String partType,String rPartCode,String rPartName,String issueDate,String claimContent,String carType,
 								String machineType,String workerCount,String issueTime,String failAmount,String inputBy,String p1,String p2,String p3,String p4,
 								String p5,String p6,String p7,String p8,String lotNo,String file1Name,String file2Name,String file3Name,String file4Name,String file5Name,
-								byte[] file1, byte[] file2,byte[] file3,byte[] file4,byte[] file5,String file1Type,String file2Type,String file3Type,String file4Type,String file5Type){
-		String query ="exec [ClaimManageDAO_prodClaimManage] ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?"; 
+								byte[] file1, byte[] file2,byte[] file3,byte[] file4,byte[] file5,String file1Type,String file2Type,String file3Type,String file4Type,String file5Type,
+								String tripCost,String prodCost){
+		String query ="exec [ClaimManageDAO_prodClaimManage] ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?"; 
 		jdbc.update(query, new Object[]{locale.getCountry(),prodType,classType,claimNo,invoiceNo,claimCost,issueCust,issueTeam,cost,partType,rPartCode,rPartName,
 				issueDate,claimContent,carType,machineType,workerCount,issueTime,failAmount,inputBy,p1,p2,p3,p4,p5,p6,p7,p8,lotNo,file1Name,file2Name,file3Name,file4Name,
-				file5Name,file1,file2,file3,file4,file5,file1Type,file2Type,file3Type,file4Type,file5Type});
+				file5Name,file1,file2,file3,file4,file5,file1Type,file2Type,file3Type,file4Type,file5Type,tripCost,prodCost});
 	}
 	
 	public List<Map<String,Object>> getClaimRegList(Locale locale, String classType,String stdDt,String endDt,String partCode,String searchLocale){
@@ -117,7 +118,54 @@ public class ClaimManageDAO {
 
 		});
 
-	}	
-
+	}
+	
+	public List<Map<String,Object>> getClaimAgreeInfo(String claimNo){
+		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		SqlParameterSource params = new MapSqlParameterSource().addValue("claimNo",claimNo);
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("ClaimManageDAO_getClaimAgreeInfo").returningResultSet("realAgreeInfo",new RowMapper<Map<String,Object>>() {
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int idx)
+					throws SQLException {
+				Map<String,Object> m = new LinkedHashMap<String,Object>();
+				for(int x=0;x<rs.getMetaData().getColumnCount();x++)
+					m.put("DATA"+x,rs.getObject((x+1)));
+				list.add(m);
+				return null;
+			}
+		});
+		sp.execute(params);
+		return list;
+	}
+	public void prodClaimAgree(String procType,String claimNo,String state,String content,String rate,String claim,String user){
+		String query = "exec [ClaimManageDAO_prodClaimAgree] ?,?,?,?,?,?,?;";
+		jdbc.update(query,procType,claimNo,state,content,rate,claim,user);
+	}
+	public List<Map<String,Object>> getClaimAgreeMail(String claimNo){
+		String query = "exec [ClaimManageDAO_getClaimAgreeMail] ?;";
+		return jdbc.queryForList(query,claimNo);
+	}
+	
+	public List<Map<String,Object>> getClaimRegInfo(String claimNo){
+		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		SqlParameterSource params = new MapSqlParameterSource()
+		.addValue("claimNo",claimNo);
+		
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("ClaimManageDAO_getClaimRegInfo").returningResultSet("listRegClaimInfo",new RowMapper<Map<String,Object>>() {
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int idx)
+					throws SQLException {
+				Map<String,Object> m = new LinkedHashMap<String, Object>();
+				for(int x=0;x<rs.getMetaData().getColumnCount();x++)
+					m.put("DATA"+x,rs.getObject((x+1)));
+				list.add(m);
+				return null;
+			}
+		});
+		sp.execute(params);
+		return list;		
+	}
+	
+	
 
 }

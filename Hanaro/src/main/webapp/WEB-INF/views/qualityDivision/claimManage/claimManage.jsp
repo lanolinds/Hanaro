@@ -150,6 +150,7 @@
 			cols.push({field:'DATA37',title:'<fmt:message key="ui.label.workContent" />',width:170,sortable:true,align:'left'});
 			cols.push({field:'DATA38',hidden:true});
 			cols.push({field:'DATA39',hidden:true});
+			cols.push({field:'DATA40',hidden:true});
 		}else if(ob=="SW"){
 			cols.push({field:'DATA32',title:'<fmt:message key="ui.label.workCost" />',width:70,sortable:true,align:'right',formatter:numeric});
 			cols.push({field:'DATA33',title:'<fmt:message key="ui.label.workContent" />',width:170,sortable:true,align:'left'});
@@ -159,6 +160,8 @@
 			cols.push({field:'DATA37',title:'<fmt:message key="ui.label.productPartNo" />',width:120,sortable:true,align:'left'});
 			cols.push({field:'DATA38',title:'<fmt:message key="ui.label.productPartNm" />',width:150,sortable:true,align:'left'});
 			cols.push({field:'DATA39',hidden:true});
+			cols.push({field:'DATA40',hidden:true});
+			cols.push({field:'DATA41',hidden:true});
 			
 		}else{
 			cols.push({field:'DATA32',hidden:true});			
@@ -389,6 +392,7 @@
 			$("input[name='p5']",$div).val(rowData.DATA37);
 			$("select[name='p6']",$div).val(rowData.DATA38);
 			$("#p7"+cDiv).numberspinner("setValue",rowData.DATA39);
+			$("input[name='prodCost']",$div).val(rowData.DATA40);
 		}else if(cDiv=="SW"){
 			$("input[name='p1']",$div).val(rowData.DATA32);
 			$("input[name='p2']",$div).val(rowData.DATA33);
@@ -397,6 +401,8 @@
 			$("#p5"+cDiv).combogrid("setValue",rowData.DATA37);
 			$("input[name='p6']",$div).val(rowData.DATA38);			
 			$("select[name='p7']",$div).val(rowData.DATA39);
+			$("input[name='tripCost']",$div).val(rowData.DATA40);
+			$("input[name='prodCost']",$div).val(rowData.DATA41);
 		}else{
 			$("select[name='p1']",$div).val(rowData.DATA32);
 			$("#p2"+cDiv).timespinner("setValue",rowData.DATA34);
@@ -638,6 +644,12 @@
 		$("form[name='form"+cDiv+"']").submit();		
 	}
 	
+	function agreeClick(rowIndex, rowData){
+		var claimNo = rowData.DATA1;
+        var win = window.open("claimAgree?claimNo="+claimNo,"AgreeDetail","width=930,height=650,location=no,menubar=no,resizable=no,scrollbars=no,status=no,toolbar=no");
+        win.focus();
+	}
+	
 
 	
 	
@@ -683,7 +695,7 @@
 			$("#ebomPart").datagrid({onClickRow:ebomPartClick});
 			$("#ebomPartDetail").datagrid({onDblClickRow:ebomPartDetailClick});			
 			$("#listReg").datagrid({onClickRow:listRegClick});
-			$("#agreeList").datagrid();
+			$("#agreeList").datagrid({onDblClickRow:agreeClick});
 			
 			
 			
@@ -1261,7 +1273,7 @@
 		</table>        
     </div>
     <div title="<fmt:message key='ui.label.claimAction'/>" iconCls="icon-table-money" style="padding:20px;">     
-	     <table title="<fmt:message key='ui.label.actionList'/>" toolbar="#divActionListTool" id="agreeList" fit="true"  idField="DATA1" singleSelect="true" url="getClaimAgreeList" pagination="true"  pageSize="10"
+	     <table title="<fmt:message key='ui.label.actionList'/>" toolbar="#divActionListTool" id="agreeList" fit="true"  idField="DATA1" singleSelect="true" url="getClaimAgreeList" pagination="true"  pageSize="50"
 	     	rowStyler = "rowStyAgree"   >			
 			<thead>
 				<tr>

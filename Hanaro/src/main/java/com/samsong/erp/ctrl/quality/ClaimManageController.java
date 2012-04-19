@@ -19,6 +19,8 @@ import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,6 +36,7 @@ import com.samsong.erp.service.cust.CustManagementService;
 import com.samsong.erp.service.empInfo.EmployeeInfoService;
 import com.samsong.erp.service.quality.ClaimManageService;
 import com.samsong.erp.util.HashMapComparator;
+
 
 
 @Controller
@@ -58,6 +61,11 @@ public class ClaimManageController {
 	
 	@Autowired
 	private MessageSource message;
+	
+
+
+
+	
 	
 	
 	@RequestMapping(value="/claimManage",method=RequestMethod.GET)
@@ -97,11 +105,15 @@ public class ClaimManageController {
 		return prefix+"/claimManage";
 	}
 	
-	
+	 
 	
 	
 	@RequestMapping(value="/claimAgree",method=RequestMethod.GET)
-	public String menuClaimAgree(){
+	public String menuClaimAgree(@RequestParam(value="claimNo") String claimNo,Model model,Authentication auth){
+		HanaroUser user =  (HanaroUser)auth.getPrincipal();
+		List<Map<String,Object>> listInfo = service.getClaimAgreeInfo(claimNo);
+		model.addAttribute("cLocale",user.getLocale().getCountry());
+		model.addAttribute("claimInfo",listInfo);
 		return prefix+"/claimAgree";
 	}
 	
@@ -166,7 +178,9 @@ public class ClaimManageController {
 			@RequestParam(value="file2")MultipartFile file2,
 			@RequestParam(value="file3")MultipartFile file3,
 			@RequestParam(value="file4")MultipartFile file4,
-			@RequestParam(value="file5")MultipartFile file5
+			@RequestParam(value="file5")MultipartFile file5,
+			@RequestParam(value="tripCost", required=false)String tripCost,
+			@RequestParam(value="prodCost", required=false)String prodCost
 			){
 		HanaroUser user = (HanaroUser)auth.getPrincipal(); 
 		String file1Name = file1.getOriginalFilename();
@@ -179,7 +193,8 @@ public class ClaimManageController {
 									partType, rPartCode, rPartName, issueDate, claimContent, carType, machineType, workerCount, issueTime,failAmount,
 									user.getUsername(), p1, p2, p3, p4, p5, p6, p7,p8,lotNo,file1Name,file2Name,file3Name,file4Name,file5Name,
 									file1.getBytes(),file2.getBytes(),file3.getBytes(),file4.getBytes(),file5.getBytes(),
-									file1.getContentType(),file2.getContentType(),file3.getContentType(),file4.getContentType(),file5.getContentType());
+									file1.getContentType(),file2.getContentType(),file3.getContentType(),file4.getContentType(),file5.getContentType(),
+									tripCost,prodCost);
 		} catch (IOException e) { 
 			e.printStackTrace();
 		}
@@ -267,7 +282,8 @@ public class ClaimManageController {
 		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		return service.getClaimActionItem(user.getLocale(), type, term);
 		
-	} 
+	}
+	
 	@RequestMapping(value="/getClaimFile", method=RequestMethod.GET)
 	public  void  getQualityIssueFile(Authentication auth, @RequestParam("claimNo") String claimNo, @RequestParam("fileName") String fileName,@RequestParam("fileSeq") String fileSeq, HttpServletResponse response){
 		byte[] file = null;
@@ -287,12 +303,35 @@ public class ClaimManageController {
 		}
 	}
 	
+	@RequestMapping(value="/getClaimImg", method=RequestMethod.GET)
+	public  void  getNcrMeasureImg(Authentication auth, @RequestParam("claimNo") String claimNo,@RequestParam("fileType") String fileType,@RequestParam("fileSeq") String fileSeq, HttpServletResponse response){		
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		byte[] file = null;
+		BufferedOutputStream out = null;
+		file = service.getClaimFile(claimNo, fileSeq);
+		try {
+			response.setContentType(fileType);
+			out = new BufferedOutputStream(response.getOutputStream());
+			out.write(file);
+			out.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	
+	@RequestMapping(value="/prodRealClaimAgree", method=RequestMethod.POST)
+	public void prodRealClaimAgree(@RequestParam("stateIng") String stateIng, 
+			@RequestParam("analyCon") String analyCon, 
+			@RequestParam("claimRate") String claimRate,
+			@RequestParam("claim") String claim,
+			@RequestParam("claimNo") String claimNo,
+			@RequestParam("procType") String procType,
+			Authentication auth){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		service.prodClaimAgree(procType,claimNo, stateIng, analyCon, claimRate, claim, user.getUsername(),user.getLocale());
+	}
 	
+    
 	
-	
-	
-	
-
-
 }

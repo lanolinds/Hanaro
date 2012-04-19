@@ -223,7 +223,12 @@
 <!-- 			<artifactId>messagesource</artifactId> -->
 <!-- 			<version>0.6.1</version> -->
 <!-- 		</dependency> -->
-		
+
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.5</version>
+		</dependency>
 	</dependencies>
 	<repositories>
 		<!-- For testing against latest Spring snapshots -->
