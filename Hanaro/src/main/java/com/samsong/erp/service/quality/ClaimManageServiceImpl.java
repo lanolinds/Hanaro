@@ -115,10 +115,13 @@ public class ClaimManageServiceImpl implements ClaimManageService {
 			String p1 = message.getMessage("ui.label.contents",null,locale);
 			String p2 = message.getMessage("ui.label.mailClaimIssue",null,locale);
 			String p3 = message.getMessage("ui.label.detailStatus",null,locale);
+			String p4 = message.getMessage("info.claimIssueSS",null,locale);
 			String d1 = message.getMessage("info.cancelClaim",null,locale);
 					
 			
-			if(!((Map<String,Object>)mailData.get(0)).get("DATA24").toString().equals("AGREE") || procType.equals("DELETE")){
+			
+			
+			if((!((Map<String,Object>)mailData.get(0)).get("DATA24").toString().equals("AGREE") && state.equals("AGREE")) || (procType.equals("DELETE") && ((Map<String,Object>)mailData.get(0)).get("DATA24").toString().equals("AGREE"))){
 				
 				Map<String,Object> dataMap = (Map<String,Object>)mailData.get(0);
 				String claimAdd = "";
@@ -135,7 +138,7 @@ public class ClaimManageServiceImpl implements ClaimManageService {
 				
 				cnt0.append("<html><head><style type='text/css'>");
 				cnt0.append("table{border-collapse:collapse;font-size:13px;}");
-				cnt0.append("th {border:1px solid silver;background-color: #fafafa;height:45px; text-align: left; white-space:nowrap;width: 130px;padding:5px;}");			
+				cnt0.append("th {border:1px solid silver;background-color: #E5E9EA;height:45px; text-align: left; white-space:nowrap;width: 130px;padding:5px;}");			
 				cnt0.append(".none{border:0px;width:680px;}");			
 				cnt0.append("td {border:1px solid silver;padding:5px;}");
 				cnt0.append(".cnt{width:550px;}");
@@ -148,10 +151,9 @@ public class ClaimManageServiceImpl implements ClaimManageService {
 				cnt0.append("<tr><td class='none' colspan='2' align='left' style='height:30px;'>&nbsp;</td></tr>");
 				cnt0.append("<tr><td class='none' colspan='2' align='left'><b>b. "+p3+"</b></td></tr>");
 				
-				if(procType.equals("DELETE"))
-					cnt0.append("<tr><td class='none' colspan='2' align='center' style='background-color:#A12725;color:#FFFFFF;font-weight:bold;font-size:25px;padding:12px;'>CLAIM REPORT</td></tr>");
-				else
-					cnt0.append("<tr><td class='none' colspan='2' align='center' style='background-color:#415262;color:#FFFFFF;font-weight:bold;font-size:25px;padding:12px;'>CLAIM REPORT</td></tr>");
+				
+				cnt0.append("<tr><td class='none' colspan='2' align='center' style='background-color:#415262;color:#FFFFFF;font-weight:bold;font-size:25px;padding:0px;'>");
+				cnt0.append("<img src='http://210.216.217.226:8181/Hanaro/resources/images/cR.png'/></td></tr>");
 				
 				cnt0.append("<tr><td class='none' colspan='2' align='right' style='font-size:13px;padding:8px;'>"+dataMap.get("DATA13")+"</td></tr>");
 				cnt0.append("<tr><th>FROM</th><td class='cnt'>"+claimNo.split("-")[0]+"</td></tr>");
@@ -161,12 +163,12 @@ public class ClaimManageServiceImpl implements ClaimManageService {
 				cnt0.append("<tr><th>PART NAME</th><td class='cnt'>"+dataMap.get("DATA12")+"</td></tr>");
 				cnt0.append("<tr><th>PROGRESSING</th><td class='cnt'>"+dataMap.get("DATA22")+"</td></tr>");
 				cnt0.append("<tr><th style='height:200px;'>CAUSE BY</th><td class='cnt'>"+content+"</td></tr>");
-				cnt0.append("<tr><th style='height:160px;'>CLAIM 보상</th><td class='cnt'>"+claimAdd+"</td></tr>");
+				cnt0.append("<tr><th>CLAIM 보상</th><td class='cnt'>"+claimAdd+"</td></tr>");
 				cnt0.append("</table></body></html>");
 				
 				cnt1.append("<html><head><style type='text/css'>");
 				cnt1.append("table{border-collapse:collapse;font-size:13px;}");
-				cnt1.append("th {border:1px solid silver;background-color: #fafafa;height:45px; text-align: left; white-space:nowrap;width: 130px;padding:5px;}");			
+				cnt1.append("th {border:1px solid silver;background-color: #E5E9EA;height:45px; text-align: left; white-space:nowrap;width: 130px;padding:5px;}");			
 				cnt1.append(".none{border:0px;width:680px;}");			
 				cnt1.append("td {border:1px solid silver;padding:5px;}");
 				cnt1.append(".cnt{width:550px;}");
@@ -175,15 +177,11 @@ public class ClaimManageServiceImpl implements ClaimManageService {
 				if(procType.equals("DELETE"))
 					cnt1.append("<tr><td class='none' colspan='2' align='left'> - "+d1+"</td></tr>");
 				else
-					cnt1.append("<tr><td class='none' colspan='2' align='left'> - "+p2+"</td></tr>");
+					cnt1.append("<tr><td class='none' colspan='2' align='left'> - "+p4+"</td></tr>");
 				cnt1.append("<tr><td class='none' colspan='2' align='left' style='height:30px;'>&nbsp;</td></tr>");
-				cnt1.append("<tr><td class='none' colspan='2' align='left'><b>b. "+p3+"</b></td></tr>");
-				
-				if(procType.equals("DELETE"))
-					cnt1.append("<tr><td class='none' colspan='2' align='center' style='background-color:#A12725;color:#FFFFFF;font-weight:bold;font-size:25px;padding:12px;'>CLAIM REPORT</td></tr>");
-				else
-					cnt1.append("<tr><td class='none' colspan='2' align='center' style='background-color:#415262;color:#FFFFFF;font-weight:bold;font-size:25px;padding:12px;'>CLAIM REPORT</td></tr>");
-				
+				cnt1.append("<tr><td class='none' colspan='2' align='left'><b>b. "+p3+"</b></td></tr>");				
+				cnt1.append("<tr><td class='none' colspan='2' align='center' style='background-color:#415262;color:#FFFFFF;font-weight:bold;font-size:25px;padding:0px;'>");
+				cnt1.append("<img src='http://210.216.217.226:8181/Hanaro/resources/images/cR.png'/></td></tr>");				
 				cnt1.append("<tr><td class='none' colspan='2' align='right' style='font-size:13px;padding:8px;'>"+dataMap.get("DATA13")+"</td></tr>");
 				cnt1.append("<tr><th>FROM</th><td class='cnt'>"+claimNo.split("-")[0]+"</td></tr>");
 				cnt1.append("<tr><th>TO</th><td class='cnt'>"+dataMap.get("DATA6")+"</td></tr>");				
@@ -191,7 +189,7 @@ public class ClaimManageServiceImpl implements ClaimManageService {
 				cnt1.append("<tr><th>PART NAME</th><td class='cnt'>"+dataMap.get("DATA12")+"</td></tr>");
 				cnt1.append("<tr><th>PROGRESSING</th><td class='cnt'>"+dataMap.get("DATA22")+"</td></tr>");
 				cnt1.append("<tr><th style='height:200px;'>CAUSE BY</th><td class='cnt'>"+content+"</td></tr>");
-				cnt1.append("<tr><th style='height:160px;'>CLAIM 보상</th><td class='cnt'>"+claimAdd+"</td></tr>");
+				cnt1.append("<tr><th>CLAIM 보상</th><td class='cnt'>"+claimAdd+"</td></tr>");
 				cnt1.append("</table></body></html>");				
 				
 				if(count0>0){
