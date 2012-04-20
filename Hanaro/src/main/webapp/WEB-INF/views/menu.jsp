@@ -71,7 +71,7 @@
 	<div style="white-space: nowrap;"><fmt:message key="menu.qualityClaimManage"/>      	
 	<div style="width:150px;">
 			<div href='<c:url value="/qualityDivision/claimManage/claimManage"/>' ><fmt:message key="menu.qualityClaimManage"/></div>
-			<div ><fmt:message key="menu.qualityClaimSearch"/></div>			
+			<div href='<c:url value="/qualityDivision/claimManage/claimStatus"/>' ><fmt:message key="menu.qualityClaimStatus"/></div>			
 	</div>
 	</div>	
 </div>

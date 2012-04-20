@@ -56,6 +56,15 @@
 <div region="center" style="padding:15px;">
 <table>
 	<tr>
+		<td colspan="6" style="text-align:left;background-color:#FBF3AF;">
+			<span style="font-weight:bold;">
+				<c:if test="${claimInfo[0].DATA47=='AGREE'}">
+					<font color="blue"><fmt:message key="info.commitClaim"/></font>
+				</c:if>
+			</span>
+		</td>		
+	</tr>
+	<tr>
 		<th colspan="2" rowspan="2" class="${claimInfo[0].DATA1}" style="width:300px;text-align:center;">
 			<span style="font-weight:bold;font-size: 2.3em;">${claimInfo[0].DATA23}</span>
 		</th>
@@ -339,7 +348,7 @@
 		</td>
 		<th style="width:140px;">&nbsp;</th>
 		<th><span  class="label-Leader-black" ><fmt:message key='ui.label.totalCLaim'/></span></th>
-		<td><input type="text" value="${claimInfo[0].DATA50}" name="claim" readonly/></td>		
+		<td><input type="text" style="color:red;" value="${claimInfo[0].DATA50}" name="claim" readonly/></td>		
 	</tr>						
 </table>
 <br>

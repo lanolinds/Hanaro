@@ -24,5 +24,6 @@ public interface ClaimManageService {
 	public List<Map<String,Object>> getClaimAgreeInfo(String claimNo);	
 	public void prodClaimAgree(String procType,String claimNo,String state,String content,String rate,String claim,String user,Locale locale);
 	public List<Map<String,Object>> getClaimAgreeMail(String claimNo);
+	public List<Map<String,Object>> getClaimStatusMain(Locale locale, String selLocale, String tab, String dateType, String stdYy,String stdDt, String endYy,String endDt);
 
 }

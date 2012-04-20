@@ -166,6 +166,31 @@ public class ClaimManageDAO {
 		return list;		
 	}
 	
+	public List<Map<String,Object>> getClaimStatusMain(Locale locale, String selLocale, String tab, String dateType, String stdYy,String stdDt, String endYy,String endDt){
+		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		SqlParameterSource params = new MapSqlParameterSource()
+		.addValue("locale",locale.getCountry())
+		.addValue("selLocale",selLocale)
+		.addValue("tab",tab)
+		.addValue("dateType",dateType)
+		.addValue("stdYy",stdYy).addValue("stdDt",stdDt).addValue("endYy",endYy).addValue("endDt",endDt);
+		
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("ClaimManageDAO_getClaimStatusMain").returningResultSet("claimStatusList",new RowMapper<Map<String,Object>>() {
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int idx)
+					throws SQLException {
+				Map<String,Object> m = new LinkedHashMap<String,Object>();
+				for(int i=0;i<rs.getMetaData().getColumnCount();i++)
+					m.put("DATA"+i,rs.getObject((i+1)));
+				list.add(m);
+				return null;
+			}
+		});
+		sp.execute(params);
+		return list;
+		
+	}
+	
 	
 
 }

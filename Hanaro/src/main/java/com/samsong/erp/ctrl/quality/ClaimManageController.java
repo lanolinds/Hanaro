@@ -117,6 +117,16 @@ public class ClaimManageController {
 		return prefix+"/claimAgree";
 	}
 	
+	
+	@RequestMapping(value="/claimStatus",method=RequestMethod.GET)
+	public String menuClaimStatus(LocalDate date,Model model){
+		int[] years = new int[10];
+		for(int x=0;x<10;x++)
+			years[x] = date.getYear()-x;
+		model.addAttribute("years",years);
+		return prefix+"/claimStatus";
+	}	
+	
 	@RequestMapping(value="/codeCustOptionLongCallbak", method=RequestMethod.POST)
 	public @ResponseBody List<Map<String,Object>> codeCustOptionCallbak(Authentication auth ,@RequestParam(value="searchType") String searchType,@RequestParam(value="q",required=false) String q){
 		HanaroUser user = (HanaroUser)auth.getPrincipal();
@@ -330,6 +340,20 @@ public class ClaimManageController {
 			Authentication auth){
 		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		service.prodClaimAgree(procType,claimNo, stateIng, analyCon, claimRate, claim, user.getUsername(),user.getLocale());
+	}
+	
+	@RequestMapping(value="/getClaimStatusMain",method=RequestMethod.GET)
+	public @ResponseBody List<Map<String,Object>> getClaimStatusMain(@RequestParam("selLocale")String selLocale,
+			@RequestParam("tab")String tab,
+			@RequestParam("dateType")String dateType,
+			@RequestParam("stdYy")String stdYy,
+			@RequestParam("stdDt")String stdDt,
+			@RequestParam("endYy")String endYy,
+			@RequestParam("endDt")String endDt,
+			Authentication auth){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		return service.getClaimStatusMain(user.getLocale(), selLocale, tab, dateType, stdYy, stdDt, endYy, endDt);
+		
 	}
 	
     
