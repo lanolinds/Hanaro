@@ -90,7 +90,7 @@
 	
 	//내용을 조회한다.
 	function searchList(){
-		checkedSearch=true;
+		checkedSearch=true;	
 		var queryParam = {};
 		queryParam.searchType = $("input[name='selectTerm']:checked").val();		
 		var year1 =""; 

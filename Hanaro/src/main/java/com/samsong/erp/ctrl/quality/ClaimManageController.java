@@ -119,11 +119,15 @@ public class ClaimManageController {
 	
 	
 	@RequestMapping(value="/claimStatus",method=RequestMethod.GET)
-	public String menuClaimStatus(LocalDate date,Model model){
+	public String menuClaimStatus(LocalDate date,Model model,Authentication auth){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		int[] years = new int[10];
 		for(int x=0;x<10;x++)
 			years[x] = date.getYear()-x;
 		model.addAttribute("years",years);
+		List<Map<String,Object>> listClaimType = service.getClaimCode("CLAIMTYPE", user.getLocale());
+		model.addAttribute("claimType",listClaimType);		
+		model.addAttribute("cLocale",user.getLocale().getCountry());
 		return prefix+"/claimStatus";
 	}	
 	
@@ -343,7 +347,8 @@ public class ClaimManageController {
 	}
 	
 	@RequestMapping(value="/getClaimStatusMain",method=RequestMethod.GET)
-	public @ResponseBody List<Map<String,Object>> getClaimStatusMain(@RequestParam("selLocale")String selLocale,
+	public @ResponseBody List<Map<String,Object>> getClaimStatusMain(
+			@RequestParam("selLocale")String selLocale,
 			@RequestParam("tab")String tab,
 			@RequestParam("dateType")String dateType,
 			@RequestParam("stdYy")String stdYy,
@@ -353,8 +358,38 @@ public class ClaimManageController {
 			Authentication auth){
 		HanaroUser user = (HanaroUser)auth.getPrincipal();
 		return service.getClaimStatusMain(user.getLocale(), selLocale, tab, dateType, stdYy, stdDt, endYy, endDt);
-		
 	}
+	@RequestMapping(value="/getClaimStatusMain",method=RequestMethod.POST)
+	public @ResponseBody Map<String,Object> getClaimStatusMainPost(
+			@RequestParam(value="selLocale",required=false)String selLocale,
+			@RequestParam(value="tab",required=false)String tab,
+			@RequestParam(value="dateType",required=false)String dateType,
+			@RequestParam(value="stdYy",required=false)String stdYy,
+			@RequestParam(value="stdDt",required=false)String stdDt,
+			@RequestParam(value="endYy",required=false)String endYy,
+			@RequestParam(value="endDt",required=false)String endDt,
+			Authentication auth,			
+			@RequestParam(value="sort",required=false) String sortKey,
+			@RequestParam(value="order",required=false) String order				
+			){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		Map<String,Object> table = new LinkedHashMap<String,Object>();
+		List<Map<String,Object>> resultList =  service.getClaimStatusMain(user.getLocale(), selLocale, tab, dateType, stdYy, stdDt, endYy, endDt);
+		
+		
+		if(resultList!=null){			
+			if(sortKey!=null){
+				Collections.sort(resultList,new HashMapComparator(sortKey, order.equalsIgnoreCase("asc")));
+			}			
+			table.put("total",resultList.size());
+			table.put("rows",resultList);
+		}else{
+			table.put("total",0);
+		}
+		return table;		
+	}	
+	
+	
 	
     
 	

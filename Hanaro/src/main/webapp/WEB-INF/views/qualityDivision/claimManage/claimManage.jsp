@@ -39,7 +39,7 @@
 	//발생품번선택 자동완성(All: 모든품번, 1001 : 완성품, 1002 : 부품)
 	function workPartListCallbak(codeString,nameString,carString,partType,divName){
 	    $("#"+codeString).combogrid({
-	    	panelWidth:583,
+	    	panelWidth:583,	    	
 	        url : '../qualityIssue/codePartListForIssueRegCallbak?partType='+partType,
 	        columns:[[  
 	                  {field:'partNo',title:'<fmt:message key="ui.label.PartNo"/>',width:100},  
