@@ -188,8 +188,32 @@ public class ClaimManageDAO {
 		});
 		sp.execute(params);
 		return list;
-		
 	}
+	
+	public List<Map<String,Object>> getClaimStatusSub(Locale locale, String selLocale,String dateType, String stdYy,String stdDt, String endYy,String endDt,String q1,String q2,String q3,String q4){
+		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		SqlParameterSource params = new MapSqlParameterSource()
+		.addValue("locale",locale.getCountry())
+		.addValue("selLocale",selLocale)		
+		.addValue("dateType",dateType)		
+		.addValue("stdYy",stdYy).addValue("stdDt",stdDt).addValue("endYy",endYy).addValue("endDt",endDt)
+		.addValue("query1",q1).addValue("query2",q2).addValue("query3",q3).addValue("query4",q4);
+		
+		sp = new SimpleJdbcCall(jdbc).withProcedureName("ClaimManageDAO_getClaimStatusSub").returningResultSet("claimStatusSubList",new RowMapper<Map<String,Object>>() {
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int idx)
+					throws SQLException {
+				Map<String,Object> m = new LinkedHashMap<String,Object>();
+				for(int i=0;i<rs.getMetaData().getColumnCount();i++)
+					m.put("DATA"+i,rs.getObject((i+1)));
+				list.add(m);
+				return null;
+			}
+		});
+		sp.execute(params);
+		return list;		
+	}
+	
 	
 	
 

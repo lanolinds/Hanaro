@@ -18,6 +18,11 @@
 			.cnStyle{background-color:#FDF7F6;}			
 			.inStyle{background-color:#F6FCFD;}
 			.czStyle{background-color:#FDF6FC;}
+			.hover1{background-color: #FFFFFF;cursor:pointer;}
+			.hover11{background-color: #FFFFFF;}
+			.hover2{background-color: #FFFFFF;cursor:pointer;}
+			.hover3{background-color: #FFFFFF;cursor:pointer;}
+			.hover4{background-color: #FFFFFF;cursor:pointer;}
 	</style>
 		
 	<script type="text/javascript" src='<c:url value="/resources/scripts/jquery/jquery.latest.js"/>'></script>
@@ -32,6 +37,23 @@
 	var countryCZ = '<fmt:message key="country.czech"/>';
 	
 	var checkLocale = "";
+	
+	
+	function popDialog(selLocale,dateType,y1,d1,y2,d2,q1,q2,q3,q4){
+		var params = {};
+		params.selLocale = selLocale;
+		params.dateType = dateType;
+		params.stdYy = y1;
+		params.stdDt = d1;
+		params.endYy = y2;
+		params.endDt = d2;
+		params.q1 = q1;
+		params.q2 = q2;
+		params.q3 = q3;
+		params.q4 = q4;
+		$("#dialogTotalList").datagrid("load",params);
+		$("#dialogTotalListPanel").dialog({modal:true});
+	}
 
 	
 	function searchList(selectedTab){
@@ -80,11 +102,11 @@
 						chartCountCN[0] += Number(cell.DATA3);
 						chartCountCN[1] += Number(cell.DATA5);
 						chartCountCN[2] += Number(cell.DATA8);
-						tableCN+="<tr><td rowspan='2'>"+cell.DATA10+"</td>";
+						tableCN+="<tr class='hover1' onmouseover='javascript:hover1(this);' onclick=\"javascript:popDialog('"+cell.DATA0+"','"+cell.DATA11+"','"+cell.DATA12+"','"+cell.DATA13+"','"+cell.DATA14+"','"+cell.DATA15+"','"+cell.DATA1+"','','','');\"><td rowspan='2'>"+cell.DATA10+"</td>";
 						tableCN+="<td><fmt:message key='ui.label.ea'/></td>";
 						tableCN+="<td style='text-align:right;'>"+numeric(cell.DATA3)+"</td>";
 						tableCN+="<td style='text-align:right;'>"+numeric(cell.DATA5)+"</td>";
-						tableCN+="<td style='text-align:right;'>"+numeric(cell.DATA8)+"</td></tr><tr>";
+						tableCN+="<td style='text-align:right;'>"+numeric(cell.DATA8)+"</td></tr><tr class='hover11'>";
 						tableCN+="<td><fmt:message key='ui.label.money'/></td>";
 						tableCN+="<td style='text-align:right;'>"+numeric(cell.DATA2)+"</td>";
 						tableCN+="<td style='text-align:right;'>"+numeric(cell.DATA4)+"</td>";
@@ -96,11 +118,11 @@
 						chartCountIN[0] += Number(cell.DATA3);
 						chartCountIN[1] += Number(cell.DATA5);
 						chartCountIN[2] += Number(cell.DATA8);	
-						tableIN+="<tr><td rowspan='2'>"+cell.DATA10+"</td>";
+						tableIN+="<tr class='hover1' onmouseover='javascript:hover1(this);' onclick=\"javascript:popDialog('"+cell.DATA0+"','"+cell.DATA11+"','"+cell.DATA12+"','"+cell.DATA13+"','"+cell.DATA14+"','"+cell.DATA15+"','"+cell.DATA1+"','','','');\"><td rowspan='2'>"+cell.DATA10+"</td>";
 						tableIN+="<td><fmt:message key='ui.label.ea'/></td>";
 						tableIN+="<td style='text-align:right;'>"+numeric(cell.DATA3)+"</td>";
 						tableIN+="<td style='text-align:right;'>"+numeric(cell.DATA5)+"</td>";
-						tableIN+="<td style='text-align:right;'>"+numeric(cell.DATA8)+"</td></tr><tr>";
+						tableIN+="<td style='text-align:right;'>"+numeric(cell.DATA8)+"</td></tr><tr class='hover11'>";
 						tableIN+="<td><fmt:message key='ui.label.money'/></td>";
 						tableIN+="<td style='text-align:right;'>"+numeric(cell.DATA2)+"</td>";
 						tableIN+="<td style='text-align:right;'>"+numeric(cell.DATA4)+"</td>";
@@ -112,11 +134,11 @@
 						chartCountCZ[0] += Number(cell.DATA3);
 						chartCountCZ[1] += Number(cell.DATA5);
 						chartCountCZ[2] += Number(cell.DATA8);
-						tableCZ+="<tr><td rowspan='2'>"+cell.DATA10+"</td>";
+						tableCZ+="<tr class='hover1' onmouseover='javascript:hover1(this);' onclick=\"javascript:popDialog('"+cell.DATA0+"','"+cell.DATA11+"','"+cell.DATA12+"','"+cell.DATA13+"','"+cell.DATA14+"','"+cell.DATA15+"','"+cell.DATA1+"','','','');\"><td rowspan='2'>"+cell.DATA10+"</td>";
 						tableCZ+="<td><fmt:message key='ui.label.ea'/></td>";
 						tableCZ+="<td style='text-align:right;'>"+numeric(cell.DATA3)+"</td>";
 						tableCZ+="<td style='text-align:right;'>"+numeric(cell.DATA5)+"</td>";
-						tableCZ+="<td style='text-align:right;'>"+numeric(cell.DATA8)+"</td></tr><tr>";
+						tableCZ+="<td style='text-align:right;'>"+numeric(cell.DATA8)+"</td></tr><tr class='hover11'>";
 						tableCZ+="<td><fmt:message key='ui.label.money'/></td>";
 						tableCZ+="<td style='text-align:right;'>"+numeric(cell.DATA2)+"</td>";
 						tableCZ+="<td style='text-align:right;'>"+numeric(cell.DATA4)+"</td>";
@@ -192,36 +214,36 @@
 					}
 				});
 				
-				tableCN+="<tr><td><fmt:message key='ui.label.ea'/></td>";
-				tableCN+="<td style='text-align:right;'>"+numeric(chartCountCN[0])+"</td>";
-				tableCN+="<td style='text-align:right;'>"+numeric(chartCountCN[1])+"</td>";
-				tableCN+="<td style='text-align:right;'>"+numeric(chartCountCN[2])+"</td>";
-				tableCN+="<td style='text-align:right;'>"+numeric(chartCountCN[3])+"</td></tr>";
-				tableCN+="<tr><td><fmt:message key='ui.label.money'/></td>";
-				tableCN+="<td style='text-align:right;'>"+numeric(chartMoneyCN[0])+"</td>";
-				tableCN+="<td style='text-align:right;'>"+numeric(chartMoneyCN[1])+"</td>";
-				tableCN+="<td style='text-align:right;'>"+numeric(chartMoneyCN[2])+"</td>";
-				tableCN+="<td style='text-align:right;'>"+numeric(chartMoneyCN[3])+"</td></tr>";
-				tableIN+="<tr><td><fmt:message key='ui.label.ea'/></td>";
-				tableIN+="<td style='text-align:right;'>"+numeric(chartCountIN[0])+"</td>";
-				tableIN+="<td style='text-align:right;'>"+numeric(chartCountIN[1])+"</td>";
-				tableIN+="<td style='text-align:right;'>"+numeric(chartCountIN[2])+"</td>";
-				tableIN+="<td style='text-align:right;'>"+numeric(chartCountIN[3])+"</td></tr>";
-				tableIN+="<tr><td><fmt:message key='ui.label.money'/></td>";
-				tableIN+="<td style='text-align:right;'>"+numeric(chartMoneyIN[0])+"</td>";
-				tableIN+="<td style='text-align:right;'>"+numeric(chartMoneyIN[1])+"</td>";
-				tableIN+="<td style='text-align:right;'>"+numeric(chartMoneyIN[2])+"</td>";
-				tableIN+="<td style='text-align:right;'>"+numeric(chartMoneyIN[3])+"</td></tr>";
-				tableCZ+="<tr><td><fmt:message key='ui.label.ea'/></td>";
-				tableCZ+="<td style='text-align:right;'>"+numeric(chartCountCZ[0])+"</td>";
-				tableCZ+="<td style='text-align:right;'>"+numeric(chartCountCZ[1])+"</td>";
-				tableCZ+="<td style='text-align:right;'>"+numeric(chartCountCZ[2])+"</td>";
-				tableCZ+="<td style='text-align:right;'>"+numeric(chartCountCZ[3])+"</td></tr>";
-				tableCZ+="<tr><td><fmt:message key='ui.label.money'/></td>";
-				tableCZ+="<td style='text-align:right;'>"+numeric(chartMoneyCZ[0])+"</td>";
-				tableCZ+="<td style='text-align:right;'>"+numeric(chartMoneyCZ[1])+"</td>";
-				tableCZ+="<td style='text-align:right;'>"+numeric(chartMoneyCZ[2])+"</td>";
-				tableCZ+="<td style='text-align:right;'>"+numeric(chartMoneyCZ[3])+"</td></tr>";					
+				tableCN+="<tr class='hover2' ><td><fmt:message key='ui.label.ea'/></td>";
+				tableCN+="<td style='text-align:right;'  onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('CN','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','LS','','');\">"+numeric(chartCountCN[0])+"</td>";
+				tableCN+="<td style='text-align:right;' onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('CN','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','RW','','');\">"+numeric(chartCountCN[1])+"</td>";
+				tableCN+="<td style='text-align:right;' onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('CN','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','SW','','');\">"+numeric(chartCountCN[2])+"</td>";
+				tableCN+="<td style='text-align:right;' onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('CN','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','EX','','');\">"+numeric(chartCountCN[3])+"</td></tr>";
+				tableCN+="<tr class='hover2'><td><fmt:message key='ui.label.money'/></td>";
+				tableCN+="<td style='text-align:right;' onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('CN','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','LS','','');\">"+numeric(chartMoneyCN[0])+"</td>";
+				tableCN+="<td style='text-align:right;' onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('CN','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','RW','','');\">"+numeric(chartMoneyCN[1])+"</td>";
+				tableCN+="<td style='text-align:right;' onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('CN','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','SW','','');\">"+numeric(chartMoneyCN[2])+"</td>";
+				tableCN+="<td style='text-align:right;' onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('CN','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','EX','','');\">"+numeric(chartMoneyCN[3])+"</td></tr>";
+				tableIN+="<tr class='hover2'><td><fmt:message key='ui.label.ea'/></td>";
+				tableIN+="<td style='text-align:right;' onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('IN','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','LS','','');\">"+numeric(chartCountIN[0])+"</td>";
+				tableIN+="<td style='text-align:right;' onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('IN','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','RW','','');\">"+numeric(chartCountIN[1])+"</td>";
+				tableIN+="<td style='text-align:right;' onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('IN','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','SW','','');\">"+numeric(chartCountIN[2])+"</td>";
+				tableIN+="<td style='text-align:right;' onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('IN','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','EX','','');\">"+numeric(chartCountIN[3])+"</td></tr>";
+				tableIN+="<tr class='hover2'><td><fmt:message key='ui.label.money'/></td>";
+				tableIN+="<td style='text-align:right;' onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('IN','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','LS','','');\">"+numeric(chartMoneyIN[0])+"</td>";
+				tableIN+="<td style='text-align:right;' onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('IN','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','RW','','');\">"+numeric(chartMoneyIN[1])+"</td>";
+				tableIN+="<td style='text-align:right;' onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('IN','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','SW','','');\">"+numeric(chartMoneyIN[2])+"</td>";
+				tableIN+="<td style='text-align:right;' onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('IN','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','EX','','');\">"+numeric(chartMoneyIN[3])+"</td></tr>";
+				tableCZ+="<tr class='hover2'><td><fmt:message key='ui.label.ea'/></td>";
+				tableCZ+="<td style='text-align:right;' onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('CZ','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','LS','','');\">"+numeric(chartCountCZ[0])+"</td>";
+				tableCZ+="<td style='text-align:right;' onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('CZ','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','RW','','');\">"+numeric(chartCountCZ[1])+"</td>";
+				tableCZ+="<td style='text-align:right;' onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('CZ','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','SW','','');\">"+numeric(chartCountCZ[2])+"</td>";
+				tableCZ+="<td style='text-align:right;' onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('CZ','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','EX','','');\">"+numeric(chartCountCZ[3])+"</td></tr>";
+				tableCZ+="<tr class='hover2'><td><fmt:message key='ui.label.money'/></td>";
+				tableCZ+="<td style='text-align:right;' onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('CZ','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','LS','','');\">"+numeric(chartMoneyCZ[0])+"</td>";
+				tableCZ+="<td style='text-align:right;' onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('CZ','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','RW','','');\">"+numeric(chartMoneyCZ[1])+"</td>";
+				tableCZ+="<td style='text-align:right;' onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('CZ','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','SW','','');\">"+numeric(chartMoneyCZ[2])+"</td>";
+				tableCZ+="<td style='text-align:right;' onmouseover='javascript:hover2(this);' onclick=\"javascript:popDialog('CZ','"+dateType+"','"+year1+"','"+date1+"','"+year2+"','"+date2+"','','EX','','');\">"+numeric(chartMoneyCZ[3])+"</td></tr>";					
 				
 				
 
@@ -274,7 +296,7 @@
 						countTotalCN[2] += Number(cell.DATA8);
 						chartMoneyCN.push(Number(cell.DATA7));
 						chartCountCN.push(Number(cell.DATA8));
-						tableCN+="<tr><td>"+cell.DATA10+"</td>";
+						tableCN+="<tr class='hover3' onmouseover='javascript:hover3(this);'  onclick=\"javascript:popDialog('"+cell.DATA0+"','"+cell.DATA11+"','"+cell.DATA12+"','"+cell.DATA13+"','"+cell.DATA14+"','"+cell.DATA15+"','','','"+cell.DATA1+"','');\"><td>"+cell.DATA10+"</td>";
 						tableCN+="<td>"+numeric(cell.DATA8)+"</td>";
 						tableCN+="<td>"+numeric(cell.DATA7)+"</td></tr>";
 					}else if("IN"==cell.DATA0){
@@ -284,7 +306,7 @@
 						countTotalIN[2] += Number(cell.DATA8);							
 						chartMoneyIN.push(Number(cell.DATA7));
 						chartCountIN.push(Number(cell.DATA8));
-						tableIN+="<tr><td>"+cell.DATA10+"</td>";
+						tableIN+="<tr class='hover3' onmouseover='javascript:hover3(this);'   onclick=\"javascript:popDialog('"+cell.DATA0+"','"+cell.DATA11+"','"+cell.DATA12+"','"+cell.DATA13+"','"+cell.DATA14+"','"+cell.DATA15+"','','','"+cell.DATA1+"','');\"><td>"+cell.DATA10+"</td>";
 						tableIN+="<td>"+numeric(cell.DATA8)+"</td>";
 						tableIN+="<td>"+numeric(cell.DATA7)+"</td></tr>";						
 					}else if("CZ"==cell.DATA0){
@@ -294,7 +316,7 @@
 						countTotalCZ[2] += Number(cell.DATA8);
 						chartMoneyCZ.push(Number(cell.DATA7));
 						chartCountCZ.push(Number(cell.DATA8));		
-						tableCZ+="<tr><td>"+cell.DATA10+"</td>";
+						tableCZ+="<tr class='hover3' onmouseover='javascript:hover3(this);'   onclick=\"javascript:popDialog('"+cell.DATA0+"','"+cell.DATA11+"','"+cell.DATA12+"','"+cell.DATA13+"','"+cell.DATA14+"','"+cell.DATA15+"','','','"+cell.DATA1+"','');\"><td>"+cell.DATA10+"</td>";
 						tableCZ+="<td>"+numeric(cell.DATA8)+"</td>";
 						tableCZ+="<td>"+numeric(cell.DATA7)+"</td></tr>";						
 					}
@@ -345,7 +367,7 @@
 						countTotalCN[2] += Number(cell.DATA8);
 						chartMoneyCN.push(Number(cell.DATA7));
 						chartCountCN.push(Number(cell.DATA8));
-						tableCN+="<tr><td>"+cell.DATA1+"</td>";
+						tableCN+="<tr class='hover4' onmouseover='javascript:hover4(this);'   onclick=\"javascript:popDialog('"+cell.DATA0+"','"+cell.DATA10+"','"+cell.DATA11+"','"+cell.DATA12+"','"+cell.DATA13+"','"+cell.DATA14+"','','','','"+cell.DATA1+"');\"><td>"+cell.DATA1+"</td>";
 						tableCN+="<td>"+numeric(cell.DATA8)+"</td>";
 						tableCN+="<td>"+numeric(cell.DATA7)+"</td></tr>";
 					}else if("IN"==cell.DATA0){
@@ -355,7 +377,7 @@
 						countTotalIN[2] += Number(cell.DATA8);							
 						chartMoneyIN.push(Number(cell.DATA7));
 						chartCountIN.push(Number(cell.DATA8));
-						tableIN+="<tr><td>"+cell.DATA1+"</td>";
+						tableIN+="<tr class='hover4' onmouseover='javascript:hover4(this);'  onclick=\"javascript:popDialog('"+cell.DATA0+"','"+cell.DATA10+"','"+cell.DATA11+"','"+cell.DATA12+"','"+cell.DATA13+"','"+cell.DATA14+"','','','','"+cell.DATA1+"');\"><td>"+cell.DATA1+"</td>";
 						tableIN+="<td>"+numeric(cell.DATA8)+"</td>";
 						tableIN+="<td>"+numeric(cell.DATA7)+"</td></tr>";						
 					}else if("CZ"==cell.DATA0){
@@ -365,7 +387,7 @@
 						countTotalCZ[2] += Number(cell.DATA8);
 						chartMoneyCZ.push(Number(cell.DATA7));
 						chartCountCZ.push(Number(cell.DATA8));		
-						tableCZ+="<tr><td>"+cell.DATA1+"</td>";
+						tableCZ+="<tr class='hover4' onmouseover='javascript:hover4(this);'  onclick=\"javascript:popDialog('"+cell.DATA0+"','"+cell.DATA10+"','"+cell.DATA11+"','"+cell.DATA12+"','"+cell.DATA13+"','"+cell.DATA14+"','','','','"+cell.DATA1+"');\"><td>"+cell.DATA1+"</td>";
 						tableCZ+="<td>"+numeric(cell.DATA8)+"</td>";
 						tableCZ+="<td>"+numeric(cell.DATA7)+"</td></tr>";						
 					}
@@ -624,6 +646,40 @@
 			return "background-color:#FCE5FC;";
 	}
 	
+	function agreeClick(rowIndex, rowData){
+		var claimNo = rowData.DATA0;
+        var win = window.open("claimAgree?claimNo="+claimNo,"AgreeDetail","width=930,height=680,location=no,menubar=no,resizable=no,scrollbars=no,status=no,toolbar=no");
+        win.focus();
+	}
+	
+	function hover1(ob){
+		$(".hover1").css("background-color","#FFFFFF");
+		$(".hover11").css("background-color","#FFFFFF");
+		$("td:eq(0)",$(".hover1")).css("text-decoration","none").css("color","black");
+		$(ob).css("background-color","#C4DCFD");		
+		$(ob).next().css("background-color","#C4DCFD");
+		$("td:eq(0)",$(ob)).css("text-decoration","underline").css("color","blue");
+	}
+	
+	function hover2(ob){
+		$(".hover2 td").css("background-color","#FFFFFF");
+		var idx =$('td',$(ob).parent()).index($(ob));
+		var $table = $(ob).parent().parent();
+		$("td:eq("+idx+")",$("tr:eq(0)",$table)).css("background-color","#C4DCFD");
+		$("td:eq("+idx+")",$("tr:eq(1)",$table)).css("background-color","#C4DCFD");
+	}
+	function hover3(ob){
+		$(".hover3").css("background-color","#FFFFFF");
+		$(ob).css("background-color","#C4DCFD");
+	}
+	
+	function hover4(ob){
+		$(".hover4").css("background-color","#FFFFFF");
+		$(ob).css("background-color","#C4DCFD");
+	}		
+	
+	
+	
 		$(document).ready(function(){
 			$("#datebox1").datebox(
 				{
@@ -645,7 +701,7 @@
 				{
 					width:100,
 					onSelect:function(date){
-						{
+				 		{
 							var year = date.getYear();
 							var mon = date.getMonth();
 							var day = date.getDate();
@@ -658,12 +714,16 @@
 				}
 			);			
 			$("#tabsong").tabs({onSelect:fnSelectTab});		
-			$("#totalList").datagrid();
+			$("#totalList").datagrid({onDblClickRow:agreeClick});
+			$("#dialogTotalList").datagrid({onDblClickRow:agreeClick});
+			
+			
+			
 		});
 	</script>
 </head>
 
-<body class="easyui-layout" style="min-width: 1024px;">
+<body class="easyui-layout" style="min-width: 1024px;" >
 <div region="north" title='<fmt:message key="system.title"/>'  border="false" 
 	iconCls="icon-draw-ring" style="height:80px; background-color:#fafafa; overflow: hidden;">
 <%@ include file="/WEB-INF/views/menu.jsp" %>
@@ -1031,9 +1091,9 @@
 	    		</tr>	    			    		
 	    	</table>  
 	    </div>        
-	    <div title="<fmt:message key='ui.chart.list'/>" iconCls="icon-application-view-list"  style="padding:20px;">  
-	     <table title="<fmt:message key='ui.label.actionList'/>" id="totalList" fit="true"  idField="DATA0" singleSelect="true" url="getClaimStatusMain" pagination="false" pageSize="100000000"
-	     	rowStyler = "rowStyAgree"   >			
+	    <div title="<fmt:message key='ui.chart.list'/>" iconCls="icon-application-view-list"  style="padding:0px;">  
+	     <table id="totalList" fit="true"  idField="DATA0" singleSelect="true" url="getClaimStatusMain" pagination="false" pageSize="100000000"
+	     	rowStyler = "rowStyAgree"  toolbar="#tabBox" >			
 			<thead>
 				<tr>
 					<th field="DATA0" hidden="true"></th>
@@ -1053,10 +1113,46 @@
 		            <th field="DATA14" width="90" sortable="true" align="right" formmater="numeric"><fmt:message key="ui.label.claimReward"/></th>
 				</tr>	
 			</thead>
+		 </table>
 	    </div>  	  	    
-	</div>  
+	</div> 
 </div>
 </div>
+<div id="dialogTotalListPanel" style="width:1150px;height:400px;"  title="<fmt:message key="ui.label.detailStatus"/>" iconCls="icon-script-error" >
+  <table id="dialogTotalList"  fit="true"  idField="DATA0" singleSelect="true" url="getClaimStatusSub" pagination="false" pageSize="100000000"
+     	rowStyler = "rowStyAgree"  toolbar="#tabBox2" >			
+		<thead>
+			<tr>
+				<th field="DATA0" hidden="true"></th>
+				<th field="DATA1" width="80" sortable="true"  align="center"><fmt:message key="ui.label.OccurDate"/></th>
+				<th field="DATA2" hidden="true"></th>										
+				<th field="DATA3" width="90" sortable="true"  align="center" styler="claimCate"><fmt:message key="ui.label.cagegory"/></th>
+	            <th field="DATA4" width="110" sortable="true" align="center">INVOICE NO</th>
+	            <th field="DATA5" width="120" sortable="true" align="left"><fmt:message key="ui.label.qualityIssue.reasonPartNo" /></th>
+	            <th field="DATA6" width="200" sortable="true" align="left"><fmt:message key="ui.label.qualityIssue.reasonPartName" /></th>
+	            <th field="DATA7" width="90" sortable="true" align="center">LOT NO</th>
+	            <th field="DATA8" width="90" sortable="true" align="center"><fmt:message key="ui.label.refTeam" /></th>
+	            <th field="DATA9" width="200" sortable="true" align="left"><fmt:message key="ui.label.qualityIssue.reasonOrgan" /></th>
+	            <th field="DATA10" width="120" sortable="true" align="left"><fmt:message key="ui.label.claimContent" /></th>
+	            <th field="DATA11" width="80" sortable="true" align="right" formmater="numeric"> <fmt:message key="chartYName.issueAmount" /></th>
+	            <th field="DATA12" width="80" sortable="true" align="right" formmater="numeric"><fmt:message key="ui.label.claimCost" /></th>
+	            <th field="DATA13" hidden="true"></th>
+	            <th field="DATA14" width="90" sortable="true" align="right" formmater="numeric"><fmt:message key="ui.label.claimReward"/></th>
+			</tr>	
+		</thead>
+	 </table>
+</div>
+<div id="tabBox" style="padding:10px;text-align:right;">
+   	<span style="background-color:#E7FAFD;padding:3px 7px;border:1px solid #B5B5B5;">${actState[0].name}</span>
+   	<span style="background-color:#FCE5FC;padding:3px 7px;border:1px solid #B5B5B5;">${actState[2].name}</span>
+   	<span style="background-color:#FFFFFF;padding:3px 7px;border:1px solid #B5B5B5;">${actState[1].name}</span>  
+</div>
+<div id="tabBox2" style="padding:10px;text-align:right;">
+   	<span style="background-color:#E7FAFD;padding:3px 7px;border:1px solid #B5B5B5;">${actState[0].name}</span>
+   	<span style="background-color:#FCE5FC;padding:3px 7px;border:1px solid #B5B5B5;">${actState[2].name}</span>
+   	<span style="background-color:#FFFFFF;padding:3px 7px;border:1px solid #B5B5B5;">${actState[1].name}</span>  
+</div>
+
 </body>
 
 </html>

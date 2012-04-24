@@ -238,6 +238,17 @@ public class ClaimManageServiceImpl implements ClaimManageService {
 		return dao.getClaimStatusMain(locale, selLocale, tab, dateType, stdYy, stdDt, endYy, endDt);
 	}
 
+
+
+
+	@Override
+	public List<Map<String, Object>> getClaimStatusSub(Locale locale,
+			String selLocale, String dateType, String stdYy, String stdDt,
+			String endYy, String endDt, String q1, String q2, String q3,
+			String q4) {
+		return dao.getClaimStatusSub(locale, selLocale, dateType, stdYy, stdDt, endYy, endDt, q1, q2, q3, q4);
+	}
+
 	
 
 

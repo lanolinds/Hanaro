@@ -128,6 +128,8 @@ public class ClaimManageController {
 		List<Map<String,Object>> listClaimType = service.getClaimCode("CLAIMTYPE", user.getLocale());
 		model.addAttribute("claimType",listClaimType);		
 		model.addAttribute("cLocale",user.getLocale().getCountry());
+		List<Map<String,Object>> actState = service.getClaimCode("AGREESTATE",user.getLocale());
+		model.addAttribute("actState",actState);		
 		return prefix+"/claimStatus";
 	}	
 	
@@ -389,6 +391,37 @@ public class ClaimManageController {
 		return table;		
 	}	
 	
+	@RequestMapping(value="/getClaimStatusSub",method=RequestMethod.POST)
+	public @ResponseBody Map<String,Object> getClaimStatusSubPost(
+			@RequestParam(value="selLocale",required=false)String selLocale,			
+			@RequestParam(value="dateType",required=false)String dateType,
+			@RequestParam(value="stdYy",required=false)String stdYy,
+			@RequestParam(value="stdDt",required=false)String stdDt,
+			@RequestParam(value="endYy",required=false)String endYy,
+			@RequestParam(value="endDt",required=false)String endDt,
+			@RequestParam(value="q1",required=false)String q1,
+			@RequestParam(value="q2",required=false)String q2,
+			@RequestParam(value="q3",required=false)String q3,
+			@RequestParam(value="q4",required=false)String q4,
+			Authentication auth,			
+			@RequestParam(value="sort",required=false) String sortKey,
+			@RequestParam(value="order",required=false) String order				
+			){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		Map<String,Object> table = new LinkedHashMap<String,Object>();
+		List<Map<String,Object>> resultList =  service.getClaimStatusSub(user.getLocale(), selLocale, dateType, stdYy, stdDt, endYy, endDt, q1, q2, q3, q4);
+				
+		if(resultList!=null){			
+			if(sortKey!=null){
+				Collections.sort(resultList,new HashMapComparator(sortKey, order.equalsIgnoreCase("asc")));
+			}			
+			table.put("total",resultList.size());
+			table.put("rows",resultList);
+		}else{
+			table.put("total",0);
+		}
+		return table;		
+	}		
 	
 	
     
