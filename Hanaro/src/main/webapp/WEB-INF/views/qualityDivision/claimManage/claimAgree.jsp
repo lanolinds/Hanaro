@@ -61,6 +61,9 @@
 				<c:if test="${claimInfo[0].DATA47=='AGREE'}">
 					<font color="blue"><fmt:message key="info.commitClaim"/></font>
 				</c:if>
+				<c:if test="${claimInfo[0].DATA47=='WAIT'}">
+					<font color="blue"><fmt:message key="info.waitClaim"/></font>
+				</c:if>				
 			</span>
 		</td>		
 	</tr>
@@ -356,7 +359,9 @@
 <c:if test="${cLocale=='KR'}">
 <div style="width:870px;text-align:center;">
 	<a  href="#" class="easyui-linkbutton" iconCls="icon-disk" onclick="javascript:agree();"><fmt:message key="ui.button.Save"/></a>
+	<c:if test="${claimInfo[0].DATA47=='AGREE' || claimInfo[0].DATA47=='WAIT' }">
 	<a  href="#" class="easyui-linkbutton" iconCls="icon-arrow-redo" onclick="javascript:agreeCancel();"><fmt:message key="ui.label.cancelAction"/></a>
+	</c:if>
 	<a  href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:self.close();"><fmt:message key="ui.button.Cancel"/></a>
 </div>
 </c:if>
