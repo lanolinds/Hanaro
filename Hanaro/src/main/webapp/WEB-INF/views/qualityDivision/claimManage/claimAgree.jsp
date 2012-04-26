@@ -358,11 +358,13 @@
 <br>
 <c:if test="${cLocale=='KR'}">
 <div style="width:870px;text-align:center;">
+	<c:if test="${own=='own'}">
 	<a  href="#" class="easyui-linkbutton" iconCls="icon-disk" onclick="javascript:agree();"><fmt:message key="ui.button.Save"/></a>
 	<c:if test="${claimInfo[0].DATA47=='AGREE' || claimInfo[0].DATA47=='WAIT' }">
 	<a  href="#" class="easyui-linkbutton" iconCls="icon-arrow-redo" onclick="javascript:agreeCancel();"><fmt:message key="ui.label.cancelAction"/></a>
 	</c:if>
-	<a  href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:self.close();"><fmt:message key="ui.button.Cancel"/></a>
+	</c:if>
+	<a  href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:self.close();"><fmt:message key="ui.button.close"/></a>
 </div>
 </c:if>
 </form>

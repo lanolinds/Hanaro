@@ -648,7 +648,7 @@
 	
 	function agreeClick(rowIndex, rowData){
 		var claimNo = rowData.DATA0;
-        var win = window.open("claimAgree?claimNo="+claimNo,"AgreeDetail","width=930,height=680,location=no,menubar=no,resizable=no,scrollbars=no,status=no,toolbar=no");
+        var win = window.open("claimAgree?own=no&claimNo="+claimNo,"AgreeDetail","width=930,height=680,location=no,menubar=no,resizable=no,scrollbars=no,status=no,toolbar=no");
         win.focus();
 	}
 	

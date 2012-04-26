@@ -109,11 +109,12 @@ public class ClaimManageController {
 	
 	
 	@RequestMapping(value="/claimAgree",method=RequestMethod.GET)
-	public String menuClaimAgree(@RequestParam(value="claimNo") String claimNo,Model model,Authentication auth){
+	public String menuClaimAgree(@RequestParam(value="claimNo") String claimNo,Model model,Authentication auth, @RequestParam(value="own",required=false)String own){
 		HanaroUser user =  (HanaroUser)auth.getPrincipal();
 		List<Map<String,Object>> listInfo = service.getClaimAgreeInfo(claimNo);
 		model.addAttribute("cLocale",user.getLocale().getCountry());
 		model.addAttribute("claimInfo",listInfo);
+		model.addAttribute("own",own);
 		return prefix+"/claimAgree";
 	}
 	
