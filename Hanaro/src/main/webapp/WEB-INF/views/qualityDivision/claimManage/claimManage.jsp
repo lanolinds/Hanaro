@@ -829,7 +829,7 @@
 									<tr>
 										<th><span  class="label-Leader-blue" ><fmt:message key='ui.label.workerCount'/></span></th>
 										<td><input id="workerCountLS" name="workerCount"  min="0" max="100" required="true"   value="0"  onchange="javascript:calClaim('LS');" /></td>
-										<th><span  class="label-Leader-black" ><fmt:message key='ui.label.claimCost'/></span></th>
+										<th><span  class="label-Leader-black" >CLAIM</span></th>
 										<td>
 											<input name="claimCost" type="text" readonly value="0" />
 											<input name="cost" type="hidden" value="0"  onchange="javascript:calClaim('LS');" />
@@ -951,7 +951,7 @@
 									<tr>
 										<th class="RW"><span  class="label-Leader-black" ><fmt:message key='ui.label.workerCount'/></span></th>
 										<td class="RW" ><input id="workerCountRW" name="workerCount" class="easyui-validatebox"   value="0" readonly/></td>
-										<th><span  class="label-Leader-black" ><fmt:message key='ui.label.claimCost'/></span></th>
+										<th><span  class="label-Leader-black" >CLAIM</span></th>
 										<td>
 											<input name="claimCost" type="text" readonly value="0" />
 											<input name="cost" type="hidden" value="0"  onchange="javascript:calClaim('RW');" />
@@ -1074,7 +1074,7 @@
 									<tr>
 										<th class="SW"><span  class="label-Leader-black" ><fmt:message key='ui.label.workerCount'/></span></th>
 										<td class="SW" ><input id="workerCountSW" name="workerCount" class="easyui-validatebox"   value="0" readonly/></td>
-										<th><span  class="label-Leader-black" ><fmt:message key='ui.label.claimCost'/></span></th>
+										<th><span  class="label-Leader-black" >CLAIM</span></th>
 										<td>
 											<input name="claimCost" type="text" readonly value="0" />
 											<input name="cost" type="hidden" value="0"  onchange="javascript:calClaim('SW');" />
@@ -1204,7 +1204,7 @@
 									<tr>
 										<th><span  class="label-Leader-blue" ><fmt:message key='ui.label.workerCount'/></span></th>
 										<td><input id="workerCountEX" name="workerCount"  min="0" max="100" required="true"   value="0" onchange="javascript:calClaim('EX');"   /></td>
-										<th><span  class="label-Leader-black" ><fmt:message key='ui.label.claimCost'/></span></th>
+										<th><span  class="label-Leader-black" >CLAIM</span></th>
 										<td>
 											<input name="claimCost" type="text" readonly value="0" />
 											<input name="cost" type="hidden" value="0"   onchange="javascript:calClaim('EX');"/>

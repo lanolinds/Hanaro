@@ -326,7 +326,7 @@
 		<th><span  class="label-Leader-black" ><fmt:message key='ui.label.qualityIssue.reasonPartName'/></span></th>
 		<td style="width:300px;">${claimInfo[0].DATA10}&nbsp;</td>
 		<th style="width:140px;">&nbsp;</th>
-		<th><span  class="label-Leader-black" ><fmt:message key='ui.label.claimCost'/></span></th>
+		<th><span  class="label-Leader-black" >CLAIM</span></th>
 		<td id="claimR">${claimInfo[0].DATA4}&nbsp;</td>
 	</tr>
 	<tr>
@@ -350,7 +350,7 @@
 		</select>
 		</td>
 		<th style="width:140px;">&nbsp;</th>
-		<th><span  class="label-Leader-black" ><fmt:message key='ui.label.totalCLaim'/></span></th>
+		<th><span  class="label-Leader-black" >CLAIM</span></th>
 		<td><input type="text" style="color:red;" value="${claimInfo[0].DATA50}" name="claim" readonly/></td>		
 	</tr>						
 </table>

@@ -504,7 +504,7 @@
 					}
 				},	
 				title: {
-					text: '<fmt:message key="ui.label.claimCost" />',
+					text: 'CLAIM',
 					style: {
 						color: '#011F8C'
 					}
@@ -532,7 +532,7 @@
 				backgroundColor: '#FFFFFF'
 			},
 			series: [{
-				name: '<fmt:message key="ui.label.claimCost" />',
+				name: 'CLAIM',
 				color: '#011F8C',
 				type: 'column',
 				yAxis: 1,
@@ -586,7 +586,7 @@
 					}
 				},	
 				title: {
-					text: '<fmt:message key="ui.label.claimCost" />',
+					text: 'CLAIM',
 					style: {
 						color: '#011F8C'
 					}
@@ -614,7 +614,7 @@
 				backgroundColor: '#FFFFFF'
 			},
 			series: [{
-				name: '<fmt:message key="ui.label.claimCost" />',
+				name: 'CLAIM',
 				color: '#011F8C',
 				type: 'bar',
 				yAxis: 1,
@@ -949,7 +949,7 @@
 	    						<tr>				
 		    						<th style="width:200px;height:25px;"><fmt:message key="ui.label.qualityIssue.reasonOrgan"/></th>	    						
 		    						<th style="width:70px;"><fmt:message key="ui.chart.agreeCount" /></th>	    						
-		    						<th style="width:100px;"><fmt:message key="ui.label.claimCost" /></th>
+		    						<th style="width:100px;">CLAIM</th>
 	    						</tr>
 	    					</thead>
 	    					<tbody></tbody>
@@ -975,7 +975,7 @@
 	    						<tr>
 		    						<th style="width:200px;height:25px;"><fmt:message key="ui.label.qualityIssue.reasonOrgan"/></th>	    						
 		    						<th style="width:70px;"><fmt:message key="ui.chart.agreeCount" /></th>	    						
-		    						<th style="width:100px;"><fmt:message key="ui.label.claimCost" /></th>
+		    						<th style="width:100px;">CLAIM</th>
 	    						</tr>
 	    					</thead>
 	    					<tbody></tbody>
@@ -1001,7 +1001,7 @@
 	    						<tr>
 		    						<th style="width:200px;height:25px;"><fmt:message key="ui.label.qualityIssue.reasonOrgan"/></th>	    						
 		    						<th style="width:70px;"><fmt:message key="ui.chart.agreeCount" /></th>	    						
-		    						<th style="width:100px;"><fmt:message key="ui.label.claimCost" /></th>
+		    						<th style="width:100px;">CLAIM</th>
 	    						</tr>	    						
 	    					</thead>
 	    					<tbody></tbody>	    				
@@ -1030,7 +1030,7 @@
 	    						<tr>				
 		    						<th style="width:60px;height:25px;"><fmt:message key="ui.label.datetime"/></th>	    						
 		    						<th style="width:60px;"><fmt:message key="ui.chart.agreeCount" /></th>	    						
-		    						<th style="width:100px;"><fmt:message key="ui.label.claimCost" /></th>
+		    						<th style="width:100px;">CLAIM</th>
 	    						</tr>
 	    					</thead>
 	    					<tbody></tbody>
@@ -1056,7 +1056,7 @@
 	    						<tr>
 		    						<th style="width:60px;height:25px;"><fmt:message key="ui.label.datetime"/></th>	    						
 		    						<th style="width:60px;"><fmt:message key="ui.chart.agreeCount" /></th>	    						
-		    						<th style="width:100px;"><fmt:message key="ui.label.claimCost" /></th>
+		    						<th style="width:100px;">CLAIM</th>
 	    						</tr>
 	    					</thead>
 	    					<tbody></tbody>
@@ -1082,7 +1082,7 @@
 	    						<tr>
 		    						<th style="width:60px;height:25px;"><fmt:message key="ui.label.datetime"/></th>	    						
 		    						<th style="width:60px;"><fmt:message key="ui.chart.agreeCount" /></th>	    						
-		    						<th style="width:100px;"><fmt:message key="ui.label.claimCost" /></th>
+		    						<th style="width:100px;">CLAIM</th>
 	    						</tr>	    						
 	    					</thead>
 	    					<tbody></tbody>	    				
@@ -1108,7 +1108,7 @@
 		            <th field="DATA9" width="200" sortable="true" align="left"><fmt:message key="ui.label.qualityIssue.reasonOrgan" /></th>
 		            <th field="DATA10" width="120" sortable="true" align="left"><fmt:message key="ui.label.claimContent" /></th>
 		            <th field="DATA11" width="80" sortable="true" align="right" formmater="numeric"> <fmt:message key="chartYName.issueAmount" /></th>
-		            <th field="DATA12" width="80" sortable="true" align="right" formmater="numeric"><fmt:message key="ui.label.claimCost" /></th>
+		            <th field="DATA12" width="80" sortable="true" align="right" formmater="numeric">CLAIM</th>
 		            <th field="DATA13" hidden="true"></th>
 		            <th field="DATA14" width="90" sortable="true" align="right" formmater="numeric"><fmt:message key="ui.label.claimReward"/></th>
 				</tr>	
@@ -1135,7 +1135,7 @@
 	            <th field="DATA9" width="200" sortable="true" align="left"><fmt:message key="ui.label.qualityIssue.reasonOrgan" /></th>
 	            <th field="DATA10" width="120" sortable="true" align="left"><fmt:message key="ui.label.claimContent" /></th>
 	            <th field="DATA11" width="80" sortable="true" align="right" formmater="numeric"> <fmt:message key="chartYName.issueAmount" /></th>
-	            <th field="DATA12" width="80" sortable="true" align="right" formmater="numeric"><fmt:message key="ui.label.claimCost" /></th>
+	            <th field="DATA12" width="80" sortable="true" align="right" formmater="numeric">CLAIM</th>
 	            <th field="DATA13" hidden="true"></th>
 	            <th field="DATA14" width="90" sortable="true" align="right" formmater="numeric"><fmt:message key="ui.label.claimReward"/></th>
 			</tr>	

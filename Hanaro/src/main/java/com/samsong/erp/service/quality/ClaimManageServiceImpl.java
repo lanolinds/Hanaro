@@ -124,6 +124,7 @@ public class ClaimManageServiceImpl implements ClaimManageService {
 			if((!((Map<String,Object>)mailData.get(0)).get("DATA24").toString().equals("AGREE") && state.equals("AGREE")) || (procType.equals("DELETE") && ((Map<String,Object>)mailData.get(0)).get("DATA24").toString().equals("AGREE"))){
 				
 				Map<String,Object> dataMap = (Map<String,Object>)mailData.get(0);
+				/*
 				String claimAdd = "";
 				float cost = Float.parseFloat(dataMap.get("DATA9").toString());
 				float totalClaim = Float.parseFloat(claim);
@@ -131,7 +132,7 @@ public class ClaimManageServiceImpl implements ClaimManageService {
 					claimAdd = claim;
 				else
 					claimAdd = String.valueOf((totalClaim/cost));
-				
+				*/
 				
 				StringBuilder cnt0 = new StringBuilder();
 				StringBuilder cnt1 = new StringBuilder();
@@ -163,7 +164,7 @@ public class ClaimManageServiceImpl implements ClaimManageService {
 				cnt0.append("<tr><th>PART NAME</th><td class='cnt'>"+dataMap.get("DATA12")+"</td></tr>");
 				cnt0.append("<tr><th>PROGRESSING</th><td class='cnt'>"+dataMap.get("DATA22")+"</td></tr>");
 				cnt0.append("<tr><th style='height:200px;'>CAUSE BY</th><td class='cnt'>"+content+"</td></tr>");
-				cnt0.append("<tr><th>CLAIM 보상</th><td class='cnt'>"+claimAdd+"</td></tr>");
+				cnt0.append("<tr><th>CLAIM 보상</th><td class='cnt'>"+claim+"</td></tr>");
 				cnt0.append("</table></body></html>");
 				
 				cnt1.append("<html><head><style type='text/css'>");
@@ -189,7 +190,7 @@ public class ClaimManageServiceImpl implements ClaimManageService {
 				cnt1.append("<tr><th>PART NAME</th><td class='cnt'>"+dataMap.get("DATA12")+"</td></tr>");
 				cnt1.append("<tr><th>PROGRESSING</th><td class='cnt'>"+dataMap.get("DATA22")+"</td></tr>");
 				cnt1.append("<tr><th style='height:200px;'>CAUSE BY</th><td class='cnt'>"+content+"</td></tr>");
-				cnt1.append("<tr><th>CLAIM 보상</th><td class='cnt'>"+claimAdd+"</td></tr>");
+				cnt1.append("<tr><th>CLAIM 보상</th><td class='cnt'>"+claim+"</td></tr>");
 				cnt1.append("</table></body></html>");				
 				
 				if(count0>0){
