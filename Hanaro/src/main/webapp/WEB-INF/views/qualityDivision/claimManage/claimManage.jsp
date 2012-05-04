@@ -25,7 +25,6 @@
 		#divEX{display:none;}
 		.valt{color:blue;}
 		.valtRED{color:red;}
-		
 	</style>
 		
 	<script type="text/javascript" src='<c:url value="/resources/scripts/jquery/jquery.latest.js"/>'></script>
@@ -34,6 +33,10 @@
 	<script type="text/javascript" src='<c:url value="/resources/scripts/common-utils.js"/>'></script>
 	<script type="text/javascript">
 	var cDivision = "";
+	var checktab1 = false;
+	var checktab2 = true;
+	var checktab3 = true;
+	var checktab4 = true;
 
 	
 	//발생품번선택 자동완성(All: 모든품번, 1001 : 완성품, 1002 : 부품)
@@ -300,7 +303,12 @@
 		var cDiv = $("input[name='claimType']:checked").val();		
 		if($("form[name='form"+cDiv+"']").form("validate")){			
 			$("input[name='prodType']",$("#div"+cDiv)).val(prodType);
-			
+			if(prodType=="INSERT"){
+				if($.trim($("input[name='file1']",$("#div"+cDiv)).val())==""){
+					alert("<fmt:message key='info.notNullFile1'/>");
+					return;
+				}
+			}
 			checkPop(cDiv);
 			//$("body").css("cursor","wait");
 			//$("form[name='form"+cDiv+"']").submit();
@@ -656,42 +664,53 @@
 		$(document).ready(function(){
 			
 			//입력하지 않는 항목을 음영처리한다.
-			$("input",$(".label-Leader-black").parent().next()).css("background-color","#F1F0F0");		
+			$("input",$(".label-Leader-black").parent().next()).css("background-color","#F1F0F0");
+			
+			$("input[name='claimType']").change(function(){
+				var tabTitle = $("input[name='claimType']:checked").val();
+				if(tabTitle=="LS" && checktab1){
+					checktab1 = false;
+					
+				}else if(tabTitle=="RW"  && checktab2){
+					checktab2 = false;
+					workPartListCallbak("rPartCodeRW","rPartName","carType","1002","RW");
+					workPartListCallbak("p2RW","p3","","1001","RW");
+					workCustListCallbak("issueCustName","issueCust","RW");
+					$("#failAmountRW").numberspinner({onSpinUp:spinClaimRW,onSpinDown:spinClaimRW});
+					$("#p7RW").numberspinner({onSpinUp:spinClaimRW,onSpinDown:spinClaimRW});
+				}else if(tabTitle=="SW"  && checktab3){
+					checktab3 = false;
+					workPartListCallbak("rPartCodeSW","rPartName","carType","1002","SW");
+					workPartListCallbak("p5SW","p6","","1001","SW");
+					workCustListCallbak("issueCustName","issueCust","SW");
+					$("#failAmountSW").numberspinner({onSpinUp:spinClaimSW,onSpinDown:spinClaimSW});
+										
+				}else if(tabTitle=="EX"  && checktab4){
+					checktab4 = false;
+					workPartListCallbak("rPartCodeEX","rPartName","carType","1002","EX");
+					workCustListCallbak("issueCustName","issueCust","EX");
+
+					$("#workerCountEX").numberspinner({onSpinUp:spinClaimEX,onSpinDown:spinClaimEX});
+					$("#failAmountEX").numberspinner({onSpinUp:spinClaimEX,onSpinDown:spinClaimEX});
+				}
+			});
 			
 			$("input[name='p4']",$("#divLS")).timespinner({value:"00:00",required:true,showSeconds:false,onSpinUp:fnSelectedLS,onSpinDown:fnSelectedLS});
 			$("input[name='p5']",$("#divLS")).timespinner({value:"00:00",required:true,showSeconds:false,onSpinUp:fnSelectedLS,onSpinDown:fnSelectedLS});
 			$("input[name='p6']",$("#divLS")).timespinner({value:"00:00",required:true,showSeconds:false,onSpinUp:fnSelectedLS,onSpinDown:fnSelectedLS});
 			$("input[name='p7']",$("#divLS")).timespinner({value:"00:00",required:true,showSeconds:false,onSpinUp:fnSelectedLS,onSpinDown:fnSelectedLS});
+			$("input[name='p2']",$("#divEX")).timespinner({value:"00:00",required:true,showSeconds:false,onSpinUp:fnSelectedEX,onSpinDown:fnSelectedEX});
+			$("input[name='p3']",$("#divEX")).timespinner({value:"00:00",required:true,showSeconds:false,onSpinUp:fnSelectedEX,onSpinDown:fnSelectedEX});
+			$("input[name='p4']",$("#divEX")).timespinner({value:"00:00",required:true,showSeconds:false,onSpinUp:fnSelectedEX,onSpinDown:fnSelectedEX});
+			$("input[name='p5']",$("#divEX")).timespinner({value:"00:00",required:true,showSeconds:false,onSpinUp:fnSelectedEX,onSpinDown:fnSelectedEX});			
 			
 			workPartListCallbak("rPartCodeLS","rPartName","carType","1002","LS");
 			workPartListCallbak("p2LS","p3","","1001","LS");
 			workCustListCallbak("issueCustName","issueCust","LS");
 			
-			workPartListCallbak("rPartCodeRW","rPartName","carType","1002","RW");
-			workPartListCallbak("p2RW","p3","","1001","RW");
-			workCustListCallbak("issueCustName","issueCust","RW");
-			
-			workPartListCallbak("rPartCodeSW","rPartName","carType","1002","SW");
-			workPartListCallbak("p5SW","p6","","1001","SW");
-			workCustListCallbak("issueCustName","issueCust","SW");
-			
-			workPartListCallbak("rPartCodeEX","rPartName","carType","1002","EX");
-			workCustListCallbak("issueCustName","issueCust","EX");
-			
-			$("input[name='p2']",$("#divEX")).timespinner({value:"00:00",required:true,showSeconds:false,onSpinUp:fnSelectedEX,onSpinDown:fnSelectedEX});
-			$("input[name='p3']",$("#divEX")).timespinner({value:"00:00",required:true,showSeconds:false,onSpinUp:fnSelectedEX,onSpinDown:fnSelectedEX});
-			$("input[name='p4']",$("#divEX")).timespinner({value:"00:00",required:true,showSeconds:false,onSpinUp:fnSelectedEX,onSpinDown:fnSelectedEX});
-			$("input[name='p5']",$("#divEX")).timespinner({value:"00:00",required:true,showSeconds:false,onSpinUp:fnSelectedEX,onSpinDown:fnSelectedEX});
-			
-			$("#workerCountLS").numberspinner({onSpinUp:spinClaimLS,onSpinDown:spinClaimLS});
-			$("#workerCountEX").numberspinner({onSpinUp:spinClaimEX,onSpinDown:spinClaimEX});
+			$("#workerCountLS").numberspinner({onSpinUp:spinClaimLS,onSpinDown:spinClaimLS});			
 			$("#failAmountLS").numberspinner({onSpinUp:spinClaimLS,onSpinDown:spinClaimLS});
-			$("#failAmountEX").numberspinner({onSpinUp:spinClaimEX,onSpinDown:spinClaimEX});
-			$("#failAmountRW").numberspinner({onSpinUp:spinClaimRW,onSpinDown:spinClaimRW});
-			$("#failAmountSW").numberspinner({onSpinUp:spinClaimSW,onSpinDown:spinClaimSW});
 			
-			$("#p7RW").numberspinner({onSpinUp:spinClaimRW,onSpinDown:spinClaimRW});
-
 			$("#ebomPart").datagrid({onClickRow:ebomPartClick});
 			$("#ebomPartDetail").datagrid({onDblClickRow:ebomPartDetailClick});			
 			$("#listReg").datagrid({onClickRow:listRegClick});
