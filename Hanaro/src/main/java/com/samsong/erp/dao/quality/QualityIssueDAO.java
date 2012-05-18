@@ -159,7 +159,7 @@ public class QualityIssueDAO {
 						m.put("placeCode", rs.getString(4));
 						m.put("item", rs.getString(5));
 						m.put("count", rs.getInt(6));
-						m.put("remark", rs.getString(7));
+						m.put("comment", rs.getString(7));
 						return m;
 					}
 				});
