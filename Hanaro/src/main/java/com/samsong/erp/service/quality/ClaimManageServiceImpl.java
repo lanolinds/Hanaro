@@ -88,8 +88,10 @@ public class ClaimManageServiceImpl implements ClaimManageService {
 		List<Map<String,Object>> mailInfo = dao.getClaimAgreeMail(claimNo);
 		JavaMailSenderImpl sender = new JavaMailSenderImpl();
 		sender.setHost("mail.samsong.co.kr");
+		sender.setUsername("hanaro");
+		sender.setPassword("hanaro");
 		sender.setDefaultEncoding("UTF-8");
-	
+		
 		
 		if(mailInfo !=null && mailInfo.size()>0){
 			int count0 = 0;
@@ -198,7 +200,7 @@ public class ClaimManageServiceImpl implements ClaimManageService {
 						MimeMessage messageCn = sender.createMimeMessage();						
 						MimeMessageHelper helper = new MimeMessageHelper(messageCn);						
 						helper.setTo(mailTo0);					
-						helper.setFrom("hanaro@samsong.co.kr");
+						helper.setFrom("hanaro@samsong.com");
 						helper.setSubject("Hanaro System Claim ["+claimNo+"]");
 						helper.setText(cnt0.toString(),true);
 						sender.send(messageCn);
@@ -211,7 +213,7 @@ public class ClaimManageServiceImpl implements ClaimManageService {
 						MimeMessage messageCn = sender.createMimeMessage();						
 						MimeMessageHelper helper = new MimeMessageHelper(messageCn);
 						helper.setTo(mailTo1);					
-						helper.setFrom("hanaro@samsong.co.kr");
+						helper.setFrom("hanaro@samsong.com");
 						helper.setSubject("Hanaro System Claim ["+claimNo+"]");
 						helper.setText(cnt1.toString(),true);
 						sender.send(messageCn);

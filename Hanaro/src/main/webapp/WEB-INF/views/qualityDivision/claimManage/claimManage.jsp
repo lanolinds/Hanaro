@@ -50,7 +50,8 @@
 	                  {field:'car',title:'<fmt:message key="ui.label.Car"/>',width:60},  
 	                  {field:'model',title:'<fmt:message key="ui.label.Model"/>',width:60},
 	                  {field:'price',title:'<fmt:message key="ui.label.unitPrice"/>',width:60},
-	                  {field:'custCode',title:'<fmt:message key="ui.label.cust.custCd"/>',width:60}
+	                  {field:'custCode',title:'<fmt:message key="ui.label.cust.custCd"/>',width:60},
+	                  {field:'localPart',title:'CKD/LOCAL',hidden:true}
 	              ]],
 	        idField:'partNo',  
 	        textField:'partNo',
@@ -58,6 +59,7 @@
 	        onSelect:function(rowIndex, rowData){
 	        	$("input[name='"+nameString+"']",$("#div"+divName)).val(rowData.partName);	        	
 	        	if(carString!=""){
+	        		$("input[name='locaType1']",$("#div"+divName)).val(rowData.localPart);
 	        		$("input[name='"+carString+"']",$("#div"+divName)).val(rowData.car);
 	        		$("input[name='cost']",$("#div"+divName)).val(rowData.price).trigger("change");
 	        		$("#issueCustName"+divName).combogrid("setValue",rowData.custCode);
@@ -72,6 +74,7 @@
 	        			}	
 	        		}
 	        	}else{
+	        		$("input[name='locaType2']",$("#div"+divName)).val(rowData.localPart);
 	        		$("input[name='prodCost']",$("#div"+divName)).val(rowData.price).trigger("change");
 	        	}
 	        }
@@ -488,7 +491,21 @@
 	}	
 	
 	
-	function calClaim(dtype){		
+	function calClaim(dtype){
+		
+		if($("input[name='locaType1']",$("#div"+dtype)).val()=="LOCAL"){
+			var localCost = 0;
+			var prodCost =0;
+			if(dtype=="RW" || dtype=="SW")
+				localCost = Number($("#workerCount"+dtype).numberspinner("getValue"))*Number($("input[name='issueTime']",$("#div"+dtype)).val())*Number(12/60);
+			else if(dtype=="LS")
+				localCost = Number($("input[name='issueTime']",$("#div"+dtype)).val())*Number(Number($("input[name='prodCost']",$("#div"+dtype)).val())-Number($("input[name='cost']",$("#div"+dtype)).val()));
+			else
+				localCost = 0;
+			$("input[name='claimCost']",$("#div"+dtype)).val(Number(localCost).toFixed(0));
+		
+			return;
+		}	
 		var totalClaim = 0;
 		var model = $("select[name='machineType']",$("#div"+dtype)).val();
 		
@@ -573,7 +590,29 @@
 	}
 	
 	
-	function checkPop(cDiv){
+	function checkPop(cDiv){		
+		if($("input[name='locaType1']",$("#div"+cDiv)).val()=="LOCAL"){
+			if(cDiv=="RW" || cDiv=="SW"){
+				$("#cRSWP_1").empty().append($("#workerCount"+cDiv).numberspinner("getValue"));
+				$("#cRSWP_2").empty().append($("input[name='issueTime']",$("#div"+cDiv)).val());
+				$("#cRSWP_3").empty().append(12/60);
+				$("#cRSWP_4").empty().append($("input[name='claimCost']",$("#div"+cDiv)).val());
+				$("#checkRSWP2").dialog({modal:true});
+			}else if(cDiv=="LS"){				
+				$("#cLSWP_1").empty().append("1");
+				$("#cLSWP_2").empty().append($("input[name='issueTime']",$("#div"+cDiv)).val());
+				$("#cLSWP_3").empty().append($("input[name='prodCost']",$("#div"+cDiv)).val());
+				$("#cLSWP_4").empty().append($("input[name='cost']",$("#div"+cDiv)).val());
+				$("#cLSWP_5").empty().append($("input[name='claimCost']",$("#div"+cDiv)).val());
+				$("#checkLSWP2").dialog({modal:true});
+			}else{
+				localCost = 0;
+			}
+					
+			return;
+		}	
+		
+		
 		var cbm = 0;
 		switch("${cLocale}"){
 			case 'IN': cbm = 0.135; break;
@@ -765,6 +804,8 @@
 											<input name="claimNo" type="text" class="auto" value="${autoCreate}" readonly />
 											<input name="classType" value="LS" type="hidden"/>
 											<input name="prodType" value="INSERT"  type="hidden"/>
+											<input name="locaType1" value=""  type="hidden" />
+											<input name="locaType2" value=""  type="hidden" />
 										</td>
 										<th><span  class="label-Leader-blue" >INVOICE NO</span></th>
 										<td><input name="invoiceNo" type="text" class="easyui-validatebox" value="" required="true" /></td>
@@ -785,6 +826,7 @@
 										<th class="LS"><span  class="label-Leader-blue" ><fmt:message key='ui.label.productPartNo'/></span></th>
 										<td class="LS">																		
 											<input id="p2LS" name="p2" style="width:130px;" required="true" />
+											<input name="prodCost" type = "hidden" value="0"  onchange="javascript:calClaim('LS');"/>
 										</td>										
 																									
 									</tr>
@@ -881,6 +923,8 @@
 											<input name="claimNo" type="text" class="auto" value="${autoCreate}" readonly />
 											<input name="classType" value="RW"  type="hidden"/>
 											<input name="prodType" value="INSERT"  type="hidden"/>
+											<input name="locaType1" value=""  type="hidden"/>
+											<input name="locaType2" value=""  type="hidden"/>											
 										</td>
 										<th><span  class="label-Leader-blue" >INVOICE NO</span></th>
 										<td><input name="invoiceNo" type="text" class="easyui-validatebox" value="" required="true" /></td>
@@ -1012,6 +1056,8 @@
 											<input name="claimNo" type="text" class="auto" value="${autoCreate}" readonly />
 											<input name="classType" value="SW"  type="hidden"/>
 											<input name="prodType" value="INSERT"  type="hidden"/>
+											<input name="locaType1" value=""  type="hidden"/>
+											<input name="locaType2" value=""  type="hidden"/>											
 										</td>
 										<th><span  class="label-Leader-blue" >INVOICE NO</span></th>
 										<td><input name="invoiceNo" type="text" class="easyui-validatebox" value="" required="true" /></td>
@@ -1142,6 +1188,8 @@
 											<input name="claimNo" type="text" class="auto" value="${autoCreate}" readonly />
 											<input name="classType" value="EX"  type="hidden"/>
 											<input name="prodType" value="INSERT"  type="hidden"/>
+											<input name="locaType1" value=""  type="hidden"/>
+											<input name="locaType2" value=""  type="hidden"/>											
 										</td>
 										<th><span  class="label-Leader-blue" >INVOICE NO</span></th>
 										<td><input name="invoiceNo" type="text" class="easyui-validatebox" value="" required="true" /></td>
@@ -1695,8 +1743,61 @@
 	 	</table>
  	</p>
  	<a  href="#" class="easyui-linkbutton" iconCls="icon-accept" onclick="javascript:subForm();" ><fmt:message key="ui.button.apply"/></a>
- </div>   
+ </div>
  
+ 
+ 
+  <div title="<fmt:message key='ui.label.checkClaim'/>" id="checkRSWP2" style="padding:20px;">
+ 	<p style="background-color:#E2F0FE;">
+ 		<b>[<fmt:message key="ui.label.calBasic"/>]</b><br>
+ 		(<fmt:message key="ui.label.workerCount"/> x <fmt:message key="ui.label.needWorkTime"/>) x (CNY 12 /h)
+ 	</p>
+ 	<p>
+	 	<table>
+	 		<tr>
+	 			<th colspan="7" align="left">[<fmt:message key="ui.label.claimCost"/>]</th>
+	 		</tr>
+	 		<tr>	 				 			
+	 			<td id="cRSWP_1" class="valt"></td>
+	 			<td class="valt"> x <td>
+	 			<td id="cRSWP_2" class="valt"></td>	 			
+	 			<td class="valt"> x <td>
+	 			<td id="cRSWP_3" class="valt"></td>
+	 			<td class="valt"> = <td>
+	 			<th id="cRSWP_4" class="valtRED"></th>
+	 		</tr>			 		 		 		
+	 	</table>
+ 	</p>
+ 	<a  href="#" class="easyui-linkbutton" iconCls="icon-accept" onclick="javascript:subForm();" ><fmt:message key="ui.button.apply"/></a>
+ </div>      
+ 
+ 
+  <div title="<fmt:message key='ui.label.checkClaim'/>" id="checkLSWP2" style="padding:20px;">
+ 	<p style="background-color:#E2F0FE;">
+ 		<b>[<fmt:message key="ui.label.calBasic"/>]</b><br>
+ 		(UPH/h) * <fmt:message key="ui.label.needWorkTime"/> * (<fmt:message key="ui.label.workerCount"/> - <fmt:message key="ui.label.needWorkTime"/>)
+ 	</p>
+ 	<p>
+	 	<table>
+	 		<tr>
+	 			<th colspan="9" align="left">[<fmt:message key="ui.label.claimCost"/>]</th>
+	 		</tr>
+	 		<tr>	 				 			
+	 			<td id="cLSWP_1" class="valt"></td>
+	 			<td class="valt"> x <td>
+	 			<td id="cLSWP_2" class="valt"></td>	 			
+	 			<td class="valt"> x (<td>	 			
+	 			<td id="cLSWP_3" class="valt"></td>	 			
+	 			<td class="valt"> - <td>
+	 			<td id="cLSWP_4" class="valt"></td>
+	 			<td class="valt">) = <td>
+	 			<th id="cLSWP_5" class="valtRED"></th>
+	 		</tr>			 		 		 		
+	 	</table>
+ 	</p>
+ 	<a  href="#" class="easyui-linkbutton" iconCls="icon-accept" onclick="javascript:subForm();" ><fmt:message key="ui.button.apply"/></a>
+ </div>      
+  
  
  
 

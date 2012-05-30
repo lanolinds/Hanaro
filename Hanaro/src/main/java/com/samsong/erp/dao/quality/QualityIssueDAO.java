@@ -84,6 +84,7 @@ public class QualityIssueDAO {
 						cell.put("model", rs.getString(4));
 						cell.put("price", rs.getString(5));
 						cell.put("custCode", rs.getString(6));
+						cell.put("localPart", rs.getString(7));
 						partList.add(cell);
 						return null;
 					}
