@@ -312,6 +312,7 @@
 					return;
 				}
 			}
+			calClaim(cDiv);
 			checkPop(cDiv);
 			//$("body").css("cursor","wait");
 			//$("form[name='form"+cDiv+"']").submit();
@@ -606,7 +607,7 @@
 				$("#cLSWP_5").empty().append($("input[name='claimCost']",$("#div"+cDiv)).val());
 				$("#checkLSWP2").dialog({modal:true});
 			}else{
-				localCost = 0;
+				alert("no ready!");
 			}
 					
 			return;
@@ -884,6 +885,7 @@
 										<td>
 											<select name="issueTeam" class="easyui-validatebox"  required="true">
 											<option value=""><fmt:message key='ui.element.Select'/></option>
+											<option value="LP">LOCAL</option>
 												<c:forEach items="${claimDept}" var="cDept">
 													<option value="${cDept.code}">${cDept.name}</option>
 												</c:forEach>
@@ -1008,6 +1010,7 @@
 										<td>
 											<select name="issueTeam" class="easyui-validatebox"  required="true">
 											<option value=""><fmt:message key='ui.element.Select'/></option>
+											<option value="LP">LOCAL</option>
 												<c:forEach items="${claimDept}" var="cDept">
 													<option value="${cDept.code}">${cDept.name}</option>
 												</c:forEach>
@@ -1140,6 +1143,7 @@
 										<td>
 											<select name="issueTeam" class="easyui-validatebox"  required="true">
 											<option value=""><fmt:message key='ui.element.Select'/></option>
+												<option value="LP">LOCAL</option>
 												<c:forEach items="${claimDept}" var="cDept">
 													<option value="${cDept.code}">${cDept.name}</option>
 												</c:forEach>
@@ -1263,6 +1267,7 @@
 										<td>
 											<select name="issueTeam" class="easyui-validatebox"  required="true">
 											<option value=""><fmt:message key='ui.element.Select'/></option>
+											<option value="LP">LOCAL</option>
 												<c:forEach items="${claimDept}" var="cDept">
 													<option value="${cDept.code}">${cDept.name}</option>
 												</c:forEach>

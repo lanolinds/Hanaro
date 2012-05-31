@@ -197,7 +197,8 @@ public class ClaimManageController {
 			@RequestParam(value="file4")MultipartFile file4,
 			@RequestParam(value="file5")MultipartFile file5,
 			@RequestParam(value="tripCost", required=false)String tripCost,
-			@RequestParam(value="prodCost", required=false)String prodCost
+			@RequestParam(value="prodCost", required=false)String prodCost,
+			@RequestParam(value="locaType1", required=false)String locaType1
 			){
 		HanaroUser user = (HanaroUser)auth.getPrincipal(); 
 		String file1Name = file1.getOriginalFilename();
@@ -205,16 +206,18 @@ public class ClaimManageController {
 		String file3Name = file3.getOriginalFilename();
 		String file4Name = file4.getOriginalFilename();
 		String file5Name = file5.getOriginalFilename();
+		locaType1 = (locaType1==null)?"":locaType1.trim();
+		
 		try {
 			service.prodClaimManage(user.getLocale(), prodType, classType, claimNo, invoiceNo, claimCost, issueCust, issueTeam, cost,
 									partType, rPartCode, rPartName, issueDate, claimContent, carType, machineType, workerCount, issueTime,failAmount,
 									user.getUsername(), p1, p2, p3, p4, p5, p6, p7,p8,lotNo,file1Name,file2Name,file3Name,file4Name,file5Name,
 									file1.getBytes(),file2.getBytes(),file3.getBytes(),file4.getBytes(),file5.getBytes(),
 									file1.getContentType(),file2.getContentType(),file3.getContentType(),file4.getContentType(),file5.getContentType(),
-									tripCost,prodCost);
+									tripCost,prodCost,locaType1);
 		} catch (IOException e) { 
 			e.printStackTrace();
-		}
+		}		
 		return "redirect:"+prefix+"/claimManage";		
 	}
 	
@@ -338,7 +341,8 @@ public class ClaimManageController {
 	}
 	
 	@RequestMapping(value="/prodRealClaimAgree", method=RequestMethod.POST)
-	public void prodRealClaimAgree(@RequestParam("stateIng") String stateIng, 
+	public void prodRealClaimAgree(
+			@RequestParam("stateIng") String stateIng, 
 			@RequestParam("analyCon") String analyCon, 
 			@RequestParam("claimRate") String claimRate,
 			@RequestParam("claim") String claim,

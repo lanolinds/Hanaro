@@ -356,17 +356,16 @@
 </table>
 <br>
 <br>
-<c:if test="${cLocale=='KR'}">
+
 <div style="width:870px;text-align:center;">
-	<c:if test="${own=='own'}">
+	<c:if test="${(own=='own' && cLocale=='KR' && claimInfo[0].DATA25!='' ) || (own=='own' && claimInfo[0].DATA25=='' && claimInfo[0].DATA0==cLocale)}">
 	<a  href="#" class="easyui-linkbutton" iconCls="icon-disk" onclick="javascript:agree();"><fmt:message key="ui.button.Save"/></a>
-	<c:if test="${claimInfo[0].DATA47=='AGREE' || claimInfo[0].DATA47=='WAIT' }">
-	<a  href="#" class="easyui-linkbutton" iconCls="icon-arrow-redo" onclick="javascript:agreeCancel();"><fmt:message key="ui.label.cancelAction"/></a>
-	</c:if>
+		<c:if test="${claimInfo[0].DATA47=='AGREE' || claimInfo[0].DATA47=='WAIT' }">
+			<a  href="#" class="easyui-linkbutton" iconCls="icon-arrow-redo" onclick="javascript:agreeCancel();"><fmt:message key="ui.label.cancelAction"/></a>
+		</c:if>
 	</c:if>
 	<a  href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:self.close();"><fmt:message key="ui.button.close"/></a>
 </div>
-</c:if>
 </form>
 
 

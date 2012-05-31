@@ -43,9 +43,135 @@ public class ClaimManageServiceImpl implements ClaimManageService {
 			String machineType,String workerCount,String issueTime,String failAmount,String inputBy,String p1,String p2,String p3,String p4,
 			String p5,String p6,String p7,String p8,String lotNo,String file1Name,String file2Name,String file3Name,String file4Name,String file5Name,
 			byte[] file1, byte[] file2,byte[] file3,byte[] file4,byte[] file5,String file1Type,String file2Type,String file3Type,String file4Type,String file5Type,
-			String tripCost,String prodCost){
-		dao.prodClaimManage(locale, prodType, classType, claimNo, invoiceNo, claimCost, issueCust, issueTeam, cost, partType, rPartCode, rPartName, issueDate, claimContent, carType, machineType, workerCount, issueTime,failAmount, inputBy, p1, p2, p3, p4, p5, p6, p7,p8,lotNo,file1Name,file2Name,file3Name,file4Name,file5Name,
-				file1,file2,file3,file4,file5,file1Type,file2Type,file3Type,file4Type,file5Type,tripCost,prodCost);
+			String tripCost,String prodCost,String locaType1){
+			String resultString = "";
+			resultString =  dao.prodClaimManage(locale, prodType, classType, claimNo, invoiceNo, claimCost, issueCust, issueTeam, cost, partType, rPartCode, rPartName, issueDate, claimContent, carType, machineType, workerCount, issueTime,failAmount, inputBy, p1, p2, p3, p4, p5, p6, p7,p8,lotNo,file1Name,file2Name,file3Name,file4Name,file5Name,
+				file1,file2,file3,file4,file5,file1Type,file2Type,file3Type,file4Type,file5Type,tripCost,prodCost,locaType1);
+			
+			//로컬에서 발생한 문제로 claim번호가 제대로 리턴되면 메일을 발송한다.
+			if(resultString!=null){
+				
+				if(locaType1.equals("LOCAL") && !resultString.equals("")){
+										
+					List<Map<String,Object>> mailData = dao.getClaimRegInfo(resultString);
+					List<Map<String,Object>> mailInfo = dao.getClaimAgreeMail(resultString);
+					JavaMailSenderImpl sender = new JavaMailSenderImpl();
+					sender.setHost("mail.samsong.co.kr");
+					sender.setUsername("hanaro");
+					sender.setPassword("hanaro");
+					sender.setDefaultEncoding("UTF-8");
+					
+					
+					
+					
+					if(mailInfo !=null && mailInfo.size()>0){
+						int count0 = 0;
+						int count1 = 0;
+						for(int i=0;i<mailInfo.size();i++){
+							if(((Map<String,Object>)mailInfo.get(i)).get("mailType").toString().equals("0"))
+								count0++;
+							else
+								count1++;
+						}
+						
+				
+						String[] mailTo0 = new String[count0];
+						String[] mailTo1 = new String[count1];
+						for(int i=0;i<mailInfo.size();i++){
+							if(((Map<String,Object>)mailInfo.get(i)).get("mailType").toString().equals("0"))
+								mailTo0[i] = ((Map<String,Object>)mailInfo.get(i)).get("email").toString();
+							else
+								mailTo1[i-count0] = ((Map<String,Object>)mailInfo.get(i)).get("email").toString();
+						}				
+						
+									
+						String pp1 = message.getMessage("ui.label.contents",null,locale);
+						String pp2 = message.getMessage("ui.label.mailClaimIssue",null,locale);
+						String pp3 = message.getMessage("ui.label.detailStatus",null,locale);
+						String pp4 = message.getMessage("info.claimIssueSS",null,locale);											
+						Map<String,Object> dataMap = (Map<String,Object>)mailData.get(0);
+				
+						
+						StringBuilder cnt0 = new StringBuilder();
+						StringBuilder cnt1 = new StringBuilder();
+						
+						cnt0.append("<html><head><style type='text/css'>");
+						cnt0.append("table{border-collapse:collapse;font-size:13px;}");
+						cnt0.append("th {border:1px solid silver;background-color: #E5E9EA;height:45px; text-align: left; white-space:nowrap;width: 130px;padding:5px;}");			
+						cnt0.append(".none{border:0px;width:680px;}");			
+						cnt0.append("td {border:1px solid silver;padding:5px;}");
+						cnt0.append(".cnt{width:550px;}");
+						cnt0.append("</style></head><body><table>");
+						cnt0.append("<tr><td class='none' colspan='2' align='left'><b>a. "+pp1+"</b></td></tr>");						
+						cnt0.append("<tr><td class='none' colspan='2' align='left'> - "+pp2+"</td></tr>");
+						cnt0.append("<tr><td class='none' colspan='2' align='left' style='height:30px;'>&nbsp;</td></tr>");
+						cnt0.append("<tr><td class='none' colspan='2' align='left'><b>b. "+pp3+"</b></td></tr>");	
+						cnt0.append("<tr><td class='none' colspan='2' align='center' style='background-color:#415262;color:#FFFFFF;font-weight:bold;font-size:25px;padding:0px;'>");
+						cnt0.append("<img src='http://app.samsong.co.kr:8080/Hanaro/resources/images/cR.png'/></td></tr>");						
+						cnt0.append("<tr><td class='none' colspan='2' align='right' style='font-size:13px;padding:8px;'>"+dataMap.get("DATA13")+"</td></tr>");
+						cnt0.append("<tr><th>FROM</th><td class='cnt'>"+resultString.split("-")[0]+"</td></tr>");
+						cnt0.append("<tr><th>TO</th><td class='cnt'>&nbsp;</td></tr>");
+						cnt0.append("<tr><th>INVOICE NO</th><td class='cnt'>"+dataMap.get("DATA3")+"</td></tr>");
+						cnt0.append("<tr><th>PART NO</th><td class='cnt'>"+dataMap.get("DATA11")+"</td></tr>");
+						cnt0.append("<tr><th>PART NAME</th><td class='cnt'>"+dataMap.get("DATA12")+"</td></tr>");
+						cnt0.append("<tr><th>PROGRESSING</th><td class='cnt'>"+dataMap.get("DATA22")+"</td></tr>");
+						cnt0.append("<tr><th style='height:200px;'>CAUSE BY</th><td class='cnt'>"+claimContent+"</td></tr>");
+						cnt0.append("<tr><th>CLAIM 보상</th><td class='cnt'>"+claimCost+"</td></tr>");
+						cnt0.append("</table></body></html>");
+						
+						cnt1.append("<html><head><style type='text/css'>");
+						cnt1.append("table{border-collapse:collapse;font-size:13px;}");
+						cnt1.append("th {border:1px solid silver;background-color: #E5E9EA;height:45px; text-align: left; white-space:nowrap;width: 130px;padding:5px;}");			
+						cnt1.append(".none{border:0px;width:680px;}");			
+						cnt1.append("td {border:1px solid silver;padding:5px;}");
+						cnt1.append(".cnt{width:550px;}");
+						cnt1.append("</style></head><body><table>");
+						cnt1.append("<tr><td class='none' colspan='2' align='left'><b>a. "+pp1+"</b></td></tr>");					
+						cnt1.append("<tr><td class='none' colspan='2' align='left'> - "+pp4+"</td></tr>");
+						cnt1.append("<tr><td class='none' colspan='2' align='left' style='height:30px;'>&nbsp;</td></tr>");
+						cnt1.append("<tr><td class='none' colspan='2' align='left'><b>b. "+pp3+"</b></td></tr>");				
+						cnt1.append("<tr><td class='none' colspan='2' align='center' style='background-color:#415262;color:#FFFFFF;font-weight:bold;font-size:25px;padding:0px;'>");
+						cnt1.append("<img src='http://210.216.217.226:8181/Hanaro/resources/images/cR.png'/></td></tr>");				
+						cnt1.append("<tr><td class='none' colspan='2' align='right' style='font-size:13px;padding:8px;'>"+dataMap.get("DATA13")+"</td></tr>");
+						cnt1.append("<tr><th>FROM</th><td class='cnt'>"+resultString.split("-")[0]+"</td></tr>");
+						cnt1.append("<tr><th>TO</th><td class='cnt'>"+dataMap.get("DATA6")+"</td></tr>");				
+						cnt1.append("<tr><th>PART NO</th><td class='cnt'>"+dataMap.get("DATA11")+"</td></tr>");
+						cnt1.append("<tr><th>PART NAME</th><td class='cnt'>"+dataMap.get("DATA12")+"</td></tr>");
+						cnt1.append("<tr><th>PROGRESSING</th><td class='cnt'>"+dataMap.get("DATA22")+"</td></tr>");
+						cnt1.append("<tr><th style='height:200px;'>CAUSE BY</th><td class='cnt'>"+claimContent+"</td></tr>");
+						cnt1.append("<tr><th>CLAIM 보상</th><td class='cnt'>"+claimCost+"</td></tr>");
+						cnt1.append("</table></body></html>");				
+						
+						if(count0>0){
+							try {
+								MimeMessage messageCn = sender.createMimeMessage();						
+								MimeMessageHelper helper = new MimeMessageHelper(messageCn);						
+								helper.setTo(mailTo0);					
+								helper.setFrom("hanaro@samsong.com");
+								helper.setSubject("Hanaro System Claim ["+resultString+"]");
+								helper.setText(cnt0.toString(),true);
+								sender.send(messageCn);
+							} catch (MessagingException e) {
+								logger.info("메일발송에러");
+							}
+						}
+						if(count1>0){
+							try {
+								MimeMessage messageCn = sender.createMimeMessage();						
+								MimeMessageHelper helper = new MimeMessageHelper(messageCn);
+								helper.setTo(mailTo1);					
+								helper.setFrom("hanaro@samsong.com");
+								helper.setSubject("Hanaro System Claim ["+resultString+"]");
+								helper.setText(cnt1.toString(),true);
+								sender.send(messageCn);
+							} catch (MessagingException e) {
+								logger.info("메일발송에러");
+							}
+						}      			
+					}
+										
+				}
+			}
 		
 	}
 
@@ -156,7 +282,7 @@ public class ClaimManageServiceImpl implements ClaimManageService {
 				
 				
 				cnt0.append("<tr><td class='none' colspan='2' align='center' style='background-color:#415262;color:#FFFFFF;font-weight:bold;font-size:25px;padding:0px;'>");
-				cnt0.append("<img src='http://210.216.217.226:8181/Hanaro/resources/images/cR.png'/></td></tr>");
+				cnt0.append("<img src='http://app.samsong.co.kr:8080/Hanaro/resources/images/cR.png'/></td></tr>");
 				
 				cnt0.append("<tr><td class='none' colspan='2' align='right' style='font-size:13px;padding:8px;'>"+dataMap.get("DATA13")+"</td></tr>");
 				cnt0.append("<tr><th>FROM</th><td class='cnt'>"+claimNo.split("-")[0]+"</td></tr>");
