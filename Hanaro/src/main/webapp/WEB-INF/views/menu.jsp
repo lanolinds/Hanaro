@@ -90,6 +90,7 @@
 	<div style="width:150px;">			
 			<div href='<c:url value="/custDivision/custInfo/createForm"/>'><fmt:message key="menu.custForm"/></div>
 			<div href='<c:url value="/custDivision/custInfo/list"/>'><fmt:message key="menu.custList"/></div>
+			<div href='<c:url value="/custDivision/manager/view"/>'><fmt:message key="menu.supplierManager"/></div>
 	</div>
 	</div>
 </div>

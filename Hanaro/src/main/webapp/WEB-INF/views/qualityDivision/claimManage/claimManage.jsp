@@ -308,7 +308,7 @@
 			$("input[name='prodType']",$("#div"+cDiv)).val(prodType);
 			if(prodType=="INSERT"){
 				if($.trim($("input[name='file1']",$("#div"+cDiv)).val())==""){
-					alert("<fmt:message key='info.notNullFile1'/>");
+					$.messager.alert('Warning',"<fmt:message key='info.notNullFile1'/>");
 					return;
 				}
 			}
@@ -593,6 +593,10 @@
 	
 	function checkPop(cDiv){		
 		if($("input[name='locaType1']",$("#div"+cDiv)).val()=="LOCAL"){
+			if($("select[name='issueTeam']",$("#div"+cDiv)).val()!="LP"){
+				$.messager.alert('Warning',"<fmt:message key='warning.notsameLocal'/>");
+				return;
+			}
 			if(cDiv=="RW" || cDiv=="SW"){
 				$("#cRSWP_1").empty().append($("#workerCount"+cDiv).numberspinner("getValue"));
 				$("#cRSWP_2").empty().append($("input[name='issueTime']",$("#div"+cDiv)).val());
