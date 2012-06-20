@@ -152,17 +152,17 @@
 			<td>
 				<table class="easyui-datagrid" iconCls="icon-application-view-list" style="width:800px;height:725px;" 
 				title='<fmt:message key="ui.label.RegList"/>' toolbar="#divSearch" pagination="true"  id="resultDataGrid" pageSize="30"   singleSelect="true" striped="true"   url="getMemberList" >
-					<thead frozen="true">
-						        <tr>						        	  
-						            <th field="cust_nm" width="150" sortable="true" align="center"><fmt:message key="ui.label.cust.custNm" /></th>  
-						            <th field="custCode" width="50" hidden="true"></th>  
-						            <th field="name" width="130" sortable="true" align="left"><fmt:message key="ui.label.name" /></th>						      
-						            <th field="email" width="200" sortable="true" align="left">E-MAIL</th>  
-						            <th field="phone" width="130" sortable="true" align="left"><fmt:message key="ui.label.cust.officePhone" /></th>
-						            <th field="remark" width="150" sortable="true" align="left"><fmt:message key="ui.label.remark" /></th>
-						            <th field="seq" width="50" hidden="true"></th>						            
-      						  </tr> 
-					</thead>
+		
+		        <tr>						        	  
+		            <th field="cust_nm" width="150" sortable="true" align="center"><fmt:message key="ui.label.cust.custNm" /></th>  
+		            <th field="custCode" width="50" hidden="true"></th>  
+		            <th field="name" width="130" sortable="true" align="left"><fmt:message key="ui.label.name" /></th>						      
+		            <th field="email" width="200" sortable="true" align="left">E-MAIL</th>  
+		            <th field="phone" width="130" sortable="true" align="left"><fmt:message key="ui.label.cust.officePhone" /></th>
+		            <th field="remark" width="150" sortable="true" align="left"><fmt:message key="ui.label.remark" /></th>
+		            <th field="seq" width="50" hidden="true"></th>						            
+  				</tr> 
+		
 					
 				</table>
 			</td>

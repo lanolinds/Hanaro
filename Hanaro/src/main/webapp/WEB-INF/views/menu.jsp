@@ -41,6 +41,7 @@
 	<div style="white-space: nowrap;"><fmt:message key="menu.items"/>      	
 	<div style="width:150px;">			
 			<div href='<c:url value="/basicDivision/items/itemLocalization"/>'><fmt:message key="menu.itemLocalization"/></div>
+			<div href='<c:url value="/basicDivision/items/localItemManager"/>'><fmt:message key="menu.localItemManager"/></div>
 	</div>
 	</div>	
 	<div style="white-space: nowrap;"><fmt:message key="menu.line"/>
