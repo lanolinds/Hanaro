@@ -50,9 +50,9 @@ public class ClaimManageServiceImpl implements ClaimManageService {
 			
 			//로컬에서 발생한 문제로 claim번호가 제대로 리턴되면 메일을 발송한다.
 			if(resultString!=null){
-				
-				if(locaType1.equals("LOCAL") && !resultString.equals("")){
-										
+				//모든 문제에 대해서 Claim메일을 발송하기로 한다.
+				//if(locaType1.equals("LOCAL") && !resultString.equals("")){				
+				if(!resultString.equals("")){
 					List<Map<String,Object>> mailData = dao.getClaimRegInfo(resultString);
 					List<Map<String,Object>> mailInfo = dao.getClaimAgreeMail(resultString);
 					JavaMailSenderImpl sender = new JavaMailSenderImpl();
