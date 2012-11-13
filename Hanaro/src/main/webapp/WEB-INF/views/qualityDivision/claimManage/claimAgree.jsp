@@ -270,7 +270,9 @@
 			</tr>	
 			<tr>		
 				<th><span  class="label-Leader-green" ><fmt:message key='ui.label.workContent'/></span></th>
-				<td colspan="3">${claimInfo[0].DATA34}&nbsp;</td>
+				<td>${claimInfo[0].DATA34}&nbsp;</td>
+				<th><span  class="label-Leader-green" ><fmt:message key='chartYName.issueAmount'/></span></th>
+				<td>${claimInfo[0].DATA22}&nbsp;</td>				
 			</tr>																					
 		</c:when>
 		<c:when test="${claimInfo[0].DATA1=='EX'}">
@@ -326,7 +328,7 @@
 		<th><span  class="label-Leader-black" ><fmt:message key='ui.label.qualityIssue.reasonPartName'/></span></th>
 		<td style="width:300px;">${claimInfo[0].DATA10}&nbsp;</td>
 		<th style="width:140px;">&nbsp;</th>
-		<th><span  class="label-Leader-black" >CLAIM</span></th>
+		<th><span  class="label-Leader-black" >CLAIM(QUANTITY)</span></th>
 		<td id="claimR">${claimInfo[0].DATA4}&nbsp;</td>
 	</tr>
 	<tr>
@@ -350,7 +352,7 @@
 		</select>
 		</td>
 		<th style="width:140px;">&nbsp;</th>
-		<th><span  class="label-Leader-black" >CLAIM</span></th>
+		<th><span  class="label-Leader-black" >CLAIM(QUANTITY)</span></th>
 		<td><input type="text" style="color:red;" value="${claimInfo[0].DATA50}" name="claim" readonly/></td>		
 	</tr>						
 </table>
