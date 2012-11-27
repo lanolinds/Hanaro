@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
-
+ 
 	<link rel="shortcut icon" href='<c:url value="/resources/images/favi.ico"/>' />
  	<link rel="icon" href='<c:url value="/resources/images/favi.ico"/>' type="image/x-icon" />
 

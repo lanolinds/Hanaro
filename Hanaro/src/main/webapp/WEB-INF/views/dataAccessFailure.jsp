@@ -4,7 +4,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ page session="false"  contentType="text/html; charset=UTF-8"%>
-<%
+<% 
 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 Exception ex = (Exception)request.getAttribute("exception");
 %>

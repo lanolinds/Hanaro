@@ -86,7 +86,7 @@ public class ProductStockController {
 
 		return "redirect:"+prefix+"/inoutManagement"; 
 	}
-	
+	 
 	@RequestMapping(value="/getIncomeOutgoList",method=RequestMethod.POST)
 	public @ResponseBody Map<String,Object> getIncomeOutgoList(
 			@RequestParam(value="category",required=false) String category,

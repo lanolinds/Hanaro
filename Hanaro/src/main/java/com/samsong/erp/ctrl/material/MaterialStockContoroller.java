@@ -85,7 +85,7 @@ public class MaterialStockContoroller {
 		logger.info("사용자("+user.getUsername()+")가 자재입고를 처리합니다");
 		
 		return "redirect:"+prefix+"/inoutManagement";
-	}
+	} 
 	
 	@RequestMapping(value="/getIncomeOutgoList",method=RequestMethod.POST)
 	public @ResponseBody Map<String,Object> getIncomeOutgoList(

@@ -7,7 +7,7 @@
 <%response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
+<head> 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Hanaro System Login Page</title>
 <link rel="stylesheet" href='<c:url value="/resources/styles/app.default.css"/>'/>
