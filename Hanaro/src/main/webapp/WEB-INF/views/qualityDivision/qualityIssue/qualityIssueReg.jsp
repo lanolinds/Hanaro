@@ -489,10 +489,10 @@
 								</td>  
 							</tr>		
 							<tr>
-								<th colspan='2' style="text-align:center;"  id="tdButton">										
+								<td colspan='2' style="text-align:center;"  id="tdButton" align="center">
 									<a href="#" onclick="javascript:validate();" class="easyui-linkbutton"  iconCls="icon-disk"  id="btInsert"><fmt:message key="ui.button.Save"/></a>																		
 									<a href="#" onclick="javascript:resetForm()" class="easyui-linkbutton"  iconCls="icon-arrow-redo" id="btCancel"><fmt:message key="ui.button.Cancel"/></a>
-								</th>
+								</td>
 							</tr>															
 						</table>
 					</form:form>

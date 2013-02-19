@@ -24,6 +24,7 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
@@ -109,37 +110,23 @@ public class QualityIssueDAO {
 		return map;
 	}
 
-	public void procQualityIssueReg(String procType, Locale locale,
+	@SuppressWarnings("deprecation")
+	public String procQualityIssueReg(String procType, Locale locale,
 			QualityIssueRegSheet sheet, String user, byte[] files1,
 			byte[] files2) {
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("procType", procType);
-		params.put("locale", locale.getCountry());
-		params.put("regNo", sheet.getRegNo());
-		params.put("division", sheet.getDivision());
-		params.put("occurSite", sheet.getOccurSite());
-		params.put("occurDate", sheet.getOccurDate());
-		params.put("occurAmPm", sheet.getOccurAmPm());
-		params.put("occurHour", sheet.getOccurHour());
-		params.put("occurPartNo", sheet.getOccurPartNo());
-		params.put("partSupplier", sheet.getPartSupplier());
-		params.put("occurPlace", sheet.getOccurPlace());
-		params.put("occurLine", sheet.getOccurLine());
-		params.put("occurProc", sheet.getOccurProc());
-		params.put("lotNo", sheet.getLotNo());
-		params.put("defectL", sheet.getDefectL());
-		params.put("defectM", sheet.getDefectM());
-		params.put("defectS", sheet.getDefectS());
-		params.put("defectAmount", sheet.getDefectAmount());
-		params.put("explanation", sheet.getExplanation());
-		params.put("file1Name", sheet.getFile1());
-		params.put("file2Name", sheet.getFile2());
-		params.put("file1", files1);
-		params.put("file2", files2);
-		params.put("user", user);
-		sp = new SimpleJdbcCall(jdbc)
-				.withProcedureName("QualityIssueDAO_procQualityIssueReg");
-		sp.execute(params);
+		String query = "exec QualityIssueDAO_procQualityIssueReg ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?";
+		return jdbc.queryForObject(query,new Object[]{procType,locale.getCountry(),sheet.getRegNo(),sheet.getDivision(),sheet.getOccurSite(),sheet.getOccurDate(),
+				sheet.getOccurAmPm(),sheet.getOccurHour(),sheet.getOccurPartNo(),sheet.getPartSupplier(),sheet.getOccurPlace(),sheet.getOccurLine(),sheet.getOccurProc(),
+				sheet.getLotNo(),sheet.getDefectL(),sheet.getDefectM(),sheet.getDefectS(),sheet.getDefectAmount(),sheet.getExplanation(),files1,files2,
+				files1,files2,user},new RowMapper<String>(){
+
+					@Override
+					public String mapRow(ResultSet rs, int arg1)
+							throws SQLException {
+							return rs.getString(1);
+					}
+			
+		});
 	}
 
 	// 처리 안 된 품질문제 리스트를 가져온다.
@@ -1713,6 +1700,65 @@ public class QualityIssueDAO {
 		});
 		sp.execute(params);
 		return list;			 
+	}
+	
+	public List<Map<String,Object>> getIssueMailList(String mailType,String regNo){
+		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		SqlParameterSource params = new MapSqlParameterSource()
+		.addValue("mailType",mailType)
+		.addValue("regNo",regNo);
+		
+		sp = new SimpleJdbcCall(jdbc).withFunctionName("QualityIssueDAO_getIssueMailList").returningResultSet("issueMailList",new RowMapper<Map<String,Object>>() {
+
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int arg1)
+					throws SQLException {
+				
+				Map<String,Object> m = new LinkedHashMap<String, Object>();
+				m.put("DATA0",rs.getString(1));
+				list.add(m);
+				return null;
+			}
+		});
+		sp.execute(params);
+		return list;
+	}
+	
+	public List<Map<String,Object>> getIssueMailDataForReg(String regNo){
+		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		SqlParameterSource params = new MapSqlParameterSource().addValue("regNo",regNo);
+		sp = new SimpleJdbcCall(jdbc).withFunctionName("QualityIssueDAO_getIssueMailDataForReg").returningResultSet("issueMailDataForReg",new RowMapper<Map<String,Object>>() {
+
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int arg1)
+					throws SQLException {
+				Map<String,Object> m = new LinkedHashMap<String, Object>();
+				m.put("DATA0",rs.getString(1));
+				m.put("DATA1",rs.getString(2));
+				m.put("DATA2",rs.getString(3));
+				m.put("DATA3",rs.getString(4));
+				m.put("DATA4",rs.getString(5));
+				m.put("DATA5",rs.getString(6));
+				m.put("DATA6",rs.getString(7));
+				m.put("DATA7",rs.getString(8));
+				m.put("DATA8",rs.getString(9));
+				m.put("DATA9",rs.getString(10));
+				m.put("DATA10",rs.getString(11));
+				m.put("DATA11",rs.getString(12));
+				m.put("DATA12",rs.getString(13));
+				m.put("DATA13",rs.getString(14));
+				m.put("DATA14",rs.getString(15));
+				m.put("DATA15",rs.getString(16));
+				m.put("DATA16",rs.getString(17));
+				m.put("DATA17",rs.getString(18));
+				m.put("DATA18",rs.getString(19));
+				m.put("DATA19",rs.getString(20));
+				list.add(m);
+				return null;
+			}
+		});
+		sp.execute(params);
+		return list;
 	}
 	
 

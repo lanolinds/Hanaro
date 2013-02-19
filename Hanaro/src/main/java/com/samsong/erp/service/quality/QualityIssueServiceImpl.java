@@ -9,9 +9,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.dao.DataAccessException;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -27,6 +33,9 @@ public class QualityIssueServiceImpl implements QualityIssueService {
  
 	@Autowired
 	private QualityIssueDAO dao;
+	
+	@Autowired
+	private MessageSource message;	
 	
 	private static Logger logger = Logger.getLogger(QualityIssueServiceImpl.class);
 	
@@ -46,8 +55,83 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	}
 
 	@Override
-	public void procQualityIssueReg(String procType, Locale locale, QualityIssueRegSheet sheet, String user, byte[] files1, byte[] files2) { 
-		dao.procQualityIssueReg(procType, locale, sheet, user, files1, files2);
+	public void procQualityIssueReg(String procType, Locale locale, QualityIssueRegSheet sheet, String user, byte[] files1, byte[] files2) {
+		String regNo="";
+		regNo = dao.procQualityIssueReg(procType, locale, sheet, user, files1, files2);
+		
+		
+		//입고검사시에만 메일 발송
+		if(procType.equals("INSERT") && sheet.getOccurSite().equals("CD") && !regNo.equals("")){
+			JavaMailSenderImpl sender = new JavaMailSenderImpl();
+			List<Map<String,Object>> mailList = dao.getIssueMailList("Q_REG", regNo);
+			List<Map<String,Object>> mailData = dao.getIssueMailDataForReg(regNo);
+		
+			
+			sender.setHost("mail.samsong.co.kr");
+			sender.setUsername("hanaro");
+			sender.setPassword("hanaro");
+			sender.setDefaultEncoding("UTF-8");
+			
+			if(mailList !=null && mailList.size()>0){
+				String[] mailTo = new String[mailList.size()];
+				for(int i=0;i<mailList.size();i++){					
+						mailTo[i]= ((Map<String,Object>)mailList.get(i)).get("DATA0").toString();
+				}				
+				StringBuilder content = new StringBuilder();
+				
+				Map<String,Object> dataMap = (Map<String,Object>)mailData.get(0);
+				
+				String hregNo = message.getMessage("ui.label.RegNo",null,locale);
+				String hdivision = message.getMessage("ui.label.QualityIssue.Division",null,locale);
+				String hOccurSite = message.getMessage("ui.label.QualityIssue.OccurSite",null,locale);
+				String hOccurDate = message.getMessage("ui.label.OccurDate",null,locale);
+				String hOccurAmPm = message.getMessage("ui.label.OccurAmPm",null,locale);
+				String hOccurHour = message.getMessage("ui.label.OccurHour",null,locale);
+				String hOccurPartNo = message.getMessage("ui.label.QualityIssue.OccurPartNo",null,locale);
+				String hOccurPartNm = message.getMessage("ui.label.QualityIssue.OccurPartNm",null,locale);
+				String hCar = message.getMessage("ui.label.Car",null,locale);
+				String hModel = message.getMessage("ui.label.Model",null,locale);
+				String hPartSupplier = message.getMessage("ui.label.PartSupplier",null,locale);
+				String hOccurPlace = message.getMessage("ui.label.QualityIssue.OccurPlace",null,locale);
+				String hOccurLine = message.getMessage("ui.label.QualityIssue.OccurLine",null,locale);
+				String hOccurProc = message.getMessage("ui.label.QualityIssue.OccurProc",null,locale);
+				String hLotNo = message.getMessage("ui.label.LotNo",null,locale);
+				String hDefectL = message.getMessage("ui.label.QualityIssue.DefectL",null,locale);
+				String hDefectM = message.getMessage("ui.label.QualityIssue.DefectM",null,locale);
+				String hDefectS = message.getMessage("ui.label.QualityIssue.DefectS",null,locale);
+				String hDefectAmount = message.getMessage("ui.label.QualityIssue.DefectAmount",null,locale);
+				String hExplanation = message.getMessage("ui.label.QualityIssue.Explanation",null,locale);				
+				
+				content.append("<HTML><HEAD><style type='text/css'>");
+				content.append("table{border-collapse:collapse;font-size:13px;}");
+				content.append("th {border:1px solid silver;background-color: #E5E9EA;height:25px; text-align: left; white-space:nowrap;width: 120px;padding:5px;}");
+				content.append("td {border:1px solid silver;padding:5px;width: 350px;}");
+				content.append("</style></HEAD><BODY>");
+				content.append("<table><tr><th>"+hregNo+"</th><td>"+dataMap.get("DATA0")+"</td><th>"+hdivision+"</th><td>"+dataMap.get("DATA1")+"</td></tr>");
+				content.append("<tr><th>"+hOccurSite+"</th><td>"+dataMap.get("DATA2")+"</td><th>"+hOccurDate+"</th><td>"+dataMap.get("DATA3")+"</td></tr>");
+				content.append("<tr><th>"+hOccurAmPm+"</th><td>"+dataMap.get("DATA4")+"</td><th>"+hOccurHour+"</th><td>"+dataMap.get("DATA5")+"</td></tr>");
+				content.append("<tr><th>"+hOccurPartNo+"</th><td>"+dataMap.get("DATA6")+"</td><th>"+hOccurPartNm+"</th><td>"+dataMap.get("DATA7")+"</td></tr>");
+				content.append("<tr><th>"+hCar+"</th><td>"+dataMap.get("DATA8")+"</td><th>"+hModel+"</th><td>"+dataMap.get("DATA9")+"</td></tr>");
+				content.append("<tr><th>"+hPartSupplier+"</th><td>"+dataMap.get("DATA10")+"</td><th>"+hOccurPlace+"</th><td>"+dataMap.get("DATA11")+"</td></tr>");
+				content.append("<tr><th>"+hOccurLine+"</th><td>"+dataMap.get("DATA12")+"</td><th>"+hOccurProc+"</th><td>"+dataMap.get("DATA13")+"</td></tr>");
+				content.append("<tr><th>"+hLotNo+"</th><td>"+dataMap.get("DATA14")+"</td><th>"+hDefectL+"</th><td>"+dataMap.get("DATA15")+"</td></tr>");
+				content.append("<tr><th>"+hDefectM+"</th><td>"+dataMap.get("DATA16")+"</td><th>"+hDefectS+"</th><td>"+dataMap.get("DATA17")+"</td></tr>");
+				content.append("<tr><th>"+hDefectAmount+"</th><td>"+dataMap.get("DATA18")+"</td><th>"+hExplanation+"</th><td>"+dataMap.get("DATA19")+"</td></tr>");
+				content.append("</table></BODY></HTML>");
+				
+				try {
+					MimeMessage messageCn = sender.createMimeMessage();						
+					MimeMessageHelper helper = new MimeMessageHelper(messageCn);						
+					helper.setTo(mailTo);					
+					helper.setFrom("hanaro@samsong.com");
+					helper.setSubject("Hanaro System Claim [품질문제등록알림]");
+					helper.setText(content.toString(),true);
+					sender.send(messageCn);
+				} catch (MessagingException e) {
+					logger.info("메일발송에러");
+				}
+			}
+		}
 	}
 
 	@Override
