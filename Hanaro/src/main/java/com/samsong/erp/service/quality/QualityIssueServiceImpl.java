@@ -124,7 +124,7 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 					MimeMessageHelper helper = new MimeMessageHelper(messageCn);						
 					helper.setTo(mailTo);					
 					helper.setFrom("hanaro@samsong.com");
-					helper.setSubject("Hanaro System Claim [품질문제등록알림]");
+					helper.setSubject("Hanaro System Claim [Quality  Issue]");
 					helper.setText(content.toString(),true);
 					sender.send(messageCn);
 				} catch (MessagingException e) {
@@ -300,6 +300,11 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 				,imgReasonFile1ContentType,  imgReasonFile2ContentType, imgTempNameFileContentType,
 				imgMeasureName1FileContentType, imgMeasureName2FileContentType);
 		
+	
+		
+		
+		
+		
 	}
 
 	@Override
@@ -365,6 +370,65 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 			String resultEvaluation, String user) {
 		dao.updateNCRMeasureProcedure(locale, ncrNo, updateType, comment, date1, date2, date3, date4, date5, manager, confirmer, approver, fileName, file, resultEvaluation, user);
 		
+		if(updateType.equals("do_plan")){
+			
+			List<Map<String,Object>> ncrList = dao.getRegNcrList("ncr",ncrNo);
+			//ncr등록되었을때만 발송한다.
+			if(ncrList!=null && ncrList.size()>0){
+				if(ncrList.get(0).get("occur_site").toString().trim().equals("CD")){
+					JavaMailSenderImpl sender  = new JavaMailSenderImpl();
+					sender.setHost("mail.samsong.co.kr");
+					sender.setUsername("hanaro");
+					sender.setPassword("hanaro");
+					sender.setDefaultEncoding("UTF-8");
+					
+					Map<String,Object> mailData = ncrList.get(0);
+					
+					String occurSiteName = mailData.get("occur_site_name").toString();
+					String partner = mailData.get("partner").toString();
+					List<Map<String,Object>> mailList = dao.getIssueMailList("NCR_REG",ncrNo);
+					
+					String[] mailTo = new String[mailList.size()];
+					for(int i=0;i<mailList.size();i++){					
+							mailTo[i]= ((Map<String,Object>)mailList.get(i)).get("DATA0").toString();
+					}				
+					StringBuilder content = new StringBuilder();
+					
+					
+					
+					String hncr = "NCR NO";					
+					String hOccurSite = message.getMessage("ui.label.QualityIssue.OccurSite",null,locale);
+					String hReasonOrgan = message.getMessage("ui.label.qualityIssue.reasonOrgan",null,locale);
+					String hTitle =  message.getMessage("ui.label.ncrInformReportMessage",null,locale);
+					
+					content.append("<HTML><HEAD><style type='text/css'>");
+					content.append("table{border-collapse:collapse;font-size:13px;}");
+					content.append("th {border:1px solid silver;background-color: #E5E9EA;height:25px; text-align: left; white-space:nowrap;width: 120px;padding:5px;}");
+					content.append("td {border:1px solid silver;padding:5px;width: 350px;}");
+					content.append("a{color:blue;cursor:pointer;}");
+					content.append("</style></HEAD><BODY>");
+					content.append("<table><tr><th colspan='2'>"+hTitle+"</th></tr><tr><th>"+hncr+"</th><td>"+ncrNo+"</td></tr>");
+					content.append("<tr><th>"+hOccurSite+"</th><td>"+occurSiteName+"</td></tr>");
+					content.append("<tr><th>"+hReasonOrgan+"</th><td>"+partner+"</td></tr>");
+					content.append("<tr><th>LINK</th><td><a href='http://app.samsong.co.kr:8080/Hanaro/qualityDivision/qualityIssue/ncrManageDetail?ncrNo="+ncrNo+"' target='_blank'>"+ncrNo+"<a>");
+					content.append("</td></tr></table></BODY></HTML>");
+					
+					try {
+						MimeMessage messageCn = sender.createMimeMessage();						
+						MimeMessageHelper helper = new MimeMessageHelper(messageCn);						
+						helper.setTo(mailTo);					
+						helper.setFrom("hanaro@samsong.com");
+						helper.setSubject("Hanaro System Claim [Quality NCR  Issue]");
+						helper.setText(content.toString(),true);
+						sender.send(messageCn);
+					} catch (MessagingException e) {
+						logger.info("메일발송에러");
+					}
+					
+					
+				}
+			}
+		}
 	}
 
 	@Override
@@ -620,7 +684,63 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 	@Override
 	public void persistApproval(String regNo,String approvalNo,String username, Locale locale) {
 		dao.persistApproval(regNo,approvalNo,username,locale);
-		
+		List<Map<String,Object>> ncrList = dao.getRegNcrList("action",approvalNo);
+		//ncr등록되었을때만 발송한다.
+		if(ncrList!=null && ncrList.size()>0){
+			if(ncrList.get(0).get("occur_site").toString().trim().equals("CD")){
+				JavaMailSenderImpl sender  = new JavaMailSenderImpl();
+				sender.setHost("mail.samsong.co.kr");
+				sender.setUsername("hanaro");
+				sender.setPassword("hanaro");
+				sender.setDefaultEncoding("UTF-8");
+				
+				for(int ncr = 0;ncr<ncrList.size();ncr++){		
+					Map<String,Object> mailData = ncrList.get(ncr);
+					String ncrNo = mailData.get("ncr").toString();					
+					String occurSiteName = mailData.get("occur_site_name").toString();
+					String partner = mailData.get("partner").toString();
+					List<Map<String,Object>> mailList = dao.getIssueMailList("NCR_REG",ncrNo);
+					
+					String[] mailTo = new String[mailList.size()];
+					for(int i=0;i<mailList.size();i++){					
+							mailTo[i]= ((Map<String,Object>)mailList.get(i)).get("DATA0").toString();
+					}				
+					StringBuilder content = new StringBuilder();
+					
+					
+					
+					String hncr = "NCR NO";					
+					String hOccurSite = message.getMessage("ui.label.QualityIssue.OccurSite",null,locale);
+					String hReasonOrgan = message.getMessage("ui.label.qualityIssue.reasonOrgan",null,locale);
+					String hTitle =  message.getMessage("ui.label.ui.label.ncrTreatReportMessage",null,locale);
+					
+					content.append("<HTML><HEAD><style type='text/css'>");
+					content.append("table{border-collapse:collapse;font-size:13px;}");
+					content.append("th {border:1px solid silver;background-color: #E5E9EA;height:25px; text-align: left; white-space:nowrap;width: 120px;padding:5px;}");
+					content.append("td {border:1px solid silver;padding:5px;width: 350px;}");
+					content.append("a{color:blue;cursor:pointer;}");
+					content.append("</style></HEAD><BODY>");
+					content.append("<table><tr><th colspan='2'>"+hTitle+"</th></tr><tr><th>"+hncr+"</th><td>"+ncrNo+"</td></tr>");
+					content.append("<tr><th>"+hOccurSite+"</th><td>"+occurSiteName+"</td></tr>");
+					content.append("<tr><th>"+hReasonOrgan+"</th><td>"+partner+"</td></tr>");
+					content.append("<tr><th>LINK</th><td><a href='http://app.samsong.co.kr:8080/Hanaro/qualityDivision/qualityIssue/ncrManageDetail?ncrNo="+ncrNo+"' target='_blank'>"+ncrNo+"<a>");
+					content.append("</td></tr></table></BODY></HTML>");
+					
+					try {
+						MimeMessage messageCn = sender.createMimeMessage();						
+						MimeMessageHelper helper = new MimeMessageHelper(messageCn);						
+						helper.setTo(mailTo);					
+						helper.setFrom("hanaro@samsong.com");
+						helper.setSubject("Hanaro System Claim [Quality NCR  Issue]");
+						helper.setText(content.toString(),true);
+						sender.send(messageCn);
+					} catch (MessagingException e) {
+						logger.info("메일발송에러");
+					}
+					
+				}		
+			}
+		}
 	}
 
 	@Override

@@ -1761,5 +1761,28 @@ public class QualityIssueDAO {
 		return list;
 	}
 	
+	public List<Map<String,Object>> getRegNcrList(String noType,String approvalNo){		
+			final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+			SqlParameterSource parms = new MapSqlParameterSource().addValue("noType",noType).addValue("ncr",approvalNo);
+			sp = new SimpleJdbcCall(jdbc).withFunctionName("QualityIssueDAO_getIssueMailDataForNcr").returningResultSet("mailDataNcr",new RowMapper<Map<String,Object>>() {
+
+				@Override
+				public Map<String, Object> mapRow(ResultSet rs, int arg1)
+						throws SQLException {
+					Map<String,Object> m = new LinkedHashMap<String, Object>();
+					m.put("ncr",rs.getString(1));
+					m.put("occur_site",rs.getString(2));
+					m.put("occur_site_name",rs.getString(3));
+					m.put("partner",rs.getString(4));
+					list.add(m);
+					return null;
+				}				
+			});
+			sp.execute(parms);
+			return list;
+	}
+	
+
+	
 
 }
