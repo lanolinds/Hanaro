@@ -147,9 +147,7 @@ public class IssueSummaryController {
 					checkRepeat = m.get(group).toString();					
 					returnList.add(newM);
 					count = 0;
-					badCount = Long.parseLong(m.get("DATA6").toString());
-					badAmount = Long.parseLong(m.get("DATA7").toString());
-					badCost = Long.parseLong(m.get("DATA9").toString());					
+		
 				}
 				count += 1;
 				badCount += Long.parseLong(m.get("DATA6").toString());
