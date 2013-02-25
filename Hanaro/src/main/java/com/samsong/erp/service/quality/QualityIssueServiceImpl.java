@@ -775,6 +775,18 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 		return dao.getIssueSummaryDetailPOP(dateType, stdYear, stdMonth, endYear, endMonth, machineType, errorType, partNo, custCode, searchLocale, locale);
 	}
 
+	@Override
+	public List<Map<String, Object>> getIssueSummaryInoutData(String stdYear,
+			String stdMonth, Locale locale) {
+		return dao.getIssueSummaryInoutData(stdYear, stdMonth, locale);
+	}
+
+	@Override
+	public String procIssueSummaryInoutData(String[] p1, String[] p2,
+			String[] p3, String[] p4, String[] p5, Locale locale) {
+		return dao.procIssueSummaryInoutData(p1, p2, p3, p4, p5, locale);
+	}
+
 
 
 }

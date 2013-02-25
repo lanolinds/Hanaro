@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -75,9 +76,15 @@ public class IssueSummaryController {
 		model.addAttribute("rcust",rcust);
 		model.addAttribute("errornm",errornm);
 		model.addAttribute("rcustnm",rcustnm);
-		model.addAttribute("searchLocale",searchLocale);
+		model.addAttribute("searchLocale",searchLocale); 
 		return prefix+"/issueSummaryDetailPop";
 	}		
+	
+	@RequestMapping(value="/issueSummaryInoutData",method=RequestMethod.GET)
+	public String menuIssueSummaryInoutData(Model model,LocalDate date){
+		model.addAttribute("today", date);
+		return prefix+"/issueSummaryInoutData";
+	}
 	
 	@RequestMapping(value="/getDateToWeek", method=RequestMethod.GET)
 	public @ResponseBody String  getDateToWeek(@RequestParam("date") String date, LocalDate localDate){
@@ -206,4 +213,26 @@ public class IssueSummaryController {
 		}
 		return table;	
 	}
+	
+	@RequestMapping(value="/getIssueSummaryInoutData",method=RequestMethod.GET)
+	public @ResponseBody List<Map<String,Object>> getIssueSummaryInoutData(
+			@RequestParam(value="p1")String p1,@RequestParam(value="p2")String p2,Authentication auth){
+			HanaroUser user = (HanaroUser)auth.getPrincipal();
+			return service.getIssueSummaryInoutData(p1, p2, user.getLocale());
+	}
+	
+	@RequestMapping(value="/procIssueSummaryInoutData",method=RequestMethod.POST)
+	public @ResponseBody String procIssueSummaryInoutData(@RequestParam(value="p1[]") String[] p1,@RequestParam(value="p2[]") String[] p2,
+			@RequestParam(value="p3[]") String[] p3,@RequestParam(value="p4[]") String[] p4,
+			@RequestParam(value="p5[]") String[] p5,Authentication auth){
+		HanaroUser user = (HanaroUser)auth.getPrincipal();
+		String result ;
+		result = service.procIssueSummaryInoutData(p1, p2, p3, p4, p5, user.getLocale());
+		
+		if(result==null)
+			return "NG";
+		else
+			return "OK";
+	}
+	
 }

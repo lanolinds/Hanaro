@@ -100,7 +100,7 @@
 	                <th field="DATA6" width="60" sortable="false" align="center"><fmt:message key="chartYName.issueCount"/></th> 
 	                <th field="DATA7" width="60" sortable="false" align="center"><fmt:message key="chartYName.issueAmount"/></th> 
 	                <th field="DATA8" width="110" sortable="false" align="center"><fmt:message key="ui.label.qualityIssue.reasonOrgan"/></th> 
-	                <th field="DATA9" width="60" sortable="false" align="center"><fmt:message key="ui.label.lossMoney"/></th> 
+	                <%-- <th field="DATA9" width="60" sortable="false" align="center"><fmt:message key="ui.label.lossMoney"/></th> --%> 
 	                <th field="DATA10" width="80" sortable="false" align="center"><fmt:message key="ui.label.RegDate"/></th> 
 	                <th field="DATA12" width="110" sortable="false" align="center" formatter="ncrPop"><fmt:message key="ui.label.ncrPublish"/></th> 
 	                <th field="DATA13" width="60" sortable="false" align="center" hidden="true"><fmt:message key="ui.label.seq"/></th> 

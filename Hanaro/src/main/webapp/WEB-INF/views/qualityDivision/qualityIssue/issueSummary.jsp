@@ -112,15 +112,16 @@
 			   var textTable3 = "<tr>";
 			   var textTable4 = "<tr>";
 			   var textTable5 = "<tr>";
-			   var textTable6 = "<tr>";
-			   var textTable7 = "<tr>";
+			   //var textTable6 = "<tr>";
+			   //var textTable7 = "<tr>";
 			   textTable1+="<th colspan='2'>"+$("#searchType option:selected").text()+"</th>";
 			   textTable2+="<th colspan='2'><fmt:message key='chartYName.issueCount'/></th>";
 			   textTable3+="<th colspan='2'><fmt:message key='chartYName.issueAmount'/></th>";
 			   textTable4+="<th rowspan='2'>PPM</th><th><fmt:message key='ui.label.plan'/></th>";
 			   textTable5+="<th><fmt:message key='ui.label.actual'/></th>";
-			   textTable6+="<th rowspan='2'><fmt:message key='ui.label.money'/></th><th><fmt:message key='ui.label.plan'/></th>";
-			   textTable7+="<th><fmt:message key='ui.label.actual'/></th>";
+//금액삭제			   
+			  // textTable6+="<th rowspan='2'><fmt:message key='ui.label.money'/></th><th><fmt:message key='ui.label.plan'/></th>";
+			   //textTable7+="<th><fmt:message key='ui.label.actual'/></th>";
 			   var selectedPart = id;
 			   
 			   
@@ -132,8 +133,8 @@
 					textTable3+="<td>"+numeric(cell.DATA4)+"</td>";
 					textTable4+="<td>"+numeric(cell.DATA9)+"</td>";
 					textTable5+="<td>"+numeric(cell.DATA7)+"</td>";
-					textTable6+="<td>"+numeric(cell.DATA10)+"</td>";
-					textTable7+="<td>"+numeric(cell.DATA5)+"</td>";
+					//textTable6+="<td>"+numeric(cell.DATA10)+"</td>";
+					//textTable7+="<td>"+numeric(cell.DATA5)+"</td>";
 					category.push(cell.DATA2);
 					issueAmount.push({y:Number(cell.DATA4),year:cell.DATA1});
 					actualMoney.push({y:Number(cell.DATA5),year:cell.DATA1});
@@ -195,7 +196,8 @@
 				            }
 				         }
 				         
-				      }, { // Tertiary yAxis
+				      },
+				      /*{ // Tertiary yAxis
 				         gridLineWidth: 0,
 				         title: {
 				            text: '<fmt:message key="chartYName.claimMoney"/>',
@@ -212,7 +214,7 @@
 				            }
 				         },opposite: true
 				     
-				      }, {
+				      },*/{
 				         gridLineWidth: 0,
 				         title: {
 				            text: '<fmt:message key="chartYName.issueCount"/>',
@@ -236,9 +238,9 @@
  				               'PPM': 'ppm',
  				               '<fmt:message key="chartYName.issueAmount"/>': 'EA',
  				               '<fmt:message key="chartYName.issueCount"/>': '',
- 				               '<fmt:message key="chartYName.claimMoney"/>': '',
- 				               '<fmt:message key="chartYName.planPpm"/>' : 'ppm',
- 				              '<fmt:message key="chartYName.planMoney"/>' : ''
+ 				            //   '<fmt:message key="chartYName.claimMoney"/>': '',
+ 				               '<fmt:message key="chartYName.planPpm"/>' : 'ppm'
+ 				             // '<fmt:message key="chartYName.planMoney"/>' : ''
  				            }[this.series.name];
 				            
 				            return ''+
@@ -260,17 +262,19 @@
 				         yAxis: 1,				         
 				         data: actualPpm      
 				      
-				      }, {
+				      },
+				      /*{
 				         name: '<fmt:message key="chartYName.claimMoney"/>',
 				         type: 'column',
 				         color: '#50B432',
 				         yAxis: 2,
 				         data: actualMoney
-				      }, {
+				      },*/
+				      {
 				         name: '<fmt:message key="chartYName.issueCount"/>',
 				         color: '#ED561B',
 				         type: 'column',
-				         yAxis: 3,
+				         yAxis: 2,
 				         yearTag:'2088',
 				         data: issueCount
 				      }, {
@@ -284,13 +288,14 @@
 				         type: 'line',
 				         yAxis: 1,
 				         data: planPpm
-					  },{
+					  }
+					  /*,{
 				         name: '<fmt:message key="chartYName.planMoney"/>',
 				         color: '#9932CC',
 				         type: 'line',
 				         yAxis: 2,
 				         data: planMoney
-					  }]
+					  }*/]
 					  ,plotOptions:{
 			                series:{cursor:"pointer",point:{events:{click:function(event){
 			                  //조회항목 파악.			                  
@@ -346,10 +351,11 @@
 					textTable2+="</tr>";
 					textTable3+="</tr>";
 					textTable4+="</tr>";
-					textTable5+="</tr>";
-					textTable6+="</tr>";
-					textTable7+="</tr></table></div>";
-					$(panel).append(textTable1+textTable2+textTable3+textTable4+textTable5+textTable6+textTable7);
+					textTable5+="</tr></table></div>";
+					//textTable6+="</tr>";
+					//textTable7+="</tr></table></div>";
+					//$(panel).append(textTable1+textTable2+textTable3+textTable4+textTable5+textTable6+textTable7);
+					$(panel).append(textTable1+textTable2+textTable3+textTable4+textTable5);
 					$("body").css("cursor","default");
 								
 			});			

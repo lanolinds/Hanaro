@@ -67,6 +67,7 @@
 			<div href='<c:url value="/qualityDivision/qualityIssue/ncrManageList"/>'><fmt:message key="menu.qualityNcrManagement"/></div>
 			<div href='<c:url value="/qualityDivision/qualityIssue/ncrStatus"/>' ><fmt:message key="menu.qualityNcrStatus"/></div>
 			<div href='<c:url value="/qualityDivision/qualityIssue/issueSummary"/>' ><fmt:message key="menu.qualityIssueSummary"/></div>
+			<div href='<c:url value="/qualityDivision/qualityIssue/issueSummaryInoutData"/>' ><fmt:message key="ui.label.qualityInoutData"/></div>
 	</div>
 	</div>
 	<div style="white-space: nowrap;"><fmt:message key="menu.qualityClaimManage"/>      	

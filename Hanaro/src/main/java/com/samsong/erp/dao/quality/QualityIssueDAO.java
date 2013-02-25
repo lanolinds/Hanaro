@@ -1782,7 +1782,132 @@ public class QualityIssueDAO {
 			return list;
 	}
 	
+	public List<Map<String,Object>> getIssueSummaryInoutData(String stdYear,String stdMonth,Locale locale){
+		final List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+		SqlParameterSource params = new MapSqlParameterSource().addValue("stdYear",stdYear).addValue("stdMonth", stdMonth).addValue("locale",locale.getCountry());
+		
+		sp = new SimpleJdbcCall(jdbc).withFunctionName("QualityIssueDAO_getIssueSummaryInoutData").returningResultSet("issueInoutData",new RowMapper<Map<String,Object>>() {
 
+			@Override
+			public Map<String, Object> mapRow(ResultSet rs, int arg1)
+					throws SQLException {
+					Map<String,Object> m = new LinkedHashMap<String, Object>();
+					m.put("stdDt",rs.getString(1));
+					m.put("mIncome",rs.getString(2));
+					m.put("mOutgo",rs.getString(3));
+					m.put("pIncome",rs.getString(4));
+					m.put("pOutgo",rs.getString(5));
+					m.put("dayView",rs.getString(6));
+					list.add(m);
+				return null;
+			} 
+		});
+		sp.execute(params);
+		return list;
+	}
+	public String procIssueSummaryInoutData(final String[] p1, final String[] p2,final  String[] p3,final  String[] p4,final String[] p5, final Locale locale){
+	String q1 = "insert into qis_material_income values( ?,?,?);";
+	String q2 = "insert into qis_material_outgo values( ?,?,?);";
+	String q3 = "insert into qis_prod_income values( ?,?,?);";
+	String q4 = "insert into qis_prod_outgo values( ?,?,?);";
 	
-
+	String d1 = "delete from qis_material_income where locale = ? and std_dt = ?;";
+	String d2 = "delete from qis_material_outgo where locale = ? and std_dt = ?;";
+	String d3 = "delete from qis_prod_income where locale = ? and std_dt = ?;";
+	String d4 = "delete from qis_prod_outgo where locale = ? and std_dt = ?;";
+	jdbc.batchUpdate(d1,new BatchPreparedStatementSetter() {		
+		@Override
+		public void setValues(PreparedStatement ps, int i) throws SQLException {
+			ps.setString(1,locale.getCountry());
+			ps.setString(2, p1[i]);
+		}
+		@Override
+		public int getBatchSize() {
+			return p1.length;
+		}
+	});
+	
+	jdbc.batchUpdate(d2,new BatchPreparedStatementSetter() {		
+		@Override
+		public void setValues(PreparedStatement ps, int i) throws SQLException {
+			ps.setString(1,locale.getCountry());
+			ps.setString(2, p1[i]);
+		}
+		@Override
+		public int getBatchSize() {
+			return p1.length;
+		}
+	});
+	
+	
+	jdbc.batchUpdate(d3,new BatchPreparedStatementSetter() {		
+		@Override
+		public void setValues(PreparedStatement ps, int i) throws SQLException {
+			ps.setString(1,locale.getCountry());
+			ps.setString(2, p1[i]);
+		}
+		@Override
+		public int getBatchSize() {
+			return p1.length;
+		}
+	});
+	
+	
+	jdbc.batchUpdate(d4,new BatchPreparedStatementSetter() {		
+		@Override
+		public void setValues(PreparedStatement ps, int i) throws SQLException {
+			ps.setString(1,locale.getCountry());
+			ps.setString(2, p1[i]);
+		}
+		@Override
+		public int getBatchSize() {
+			return p1.length;
+		}
+	});
+	
+	jdbc.batchUpdate(q1,new BatchPreparedStatementSetter() {
+		@Override
+		public void setValues(PreparedStatement ps, int i) throws SQLException {
+			ps.setString(1,locale.getCountry());
+			ps.setString(2, p1[i]);
+			ps.setString(3 ,p2[i]);
+		}
+		@Override
+		public int getBatchSize() {return p2.length;}
+	});
+	
+	jdbc.batchUpdate(q2,new BatchPreparedStatementSetter() {
+		@Override
+		public void setValues(PreparedStatement ps, int i) throws SQLException {
+			ps.setString(1,locale.getCountry());
+			ps.setString(2, p1[i]);
+			ps.setString(3 ,p3[i]);
+		}
+		@Override
+		public int getBatchSize() {return p3.length;}
+	});
+	
+	jdbc.batchUpdate(q3,new BatchPreparedStatementSetter() {
+		@Override
+		public void setValues(PreparedStatement ps, int i) throws SQLException {
+			ps.setString(1,locale.getCountry());
+			ps.setString(2, p1[i]);
+			ps.setString(3 ,p4[i]);
+		}
+		@Override
+		public int getBatchSize() {return p4.length;}
+	});
+	
+	jdbc.batchUpdate(q4,new BatchPreparedStatementSetter() {
+		@Override
+		public void setValues(PreparedStatement ps, int i) throws SQLException {
+			ps.setString(1,locale.getCountry());
+			ps.setString(2, p1[i]);
+			ps.setString(3 ,p5[i]);
+		}
+		@Override
+		public int getBatchSize() {return p5.length;}
+	});
+	return "OK";
+	}
 }
