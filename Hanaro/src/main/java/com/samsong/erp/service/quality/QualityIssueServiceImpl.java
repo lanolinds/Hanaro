@@ -206,7 +206,8 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 		if(method.equals("abandon")){
 			claim = count*unitPrice*manageRates.get(origin)*0.9d;
 			if(origin.equals("CA")){
-				claim *=2000;  // 초기유동이면 개당 2000원 검사비용.
+				//claim *=2000;  // 초기유동이면 개당 2000원 검사비용.
+				claim+=(count*2000);
 			}
 			if(origin.startsWith("D")){
 				claim +=testCost;  // 출처가 시험실이면 검사비 추가
