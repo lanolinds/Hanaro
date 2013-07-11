@@ -151,7 +151,7 @@ public class ClaimManageServiceImpl implements ClaimManageService {
 								helper.setSubject("Hanaro System Claim ["+resultString+"]");
 								helper.setText(cnt0.toString(),true);
 								sender.send(messageCn);
-							} catch (MessagingException e) {
+							} catch (Exception e) {
 								logger.info("메일발송에러");
 							}
 						}
@@ -164,7 +164,7 @@ public class ClaimManageServiceImpl implements ClaimManageService {
 								helper.setSubject("Hanaro System Claim ["+resultString+"]");
 								helper.setText(cnt1.toString(),true);
 								sender.send(messageCn);
-							} catch (MessagingException e) {
+							} catch (Exception e) {
 								logger.info("메일발송에러");
 							}
 						}      			
@@ -330,7 +330,7 @@ public class ClaimManageServiceImpl implements ClaimManageService {
 						helper.setSubject("Hanaro System Claim ["+claimNo+"]");
 						helper.setText(cnt0.toString(),true);
 						sender.send(messageCn);
-					} catch (MessagingException e) {
+					} catch (Exception e) {
 						logger.info("메일발송에러");
 					}
 				}
@@ -343,7 +343,7 @@ public class ClaimManageServiceImpl implements ClaimManageService {
 						helper.setSubject("Hanaro System Claim ["+claimNo+"]");
 						helper.setText(cnt1.toString(),true);
 						sender.send(messageCn);
-					} catch (MessagingException e) {
+					} catch (Exception e) {
 						logger.info("메일발송에러");
 					}
 				}      			

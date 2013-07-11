@@ -127,7 +127,7 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 					helper.setSubject("Hanaro System Claim [Quality  Issue]");
 					helper.setText(content.toString(),true);
 					sender.send(messageCn);
-				} catch (MessagingException e) {
+				} catch (Exception e) {
 					logger.info("메일발송에러");
 				}
 			}
@@ -422,7 +422,7 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 						helper.setSubject("Hanaro System Claim [Quality NCR  Issue]");
 						helper.setText(content.toString(),true);
 						sender.send(messageCn);
-					} catch (MessagingException e) {
+					} catch (Exception e) {
 						logger.info("메일발송에러");
 					}
 					
@@ -735,7 +735,7 @@ public class QualityIssueServiceImpl implements QualityIssueService {
 						helper.setSubject("Hanaro System Claim [Quality NCR  Issue]");
 						helper.setText(content.toString(),true);
 						sender.send(messageCn);
-					} catch (MessagingException e) {
+					} catch (Exception e) {
 						logger.info("메일발송에러");
 					}
 					
